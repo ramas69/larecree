@@ -45,4 +45,26 @@ final class FormationRepositoryTest extends KernelTestCase
         self::assertSame('first', $result[0]->getSlug());
         self::assertSame('second', $result[1]->getSlug());
     }
+
+    public function testFindBySlugReturnsFormationWhenItExists(): void
+    {
+        $formation = (new Formation())
+            ->setSlug('formation-claude')
+            ->setTitle('Formation Claude')
+            ->setPriceCents(39700)
+            ->setPublished(true);
+
+        $this->em->persist($formation);
+        $this->em->flush();
+
+        $loaded = $this->repo->findBySlug('formation-claude');
+
+        self::assertNotNull($loaded);
+        self::assertSame('Formation Claude', $loaded->getTitle());
+    }
+
+    public function testFindBySlugReturnsNullWhenAbsent(): void
+    {
+        self::assertNull($this->repo->findBySlug('does-not-exist'));
+    }
 }

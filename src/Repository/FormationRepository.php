@@ -30,4 +30,9 @@ final class FormationRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    public function findBySlug(string $slug): ?Formation
+    {
+        return $this->findOneBy(['slug' => $slug]);
+    }
 }
