@@ -17,4 +17,17 @@ final class FormationRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Formation::class);
     }
+
+    /**
+     * @return Formation[]
+     */
+    public function findPublished(): array
+    {
+        return $this->createQueryBuilder('f')
+            ->where('f.published = true')
+            ->orderBy('f.displayOrder', 'ASC')
+            ->addOrderBy('f.title', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }
