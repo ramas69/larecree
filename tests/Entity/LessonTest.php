@@ -69,4 +69,12 @@ final class LessonTest extends TestCase
 
         self::assertSame('0 min 0 s', $lesson->getDurationFormatted());
     }
+
+    public function testGetResourcesReturnsEmptyCollectionOnConstruct(): void
+    {
+        $lesson = new Lesson();
+
+        self::assertCount(0, $lesson->getResources());
+        self::assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $lesson->getResources());
+    }
 }

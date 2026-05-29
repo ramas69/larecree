@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\LessonRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: LessonRepository::class)]
@@ -46,9 +48,17 @@ class Lesson
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    /**
+     * @var Collection<int, Resource>
+     */
+    #[ORM\OneToMany(targetEntity: Resource::class, mappedBy: 'lesson', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['displayOrder' => 'ASC'])]
+    private Collection $resources;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->resources = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -155,5 +165,32 @@ class Lesson
     public function markUpdated(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    /**
+     * @return Collection<int, Resource>
+     */
+    public function getResources(): Collection
+    {
+        return $this->resources;
+    }
+
+    public function addResource(Resource $resource): static
+    {
+        if (!$this->resources->contains($resource)) {
+            $this->resources->add($resource);
+            $resource->setLesson($this);
+        }
+
+        return $this;
+    }
+
+    public function removeResource(Resource $resource): static
+    {
+        if ($this->resources->removeElement($resource) && $resource->getLesson() === $this) {
+            $resource->setLesson(null);
+        }
+
+        return $this;
     }
 }
