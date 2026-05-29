@@ -84,4 +84,10 @@ final class EnrollmentTest extends TestCase
 
         self::assertSame(39700, $enrollment->getAmountCents());
     }
+
+    public function testGetProgressesReturnsEmptyCollectionOnConstruct(): void
+    {
+        $enrollment = new Enrollment();
+        self::assertCount(0, $enrollment->getProgresses());
+    }
 }
