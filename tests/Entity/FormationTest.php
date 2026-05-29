@@ -53,4 +53,12 @@ final class FormationTest extends TestCase
         self::assertCount(0, $formation->getModules());
         self::assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $formation->getModules());
     }
+
+    public function testGetEnrollmentsReturnsEmptyCollectionOnConstruct(): void
+    {
+        $formation = new Formation();
+
+        self::assertCount(0, $formation->getEnrollments());
+        self::assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $formation->getEnrollments());
+    }
 }
