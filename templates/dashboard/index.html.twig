@@ -24,37 +24,166 @@
 
             <nav class="app-nav" aria-label="Navigation">
                 <a href="{{ path('app_dashboard') }}">Mes formations</a>
-                {% if app.user.isAdmin %}<a href="#">Admin</a>{% endif %}
+                <a href="#">Catalogue</a>
+                <a href="#">Communauté</a>
+                {% if app.user.isAdmin %}<a href="#" style="color: var(--rose);">Admin</a>{% endif %}
             </nav>
 
-            <div class="app-user">
-                <span>Bonjour <strong>{{ app.user.firstName }}</strong></span>
-                <a href="{{ path('app_logout') }}">Déconnexion</a>
+            <div style="display: flex; align-items: center;">
+                <div class="app-user-menu">
+                    <span class="app-avatar" aria-hidden="true">{{ app.user.firstName|first }}</span>
+                    <span class="app-user-name">{{ app.user.firstName }}</span>
+                </div>
+                <a href="{{ path('app_logout') }}" class="app-logout">Déconnexion</a>
             </div>
         </div>
     </header>
 
     <main class="app-main">
-        <span class="eyebrow">— Dashboard</span>
-        <h1 style="font-family: 'Fraunces', serif; font-size: clamp(32px, 4vw, 48px); margin-bottom: 28px;">
-            Bienvenue, <em style="color: var(--rose); font-style: italic;">{{ app.user.firstName }}</em>.
-        </h1>
 
-        <div class="card-soft">
-            <span class="eyebrow">— Profil</span>
-            <p style="margin-bottom: 8px;"><strong>Prénom :</strong> {{ app.user.firstName }}</p>
-            <p style="margin-bottom: 8px;"><strong>Nom :</strong> {{ app.user.lastName }}</p>
-            <p style="margin-bottom: 8px;"><strong>Email :</strong> {{ app.user.email }}</p>
-            <p style="margin-bottom: 8px;"><strong>Rôles :</strong> {{ app.user.roles|join(', ') }}</p>
-            <p style="margin-bottom: 8px;"><strong>Vérifié :</strong> {{ app.user.isVerified ? 'Oui ✓' : 'Non' }}</p>
-            <p><strong>Inscrit le :</strong> {{ app.user.createdAt|date('d/m/Y H:i') }}</p>
-        </div>
+        <section class="dash-hero">
+            <span class="dash-hero-caveat">salut {{ app.user.firstName }}</span>
+            <h1 class="dash-hero-title">Bon <em>retour</em>.</h1>
+            <p class="dash-hero-sub">Reprends ton parcours là où tu l'as laissé, ou explore une nouvelle formation.</p>
+        </section>
 
-        <div class="card-soft">
-            <span class="eyebrow">— Mes formations</span>
-            <p style="color: var(--ink-soft);">Aucune formation pour l'instant.</p>
-            <p style="margin-top: 14px;"><a href="https://larecreetech.com" style="color: var(--rose); font-weight: 600;">Découvrir la Formation Claude →</a></p>
-        </div>
+        <section class="dash-stats">
+            <div class="dash-stat">
+                <span class="dash-stat-label">— Formations</span>
+                <div class="dash-stat-value">0</div>
+                <span class="dash-stat-hint">en cours</span>
+            </div>
+            <div class="dash-stat">
+                <span class="dash-stat-label">— Heures vidéo</span>
+                <div class="dash-stat-value">0h</div>
+                <span class="dash-stat-hint">accumulées</span>
+            </div>
+            <div class="dash-stat">
+                <span class="dash-stat-label">— Progression</span>
+                <div class="dash-stat-value">—</div>
+                <span class="dash-stat-hint">moyenne</span>
+            </div>
+            <div class="dash-stat">
+                <span class="dash-stat-label">— Certificats</span>
+                <div class="dash-stat-value">0</div>
+                <span class="dash-stat-hint">obtenus</span>
+            </div>
+        </section>
+
+        <section class="dash-section">
+            <div class="dash-section-head">
+                <h2 class="dash-section-title">Reprendre <em>où tu en étais</em></h2>
+                <a href="#" class="dash-section-action">Voir tout →</a>
+            </div>
+
+            <div class="dash-continue">
+                <div class="dash-continue-thumb" aria-hidden="true">
+                    <div class="dash-continue-thumb-play">▶</div>
+                    <span class="dash-continue-thumb-time">14:32</span>
+                </div>
+                <div class="dash-continue-body">
+                    <span class="dash-continue-eyebrow">★ Formation Claude · M03 · Leçon 04</span>
+                    <h3>Configurer un <em>Project</em> comme un·e pro</h3>
+                    <p class="dash-continue-meta">Tu en es à 6 min 47 s sur 14 min 32 s · 8 min restantes</p>
+
+                    <div class="dash-progress-bar">
+                        <div class="dash-progress-bar-fill" style="width: 47%;"></div>
+                    </div>
+                    <div class="dash-progress-meta">
+                        <span><strong>47 %</strong> de la leçon</span>
+                        <span>Vue il y a 2 jours</span>
+                    </div>
+
+                    <a href="#" class="dash-continue-cta">▶ Reprendre la leçon</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="dash-section">
+            <div class="dash-section-head">
+                <h2 class="dash-section-title">Ton <em>parcours</em></h2>
+                <a href="#" class="dash-section-action">Voir formation →</a>
+            </div>
+
+            <div class="dash-progress-map" aria-label="Carte de progression Formation Claude">
+                <div class="dash-progress-map-title">
+                    <span>— <strong>Formation Claude 2026</strong></span>
+                    <span><em>Progression : 28 %</em> · 2 modules validés sur 8</span>
+                </div>
+
+                <div class="map-track">
+                    <div class="map-node">
+                        <span class="map-marker is-done" title="Module 01 validé">✓</span>
+                        <span class="map-label">M01</span>
+                    </div>
+                    <div class="map-connector is-done"></div>
+
+                    <div class="map-node">
+                        <span class="map-marker is-done" title="Module 02 validé">✓</span>
+                        <span class="map-label">M02</span>
+                    </div>
+                    <div class="map-connector"></div>
+
+                    <div class="map-node">
+                        <span class="map-marker is-current" title="Module 03 en cours">03</span>
+                        <span class="map-label">M03</span>
+                        <span class="map-pct">47%</span>
+                    </div>
+                    <div class="map-connector"></div>
+
+                    <div class="map-node">
+                        <span class="map-marker">04</span>
+                        <span class="map-label">M04</span>
+                    </div>
+                    <div class="map-connector"></div>
+
+                    <div class="map-node">
+                        <span class="map-marker">05</span>
+                        <span class="map-label">M05</span>
+                    </div>
+                    <div class="map-connector"></div>
+
+                    <div class="map-node">
+                        <span class="map-marker">06</span>
+                        <span class="map-label">M06</span>
+                    </div>
+                    <div class="map-connector"></div>
+
+                    <div class="map-node">
+                        <span class="map-marker">07</span>
+                        <span class="map-label">M07</span>
+                    </div>
+                    <div class="map-connector"></div>
+
+                    <div class="map-node">
+                        <span class="map-marker is-finale" title="Module 08 — Finale">★</span>
+                        <span class="map-label">M08</span>
+                    </div>
+                </div>
+
+                <div class="dash-progress-map-foot">
+                    <span>Dernier module validé : <strong>M02 — Le prompt parfait</strong></span>
+                    <a href="#">→ Voir détail formation</a>
+                </div>
+            </div>
+        </section>
+
+        <section class="dash-section">
+            <div class="dash-section-head">
+                <h2 class="dash-section-title">Activité <em>récente</em></h2>
+            </div>
+
+            <div class="dash-activity">
+                <div class="dash-activity-item">
+                    <span class="dash-activity-dot" aria-hidden="true"></span>
+                    <div class="dash-activity-body">
+                        <strong>Compte créé</strong>
+                        <span>{{ app.user.createdAt|date('d/m/Y · H:i') }}</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
     </main>
 
     <footer class="app-footer">
