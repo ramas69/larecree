@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Entity;
 
 use App\Repository\FormationRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FormationRepository::class)]
@@ -53,9 +55,17 @@ class Formation
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    /**
+     * @var Collection<int, Module>
+     */
+    #[ORM\OneToMany(targetEntity: Module::class, mappedBy: 'formation', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['displayOrder' => 'ASC'])]
+    private Collection $modules;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->modules = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -195,5 +205,32 @@ class Formation
     public function markUpdated(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
+    }
+
+    /**
+     * @return Collection<int, Module>
+     */
+    public function getModules(): Collection
+    {
+        return $this->modules;
+    }
+
+    public function addModule(Module $module): static
+    {
+        if (!$this->modules->contains($module)) {
+            $this->modules->add($module);
+            $module->setFormation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeModule(Module $module): static
+    {
+        if ($this->modules->removeElement($module) && $module->getFormation() === $this) {
+            $module->setFormation(null);
+        }
+
+        return $this;
     }
 }

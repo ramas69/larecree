@@ -45,4 +45,12 @@ final class FormationTest extends TestCase
 
         self::assertSame('0,00 €', $formation->getPriceFormatted());
     }
+
+    public function testGetModulesReturnsEmptyCollectionOnConstruct(): void
+    {
+        $formation = new Formation();
+
+        self::assertCount(0, $formation->getModules());
+        self::assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $formation->getModules());
+    }
 }
