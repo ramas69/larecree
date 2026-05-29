@@ -46,4 +46,12 @@ final class ModuleTest extends TestCase
         self::assertNull($module->getFormation());
         self::assertCount(0, $formation->getModules());
     }
+
+    public function testGetLessonsReturnsEmptyCollectionOnConstruct(): void
+    {
+        $module = new \App\Entity\Module();
+
+        self::assertCount(0, $module->getLessons());
+        self::assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $module->getLessons());
+    }
 }

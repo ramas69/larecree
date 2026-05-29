@@ -4,25 +4,23 @@ declare(strict_types=1);
 
 namespace App\Entity;
 
-use App\Repository\ModuleRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\LessonRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ModuleRepository::class)]
-#[ORM\Table(name: 'module')]
-#[ORM\UniqueConstraint(name: 'UNIQ_module_formation_slug', columns: ['formation_id', 'slug'])]
+#[ORM\Entity(repositoryClass: LessonRepository::class)]
+#[ORM\Table(name: 'lesson')]
+#[ORM\UniqueConstraint(name: 'UNIQ_lesson_module_slug', columns: ['module_id', 'slug'])]
 #[ORM\HasLifecycleCallbacks]
-class Module
+class Lesson
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Formation::class, inversedBy: 'modules')]
+    #[ORM\ManyToOne(targetEntity: Module::class, inversedBy: 'lessons')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    private ?Formation $formation = null;
+    private ?Module $module = null;
 
     #[ORM\Column(length: 200)]
     private ?string $title = null;
@@ -30,8 +28,14 @@ class Module
     #[ORM\Column(length: 180)]
     private ?string $slug = null;
 
+    #[ORM\Column(length: 80)]
+    private ?string $vimeoVideoId = null;
+
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
+
+    #[ORM\Column]
+    private int $durationSeconds = 0;
 
     #[ORM\Column]
     private int $displayOrder = 0;
@@ -42,17 +46,9 @@ class Module
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    /**
-     * @var Collection<int, Lesson>
-     */
-    #[ORM\OneToMany(targetEntity: Lesson::class, mappedBy: 'module', cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[ORM\OrderBy(['displayOrder' => 'ASC'])]
-    private Collection $lessons;
-
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
-        $this->lessons = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -60,14 +56,14 @@ class Module
         return $this->id;
     }
 
-    public function getFormation(): ?Formation
+    public function getModule(): ?Module
     {
-        return $this->formation;
+        return $this->module;
     }
 
-    public function setFormation(?Formation $formation): static
+    public function setModule(?Module $module): static
     {
-        $this->formation = $formation;
+        $this->module = $module;
         return $this;
     }
 
@@ -93,6 +89,17 @@ class Module
         return $this;
     }
 
+    public function getVimeoVideoId(): ?string
+    {
+        return $this->vimeoVideoId;
+    }
+
+    public function setVimeoVideoId(string $vimeoVideoId): static
+    {
+        $this->vimeoVideoId = $vimeoVideoId;
+        return $this;
+    }
+
     public function getDescription(): ?string
     {
         return $this->description;
@@ -102,6 +109,25 @@ class Module
     {
         $this->description = $description;
         return $this;
+    }
+
+    public function getDurationSeconds(): int
+    {
+        return $this->durationSeconds;
+    }
+
+    public function setDurationSeconds(int $durationSeconds): static
+    {
+        $this->durationSeconds = $durationSeconds;
+        return $this;
+    }
+
+    public function getDurationFormatted(): string
+    {
+        $minutes = intdiv($this->durationSeconds, 60);
+        $seconds = $this->durationSeconds % 60;
+
+        return sprintf('%d min %d s', $minutes, $seconds);
     }
 
     public function getDisplayOrder(): int
@@ -129,32 +155,5 @@ class Module
     public function markUpdated(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
-    }
-
-    /**
-     * @return Collection<int, Lesson>
-     */
-    public function getLessons(): Collection
-    {
-        return $this->lessons;
-    }
-
-    public function addLesson(Lesson $lesson): static
-    {
-        if (!$this->lessons->contains($lesson)) {
-            $this->lessons->add($lesson);
-            $lesson->setModule($this);
-        }
-
-        return $this;
-    }
-
-    public function removeLesson(Lesson $lesson): static
-    {
-        if ($this->lessons->removeElement($lesson) && $lesson->getModule() === $this) {
-            $lesson->setModule(null);
-        }
-
-        return $this;
     }
 }
