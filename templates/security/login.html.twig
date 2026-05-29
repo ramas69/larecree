@@ -1,0 +1,85 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion — La Récrée Tech{% endblock %}
+
+{% block body %}
+<div class="auth-page">
+
+    <header class="auth-header">
+        <a href="https://larecreetech.com" class="auth-brand" aria-label="La Récrée Tech">
+            <svg class="auth-brand-svg" viewBox="0 0 280 280" aria-hidden="true">
+                <g transform="translate(20, 20)">
+                    <path d="M 120 0 A 100 100 0 0 1 207 50 L 190 60 A 80 80 0 0 0 120 20 Z" fill="#E8587A"/>
+                    <path d="M 207 50 A 100 100 0 0 1 207 150 L 190 140 A 80 80 0 0 0 190 60 Z" fill="#E8587A"/>
+                    <path d="M 207 150 A 100 100 0 0 1 120 200 L 120 180 A 80 80 0 0 0 190 140 Z" fill="none" stroke="#E8587A" stroke-width="3" opacity="0.4"/>
+                    <path d="M 120 200 A 100 100 0 0 1 33 150 L 50 140 A 80 80 0 0 0 120 180 Z" fill="none" stroke="#E8587A" stroke-width="3" opacity="0.4"/>
+                    <path d="M 33 150 A 100 100 0 0 1 33 50 L 50 60 A 80 80 0 0 0 50 140 Z" fill="none" stroke="#E8587A" stroke-width="3" opacity="0.4"/>
+                    <path d="M 33 50 A 100 100 0 0 1 120 0 L 120 20 A 80 80 0 0 0 50 60 Z" fill="none" stroke="#E8587A" stroke-width="3" opacity="0.4"/>
+                    <text x="120" y="118" font-family="Fraunces, Georgia, serif" font-size="36" font-weight="500" font-style="italic" fill="#E8587A" text-anchor="middle" letter-spacing="-1.5">récrée</text>
+                </g>
+            </svg>
+            <span>la <em>récrée</em> tech.</span>
+        </a>
+        <a href="https://larecreetech.com" class="auth-header-link">← Retour au site</a>
+    </header>
+
+    <main class="auth-main">
+        <div class="auth-card">
+            <span class="auth-eyebrow">— Connexion</span>
+            <h1 class="auth-title">Bon <em>retour</em>.</h1>
+            <p class="auth-sub">Reprends ton parcours là où tu l'as laissé.</p>
+
+            {% if error %}
+                <div class="auth-alert">
+                    {{ error.messageKey|trans(error.messageData, 'security') }}
+                </div>
+            {% endif %}
+
+            <form method="post" novalidate>
+                <div class="auth-field">
+                    <label for="inputEmail">Email</label>
+                    <input type="email"
+                           id="inputEmail"
+                           name="email"
+                           value="{{ last_username }}"
+                           autocomplete="email"
+                           required
+                           autofocus
+                           placeholder="toi@exemple.com">
+                </div>
+
+                <div class="auth-field">
+                    <label for="inputPassword">Mot de passe</label>
+                    <input type="password"
+                           id="inputPassword"
+                           name="password"
+                           autocomplete="current-password"
+                           required
+                           placeholder="••••••••">
+                </div>
+
+                <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+                <div class="auth-row-between">
+                    <label>
+                        <input type="checkbox" name="_remember_me" checked>
+                        Se souvenir de moi
+                    </label>
+                    <a href="#">Mot de passe oublié ?</a>
+                </div>
+
+                <button type="submit" class="auth-submit">Me connecter →</button>
+            </form>
+
+            <p class="auth-footer-link">
+                Pas encore inscrit·e ? <a href="https://larecreetech.com">Voir la formation →</a>
+            </p>
+        </div>
+    </main>
+
+    <footer class="auth-foot">
+        © 2026 La Récrée Tech · Conçu et construit avec Claude
+    </footer>
+
+</div>
+{% endblock %}

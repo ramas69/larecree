@@ -1,0 +1,358 @@
+/* =============================================================
+   La Récrée Tech — Plateforme app · Design system
+   ============================================================= */
+
+:root {
+  --rose: #C8395E;
+  --rose-light: #E8587A;
+  --rose-deep: #A82248;
+  --rose-pale: #F0D6D6;
+  --ink: #14110D;
+  --ink-soft: #4A4540;
+  --cream: #FCFAF5;
+  --cream-warm: #F5EEDB;
+  --tableau: #1F3025;
+  --tableau-light: #2D4438;
+  --line: rgba(20, 17, 13, 0.10);
+  --line-strong: rgba(20, 17, 13, 0.18);
+  --grid: rgba(20, 17, 13, 0.05);
+  --grid-dark: rgba(252, 250, 245, 0.08);
+  --shadow-soft: 0 8px 24px rgba(20, 17, 13, 0.06);
+  --shadow-rose: 0 8px 24px rgba(200, 57, 94, 0.25);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; }
+body {
+  font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 16px;
+  line-height: 1.55;
+  min-height: 100vh;
+}
+a { color: var(--rose); text-decoration: none; }
+a:hover { color: var(--rose-deep); }
+button { font-family: inherit; cursor: pointer; }
+input, textarea, select { font-family: inherit; }
+
+h1, h2, h3, h4 {
+  font-family: 'Fraunces', Georgia, serif;
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  color: var(--ink);
+}
+
+/* =============================================================
+   Auth layout (login · register · reset)
+   ============================================================= */
+
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--tableau);
+  background-image:
+    linear-gradient(var(--grid-dark) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-dark) 1px, transparent 1px);
+  background-size: 30px 30px;
+  color: var(--cream);
+}
+
+.auth-header {
+  padding: 28px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--cream);
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  text-decoration: none;
+}
+.auth-brand em { color: var(--rose-light); font-style: italic; }
+.auth-brand-svg { width: 44px; height: 44px; }
+.auth-header-link {
+  font-family: 'DM Mono', Menlo, monospace;
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(252, 250, 245, 0.65);
+  text-decoration: none;
+}
+.auth-header-link:hover { color: var(--rose-light); }
+
+.auth-main {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px 60px;
+}
+
+.auth-card {
+  background: var(--cream);
+  border-radius: 16px;
+  padding: clamp(36px, 5vw, 56px) clamp(28px, 4vw, 48px);
+  max-width: 440px;
+  width: 100%;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(240, 214, 214, 0.4);
+}
+
+.auth-eyebrow {
+  display: block;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rose);
+  margin-bottom: 14px;
+}
+
+.auth-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(28px, 4vw, 38px);
+  font-weight: 400;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  margin-bottom: 12px;
+}
+.auth-title em { font-style: italic; color: var(--rose); }
+
+.auth-sub {
+  color: var(--ink-soft);
+  font-size: 15px;
+  line-height: 1.55;
+  margin-bottom: 32px;
+}
+
+.auth-field {
+  margin-bottom: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.auth-field label {
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.auth-field input {
+  width: 100%;
+  font-family: 'Manrope', sans-serif;
+  font-size: 16px;
+  padding: 13px 16px;
+  background: #fff;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  color: var(--ink);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.auth-field input:focus {
+  outline: none;
+  border-color: var(--rose);
+  box-shadow: 0 0 0 3px rgba(200, 57, 94, 0.12);
+}
+.auth-field input::placeholder {
+  color: var(--ink-soft);
+  opacity: 0.55;
+}
+
+.auth-row-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 18px 0 24px;
+  font-size: 13.5px;
+  color: var(--ink-soft);
+}
+.auth-row-between label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.auth-row-between input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--rose);
+  cursor: pointer;
+}
+.auth-row-between a:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.auth-submit {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px;
+  background: var(--rose);
+  color: #fff;
+  border: 1px solid var(--rose);
+  border-radius: 12px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.auth-submit:hover {
+  background: var(--rose-deep);
+  border-color: var(--rose-deep);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-rose);
+}
+
+.auth-alert {
+  background: var(--rose-pale);
+  border: 1px solid rgba(200, 57, 94, 0.35);
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--rose-deep);
+}
+
+.auth-footer-link {
+  margin-top: 28px;
+  text-align: center;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+.auth-footer-link a {
+  color: var(--rose);
+  font-weight: 600;
+}
+
+.auth-foot {
+  padding: 20px 32px;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: rgba(252, 250, 245, 0.45);
+}
+
+/* =============================================================
+   App layout (dashboard authenticated pages)
+   ============================================================= */
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--cream);
+}
+
+.app-header {
+  background: rgba(252, 250, 245, 0.92);
+  backdrop-filter: saturate(140%) blur(14px);
+  border-bottom: 1px solid var(--line);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.app-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 32px;
+  max-width: 1280px;
+  margin: 0 auto;
+}
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--ink);
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  text-decoration: none;
+}
+.app-brand em { color: var(--rose); font-style: italic; }
+.app-brand .dot { color: var(--rose); }
+.app-brand-svg { width: 40px; height: 40px; }
+
+.app-nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 14px;
+}
+.app-nav a {
+  color: var(--ink-soft);
+  font-weight: 500;
+}
+.app-nav a:hover { color: var(--rose); }
+
+.app-user {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ink-soft);
+}
+.app-user strong { color: var(--ink); }
+
+.app-main {
+  flex: 1;
+  max-width: 1280px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 48px 32px;
+}
+
+.app-footer {
+  border-top: 1px solid var(--line);
+  padding: 24px 32px;
+  text-align: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+}
+
+/* Dashboard quick utilities */
+.card-soft {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 28px;
+  margin-bottom: 18px;
+}
+.eyebrow {
+  display: inline-block;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--rose);
+  margin-bottom: 14px;
+}
+
+::selection { background: var(--rose); color: #fff; }
+:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
