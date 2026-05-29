@@ -62,10 +62,18 @@ class Formation
     #[ORM\OrderBy(['displayOrder' => 'ASC'])]
     private Collection $modules;
 
+    /**
+     * @var Collection<int, Enrollment>
+     */
+    #[ORM\OneToMany(targetEntity: Enrollment::class, mappedBy: 'formation', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[ORM\OrderBy(['createdAt' => 'DESC'])]
+    private Collection $enrollments;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->modules = new ArrayCollection();
+        $this->enrollments = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -229,6 +237,33 @@ class Formation
     {
         if ($this->modules->removeElement($module) && $module->getFormation() === $this) {
             $module->setFormation(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Enrollment>
+     */
+    public function getEnrollments(): Collection
+    {
+        return $this->enrollments;
+    }
+
+    public function addEnrollment(Enrollment $enrollment): static
+    {
+        if (!$this->enrollments->contains($enrollment)) {
+            $this->enrollments->add($enrollment);
+            $enrollment->setFormation($this);
+        }
+
+        return $this;
+    }
+
+    public function removeEnrollment(Enrollment $enrollment): static
+    {
+        if ($this->enrollments->removeElement($enrollment) && $enrollment->getFormation() === $this) {
+            $enrollment->setFormation(null);
         }
 
         return $this;
