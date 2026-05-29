@@ -30,4 +30,19 @@ final class FormationTest extends TestCase
         self::assertSame('Formation Claude 2026', $formation->getTitle());
         self::assertSame('La formation complète', $formation->getSubtitle());
     }
+
+    public function testGetPriceFormattedRendersEuroFromCents(): void
+    {
+        $formation = new Formation();
+        $formation->setPriceCents(39700);
+
+        self::assertSame('397,00 €', $formation->getPriceFormatted());
+    }
+
+    public function testGetPriceFormattedHandlesZero(): void
+    {
+        $formation = new Formation();
+
+        self::assertSame('0,00 €', $formation->getPriceFormatted());
+    }
 }

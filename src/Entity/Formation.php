@@ -118,6 +118,14 @@ class Formation
         return $this;
     }
 
+    public function getPriceFormatted(): string
+    {
+        $amount = $this->priceCents / 100;
+        $formatted = number_format($amount, 2, ',', ' ');
+
+        return $formatted.' '.($this->currency === 'EUR' ? '€' : $this->currency);
+    }
+
     public function getCurrency(): string
     {
         return $this->currency;
