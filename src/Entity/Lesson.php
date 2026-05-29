@@ -55,10 +55,17 @@ class Lesson
     #[ORM\OrderBy(['displayOrder' => 'ASC'])]
     private Collection $resources;
 
+    /**
+     * @var Collection<int, LessonProgress>
+     */
+    #[ORM\OneToMany(targetEntity: LessonProgress::class, mappedBy: 'lesson', cascade: ['persist', 'remove'], orphanRemoval: true)]
+    private Collection $progresses;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
         $this->resources = new ArrayCollection();
+        $this->progresses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -189,6 +196,33 @@ class Lesson
     {
         if ($this->resources->removeElement($resource) && $resource->getLesson() === $this) {
             $resource->setLesson(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, LessonProgress>
+     */
+    public function getProgresses(): Collection
+    {
+        return $this->progresses;
+    }
+
+    public function addProgress(LessonProgress $progress): static
+    {
+        if (!$this->progresses->contains($progress)) {
+            $this->progresses->add($progress);
+            $progress->setLesson($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProgress(LessonProgress $progress): static
+    {
+        if ($this->progresses->removeElement($progress) && $progress->getLesson() === $this) {
+            $progress->setLesson(null);
         }
 
         return $this;

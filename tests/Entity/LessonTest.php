@@ -77,4 +77,11 @@ final class LessonTest extends TestCase
         self::assertCount(0, $lesson->getResources());
         self::assertInstanceOf(\Doctrine\Common\Collections\Collection::class, $lesson->getResources());
     }
+
+    public function testGetProgressesReturnsEmptyCollectionOnConstruct(): void
+    {
+        $lesson = new Lesson();
+
+        self::assertCount(0, $lesson->getProgresses());
+    }
 }
