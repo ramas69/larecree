@@ -44,7 +44,7 @@ final class StripeCheckoutService
      * Crée une Stripe Checkout Session pour la formation donnée.
      * Persiste un Payment en pending pour audit.
      */
-    public function createSession(Formation $formation): StripeSession
+    public function createSession(Formation $formation, string $plan = 'once'): StripeSession
     {
         // Stripe needs LITERAL "{CHECKOUT_SESSION_ID}" in the URL; UrlGenerator
         // would URL-encode the braces, so build it manually.
@@ -52,7 +52,7 @@ final class StripeCheckoutService
             .'?session_id={CHECKOUT_SESSION_ID}';
         $cancelUrl = $this->urlGenerator->generate('app_checkout_cancel', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $session = $this->client()->checkout->sessions->create([
+        $params = [
             'mode'                 => 'payment',
             'success_url'          => $successUrl,
             'cancel_url'           => $cancelUrl,
@@ -62,6 +62,7 @@ final class StripeCheckoutService
             'metadata' => [
                 'formation_slug' => $formation->getSlug(),
                 'formation_id'   => (string) $formation->getId(),
+                'plan'           => $plan,
             ],
             'line_items' => [[
                 'quantity'   => 1,
@@ -74,7 +75,16 @@ final class StripeCheckoutService
                     ],
                 ],
             ]],
-        ]);
+        ];
+
+        if ($plan === '3x') {
+            // Paiement en 3 fois via Klarna (à activer dans Stripe Dashboard → Settings → Payment methods).
+            // Klarna gère la division en 3 mensualités côté user, Stripe te paie le total moins la commission.
+            $params['payment_method_types'] = ['card', 'klarna'];
+            $params['payment_method_options']['klarna']['preferred_locale'] = 'fr-FR';
+        }
+
+        $session = $this->client()->checkout->sessions->create($params);
 
         $payment = (new Payment())
             ->setFormation($formation)
