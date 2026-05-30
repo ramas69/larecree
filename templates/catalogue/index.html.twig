@@ -36,22 +36,17 @@
             <div class="cat-grid">
                 {% for card in cards %}
                     {% set f = card.formation %}
-                    {% set cover = f.slug == 'claude-2026' ? '/images/modules/module-01-ouverture.png' : null %}
                     <article class="cat-card {{ card.enrolled ? 'is-enrolled' : '' }} {{ card.vipGranted ? 'is-vip' : '' }}">
 
                         <a href="{{ path('app_formation_show', { slug: f.slug }) }}" class="cat-card-cover-link" aria-label="Voir {{ f.title }}">
                             <div class="cat-card-cover">
-                                {% if cover %}
-                                    <img src="{{ cover }}" alt="" loading="lazy">
-                                {% else %}
-                                    <div class="cat-card-cover-fallback">
-                                        <span class="cat-card-cover-grid" aria-hidden="true"></span>
-                                        <span class="cat-card-cover-eyebrow">★ La Récré Tech · Formation</span>
-                                        <span class="cat-card-cover-num">{{ '%02d'|format(loop.index) }}</span>
-                                        <span class="cat-card-cover-title">{{ f.title }}</span>
-                                        {% if f.subtitle %}<span class="cat-card-cover-sub">{{ f.subtitle }}</span>{% endif %}
-                                    </div>
-                                {% endif %}
+                                <div class="cat-card-cover-fallback">
+                                    <span class="cat-card-cover-grid" aria-hidden="true"></span>
+                                    <span class="cat-card-cover-eyebrow">★ La Récré Tech · Formation</span>
+                                    <span class="cat-card-cover-num">{{ '%02d'|format(loop.index) }}</span>
+                                    <span class="cat-card-cover-title">{{ f.title }}</span>
+                                    {% if f.subtitle %}<span class="cat-card-cover-sub">{{ f.subtitle }}</span>{% endif %}
+                                </div>
                                 <div class="cat-card-cover-overlay" aria-hidden="true"></div>
                                 {% if card.enrolled %}
                                     <span class="cat-card-badge {{ card.vipGranted ? 'is-vip' : '' }}">{{ card.vipGranted ? '★ VIP' : '✓ Inscrit·e' }}</span>
