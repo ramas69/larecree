@@ -29,6 +29,10 @@
             <h1 class="auth-title">Bon <em>retour</em>.</h1>
             <p class="auth-sub">Reprends ton parcours là où tu l'as laissé.</p>
 
+            {% for msg in app.flashes('success') %}
+                <div class="auth-success">{{ msg }}</div>
+            {% endfor %}
+
             {% if error %}
                 <div class="auth-alert">
                     {{ error.messageKey|trans(error.messageData, 'security') }}
@@ -65,7 +69,7 @@
                         <input type="checkbox" name="_remember_me" checked>
                         Se souvenir de moi
                     </label>
-                    <a href="#">Mot de passe oublié ?</a>
+                    <a href="{{ path('app_reset_password_request') }}">Mot de passe oublié ?</a>
                 </div>
 
                 <button type="submit" class="auth-submit">Me connecter →</button>

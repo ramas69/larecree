@@ -218,6 +218,41 @@ h1, h2, h3, h4 {
   transform: translateY(-1px);
   box-shadow: var(--shadow-rose);
 }
+.auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 16px;
+  background: var(--rose);
+  color: #fff;
+  border: 1px solid var(--rose);
+  border-radius: 12px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.2s;
+  margin-top: 8px;
+}
+.auth-btn:hover {
+  background: var(--rose-deep);
+  border-color: var(--rose-deep);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-rose);
+  color: #fff;
+}
+.auth-success {
+  background: rgba(200, 57, 94, 0.08);
+  border-left: 4px solid var(--rose);
+  border-radius: 6px;
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  font-size: 14px;
+  color: var(--ink);
+}
 
 .auth-alert {
   background: var(--rose-pale);
