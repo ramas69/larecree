@@ -60,11 +60,13 @@ final class StudentJourneyTest extends WebTestCase
         $client->request('GET', '/formations');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('.dash-hero-title', 'prochaine');
+        self::assertSelectorTextContains('.cat-hero-title', 'prochaine');
         // 2 formations seedées, toutes 2 catalogued
-        self::assertGreaterThanOrEqual(2, $client->getCrawler()->filter('.catalogue-card')->count());
-        // Rama est inscrit aux 2 → 2 badges "inscrit"
-        self::assertGreaterThanOrEqual(2, $client->getCrawler()->filter('.catalogue-card.is-enrolled')->count());
+        self::assertGreaterThanOrEqual(2, $client->getCrawler()->filter('.cat-card')->count());
+        // Rama est inscrit aux 2 → 2 cards marquées
+        self::assertGreaterThanOrEqual(2, $client->getCrawler()->filter('.cat-card.is-enrolled')->count());
+        // Hero stats présentes
+        self::assertSelectorExists('.cat-hero-stats');
     }
 
     public function testFormationShowDisplaysProgrammeAndDoneMarkers(): void

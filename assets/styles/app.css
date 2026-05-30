@@ -868,23 +868,395 @@ h1, h2, h3, h4 {
   border-radius: 4px;
 }
 
-/* CATALOGUE */
-.catalogue-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.4rem; }
-.catalogue-card { background: #fff; border: 1px solid #efe9df; border-radius: 14px; overflow: hidden; display: flex; flex-direction: column; transition: transform .15s ease, box-shadow .15s ease; }
-.catalogue-card:hover { transform: translateY(-2px); box-shadow: 0 12px 32px -16px rgba(31, 48, 37, 0.18); }
-.catalogue-card.is-enrolled { border-color: var(--rose); }
-.catalogue-card-cover { position: relative; aspect-ratio: 16 / 9; background: linear-gradient(135deg, #1F3025 0%, #2c4534 100%); color: #FCFAF5; display: flex; align-items: center; justify-content: center; }
-.catalogue-card-cover-mark { font-family: 'Fraunces', serif; font-style: italic; font-size: 4rem; font-weight: 500; color: var(--rose); opacity: 0.65; }
-.catalogue-card-cover-img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block; }
-.catalogue-card-badge { position: absolute; top: 0.8rem; right: 0.8rem; background: var(--rose); color: #fff; font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.08em; padding: 0.3rem 0.6rem; border-radius: 99px; text-transform: uppercase; }
-.catalogue-card-body { padding: 1.2rem 1.2rem 1.4rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
-.catalogue-card-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: 0.1em; color: var(--ink-soft); text-transform: uppercase; }
-.catalogue-card-title { font-family: 'Fraunces', serif; font-size: 1.35rem; font-weight: 500; margin: 0; color: var(--ink); }
-.catalogue-card-sub { font-size: 0.9rem; color: var(--ink-soft); margin: 0; }
-.catalogue-card-meta { display: flex; justify-content: space-between; margin-top: 0.6rem; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.05em; color: var(--ink-soft); }
-.catalogue-card-price { color: var(--ink); font-weight: 600; }
-.catalogue-card-cta { margin-top: 0.8rem; display: inline-block; padding: 0.7rem 1rem; background: var(--rose); color: #fff; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 0.9rem; text-align: center; transition: background .15s ease; }
-.catalogue-card-cta:hover { background: #B22F50; }
+/* ============================================
+   CATALOGUE — Récrée Tech DA
+   ============================================ */
+
+/* HERO — tableau-noir billboard */
+.cat-hero {
+  position: relative;
+  margin: 0 0 2.5rem;
+  padding: 3.5rem 2rem 3rem;
+  background: #1F3025;
+  color: #FCFAF5;
+  border-radius: 20px;
+  overflow: hidden;
+  isolation: isolate;
+}
+.cat-hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(252, 250, 245, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(252, 250, 245, 0.05) 1px, transparent 1px);
+  background-size: 60px 60px;
+  background-position: -1px -1px;
+  z-index: -1;
+}
+.cat-hero::before,
+.cat-hero::after {
+  content: '';
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(252, 250, 245, 0.4);
+  z-index: 0;
+}
+.cat-hero::before { top: 1rem; left: 1rem; border-right: 0; border-bottom: 0; }
+.cat-hero::after { bottom: 1rem; right: 1rem; border-left: 0; border-top: 0; }
+.cat-hero-inner { position: relative; max-width: 760px; }
+.cat-hero-caveat {
+  font-family: 'Caveat', cursive;
+  font-size: 2rem;
+  color: var(--rose);
+  display: inline-block;
+  transform: rotate(-2deg);
+  margin-bottom: 0.6rem;
+}
+.cat-hero-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(2.4rem, 5vw, 4rem);
+  font-weight: 500;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 0 0 1rem;
+  color: #FCFAF5;
+}
+.cat-hero-title em {
+  font-style: italic;
+  color: var(--rose);
+}
+.cat-hero-sub {
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  color: rgba(252, 250, 245, 0.78);
+  margin: 0 0 1.8rem;
+  max-width: 560px;
+}
+.cat-hero-stats {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2.5rem;
+}
+.cat-hero-stats li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cat-hero-stats strong {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 2.2rem;
+  font-weight: 500;
+  color: #FCFAF5;
+  line-height: 1;
+}
+.cat-hero-stats li.is-mine strong { color: var(--rose); }
+.cat-hero-stats span {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: rgba(252, 250, 245, 0.55);
+  text-transform: uppercase;
+}
+
+/* SECTION HEAD */
+.cat-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+.cat-section-title {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  font-weight: 500;
+  margin: 0;
+  color: var(--ink);
+}
+.cat-section-title em {
+  font-style: italic;
+  color: var(--rose);
+}
+.cat-section-hint {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+
+/* GRID */
+.cat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1.8rem;
+}
+
+/* CARD */
+.cat-card {
+  background: #fff;
+  border: 1px solid #efe9df;
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+}
+.cat-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px -22px rgba(31, 48, 37, 0.28);
+  border-color: rgba(200, 57, 94, 0.35);
+}
+.cat-card.is-enrolled { border-color: rgba(200, 57, 94, 0.55); }
+.cat-card.is-vip { border-color: rgba(200, 57, 94, 0.85); box-shadow: 0 0 0 2px rgba(200, 57, 94, 0.08) inset; }
+
+/* CARD COVER */
+.cat-card-cover-link { display: block; text-decoration: none; }
+.cat-card-cover {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  background: #1F3025;
+  overflow: hidden;
+}
+.cat-card-cover img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .4s ease;
+}
+.cat-card:hover .cat-card-cover img { transform: scale(1.04); }
+.cat-card-cover-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(31, 48, 37, 0) 55%, rgba(31, 48, 37, 0.5) 100%);
+  pointer-events: none;
+}
+
+/* CARD COVER FALLBACK (formation sans image) */
+.cat-card-cover-fallback {
+  position: absolute;
+  inset: 0;
+  padding: 1.4rem;
+  color: #FCFAF5;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  isolation: isolate;
+}
+.cat-card-cover-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(252, 250, 245, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(252, 250, 245, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: -1;
+}
+.cat-card-cover-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--rose);
+  text-transform: uppercase;
+}
+.cat-card-cover-num {
+  align-self: center;
+  font-family: 'Fraunces', serif;
+  font-size: 5rem;
+  font-weight: 400;
+  line-height: 1;
+  color: #FCFAF5;
+}
+.cat-card-cover-title {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: var(--rose);
+  line-height: 1.1;
+}
+.cat-card-cover-sub {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 0.8rem;
+  color: rgba(252, 250, 245, 0.7);
+  margin-top: 0.3rem;
+}
+
+/* CARD BADGE */
+.cat-card-badge {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: var(--rose);
+  color: #fff;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  padding: 0.4rem 0.7rem;
+  border-radius: 99px;
+  text-transform: uppercase;
+  z-index: 2;
+  box-shadow: 0 4px 12px -4px rgba(200, 57, 94, 0.5);
+}
+.cat-card-badge.is-vip {
+  background: #1F3025;
+  color: var(--rose);
+  border: 1px solid var(--rose);
+  box-shadow: 0 4px 12px -4px rgba(31, 48, 37, 0.5);
+}
+
+/* CARD BODY */
+.cat-card-body {
+  padding: 1.4rem 1.4rem 1.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  flex: 1;
+}
+.cat-card-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+.cat-card-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+.cat-card-title a {
+  color: var(--ink);
+  text-decoration: none;
+  background-image: linear-gradient(var(--rose), var(--rose));
+  background-size: 0 2px;
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  transition: background-size .25s ease;
+}
+.cat-card-title a:hover {
+  color: var(--rose);
+  background-size: 100% 2px;
+}
+.cat-card-sub {
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: var(--ink-soft);
+  margin: 0;
+}
+
+/* CARD PROGRESS */
+.cat-card-progress {
+  margin-top: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.cat-card-progress-bar {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  border: 0;
+  border-radius: 99px;
+  background: rgba(31, 48, 37, 0.08);
+  overflow: hidden;
+}
+.cat-card-progress-bar::-webkit-progress-bar {
+  background: rgba(31, 48, 37, 0.08);
+  border-radius: 99px;
+}
+.cat-card-progress-bar::-webkit-progress-value {
+  background: linear-gradient(90deg, var(--rose), #E8587A);
+  border-radius: 99px;
+  transition: width .25s ease;
+}
+.cat-card-progress-bar::-moz-progress-bar {
+  background: linear-gradient(90deg, var(--rose), #E8587A);
+  border-radius: 99px;
+}
+.cat-card-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.05em;
+  color: var(--ink-soft);
+}
+.cat-card-progress-meta strong {
+  color: var(--rose);
+  font-weight: 600;
+}
+
+/* CARD PRICE */
+.cat-card-price-row {
+  margin-top: 0.6rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.8rem 1rem;
+  background: var(--cream, #FCFAF5);
+  border-radius: 10px;
+}
+.cat-card-price-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+.cat-card-price {
+  font-family: 'Fraunces', serif;
+  font-style: italic;
+  font-size: 1.3rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+/* CARD CTA */
+.cat-card-cta {
+  margin-top: 1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.9rem 1.2rem;
+  background: var(--ink, #1F3025);
+  color: #FCFAF5;
+  border-radius: 10px;
+  text-decoration: none;
+  font-family: 'Manrope', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  text-align: center;
+  transition: background .15s ease, transform .15s ease;
+}
+.cat-card-cta:hover {
+  background: var(--rose);
+  transform: translateY(-1px);
+}
+.cat-card-cta.is-resume {
+  background: var(--rose);
+}
+.cat-card-cta.is-resume:hover {
+  background: #B22F50;
+}
 
 /* PROGRAMME FORMATION */
 .formation-programme { display: flex; flex-direction: column; gap: 1.2rem; }
