@@ -115,11 +115,11 @@ final class StudentJourneyTest extends WebTestCase
         $formation = $em->getRepository(Formation::class)->findOneBy(['slug' => 'claude-2026']);
         self::assertNotNull($formation);
 
-        $client->request('GET', '/formations/claude-2026/documents-contexte/m4-l1');
+        $client->request('GET', '/formations/claude-2026/artifacts/m4-l1');
         $token = $client->getCrawler()->filter('input[name="_token"]')->attr('value');
         self::assertNotEmpty($token);
 
-        $client->request('POST', '/formations/claude-2026/documents-contexte/m4-l1/complete', [
+        $client->request('POST', '/formations/claude-2026/artifacts/m4-l1/complete', [
             '_token' => $token,
         ]);
         self::assertResponseRedirects();
@@ -134,7 +134,7 @@ final class StudentJourneyTest extends WebTestCase
 
         $lesson = null;
         foreach ($enrollment->getFormation()->getModules() as $m) {
-            if ($m->getSlug() === 'documents-contexte') {
+            if ($m->getSlug() === 'artifacts') {
                 foreach ($m->getLessons() as $l) {
                     if ($l->getSlug() === 'm4-l1') {
                         $lesson = $l;
