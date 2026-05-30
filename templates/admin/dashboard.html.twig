@@ -1,0 +1,135 @@
+{% extends '@EasyAdmin/page/content.html.twig' %}
+
+{% macro euro(cents) %}{{ (cents / 100)|number_format(0, ',', ' ') }} €{% endmacro %}
+
+{% block content_title %}Tableau de bord{% endblock %}
+
+{% block main %}
+    {% import _self as money %}
+
+    <section class="kpi-grid">
+        <div class="kpi-card kpi-card--primary">
+            <span class="kpi-label">CA du mois</span>
+            <span class="kpi-value">{{ money.euro(revenueMonth) }}</span>
+            <span class="kpi-hint">
+                {% if revenueDelta is not null %}
+                    {{ revenueDelta >= 0 ? '▲' : '▼' }} {{ revenueDelta|abs }} % vs mois dernier ({{ money.euro(revenuePrev) }})
+                {% else %}
+                    Pas de point de comparaison
+                {% endif %}
+            </span>
+        </div>
+
+        <div class="kpi-card">
+            <span class="kpi-label">CA total</span>
+            <span class="kpi-value">{{ money.euro(revenueTotal) }}</span>
+            <span class="kpi-hint">Depuis le lancement</span>
+        </div>
+
+        <div class="kpi-card">
+            <span class="kpi-label">Ventes</span>
+            <span class="kpi-value">{{ sales }}</span>
+            <span class="kpi-hint">Paiements réussis</span>
+        </div>
+
+        <div class="kpi-card">
+            <span class="kpi-label">Panier moyen</span>
+            <span class="kpi-value">{{ money.euro(avgOrder) }}</span>
+            <span class="kpi-hint">CA total / ventes</span>
+        </div>
+
+        <div class="kpi-card">
+            <span class="kpi-label">Remboursé</span>
+            <span class="kpi-value">{{ money.euro(refundedTotal) }}</span>
+            <span class="kpi-hint">Total des refunds</span>
+        </div>
+
+        <div class="kpi-card">
+            <span class="kpi-label">Accès VIP</span>
+            <span class="kpi-value">{{ vipCount }}</span>
+            <span class="kpi-hint">Inscriptions offertes (CA 0)</span>
+        </div>
+
+        <div class="kpi-card">
+            <span class="kpi-label">Comptes</span>
+            <span class="kpi-value">{{ usersCount }}</span>
+            <span class="kpi-hint">Utilisateurs inscrits</span>
+        </div>
+    </section>
+
+    <section class="kpi-table-wrap">
+        <h2 class="kpi-table-title">CA par formation</h2>
+        {% if byFormation is empty %}
+            <p class="kpi-empty">Aucune vente enregistrée pour l'instant.</p>
+        {% else %}
+            <table class="table kpi-table">
+                <thead>
+                    <tr>
+                        <th>Formation</th>
+                        <th class="text-end">Ventes</th>
+                        <th class="text-end">CA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in byFormation %}
+                        <tr>
+                            <td>{{ row.title }}</td>
+                            <td class="text-end">{{ row.sales }}</td>
+                            <td class="text-end">{{ money.euro(row.revenue) }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </section>
+
+    <p class="kpi-note">
+        Modèle one-shot (achats uniques) — pas d'abonnement, donc pas de MRR au sens strict.
+        Le « CA du mois » est l'équivalent le plus proche.
+    </p>
+
+    <style>
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+        .kpi-card {
+            background: #fff;
+            border: 1px solid rgba(20, 17, 13, 0.10);
+            border-radius: 14px;
+            padding: 20px 22px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .kpi-card--primary {
+            background: #1F3025;
+            border-color: #1F3025;
+            color: #FCFAF5;
+        }
+        .kpi-label {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #C8395E;
+        }
+        .kpi-card--primary .kpi-label { color: #E8587A; }
+        .kpi-value {
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 1.1;
+            color: #14110D;
+        }
+        .kpi-card--primary .kpi-value { color: #FCFAF5; }
+        .kpi-hint { font-size: 12px; color: #4A453E; }
+        .kpi-card--primary .kpi-hint { color: rgba(252, 250, 245, 0.7); }
+
+        .kpi-table-wrap { margin-bottom: 24px; }
+        .kpi-table-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+        .kpi-empty { color: #4A453E; }
+        .kpi-note { font-size: 12px; color: #4A453E; font-style: italic; }
+    </style>
+{% endblock %}

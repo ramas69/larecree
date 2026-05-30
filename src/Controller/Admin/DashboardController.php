@@ -4,11 +4,14 @@ declare(strict_types=1);
 
 namespace App\Controller\Admin;
 
+use App\Entity\EnrollmentSource;
+use App\Repository\EnrollmentRepository;
+use App\Repository\PaymentRepository;
+use App\Repository\UserRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -17,15 +20,35 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DashboardController extends AbstractDashboardController
 {
     public function __construct(
-        private readonly AdminUrlGenerator $adminUrlGenerator,
+        private readonly PaymentRepository $payments,
+        private readonly EnrollmentRepository $enrollments,
+        private readonly UserRepository $users,
     ) {
     }
 
     public function index(): Response
     {
-        $url = $this->adminUrlGenerator->setController(UserCrudController::class)->generateUrl();
+        $now        = new \DateTimeImmutable();
+        $monthStart = $now->modify('first day of this month')->setTime(0, 0);
+        $prevStart  = $monthStart->modify('-1 month');
 
-        return $this->redirect($url);
+        $revenueMonth = $this->payments->revenueBetweenCents($monthStart, $now);
+        $revenuePrev  = $this->payments->revenueBetweenCents($prevStart, $monthStart);
+        $revenueTotal = $this->payments->totalRevenueCents();
+        $sales        = $this->payments->countSales();
+
+        return $this->render('admin/dashboard.html.twig', [
+            'revenueMonth'  => $revenueMonth,
+            'revenuePrev'   => $revenuePrev,
+            'revenueDelta'  => $revenuePrev > 0 ? (int) round(($revenueMonth - $revenuePrev) / $revenuePrev * 100) : null,
+            'revenueTotal'  => $revenueTotal,
+            'refundedTotal' => $this->payments->refundedTotalCents(),
+            'sales'         => $sales,
+            'avgOrder'      => $sales > 0 ? (int) round($revenueTotal / $sales) : 0,
+            'vipCount'      => $this->enrollments->countBySource(EnrollmentSource::Vip),
+            'usersCount'    => $this->users->count([]),
+            'byFormation'   => $this->payments->revenueByFormation(),
+        ]);
     }
 
     public function configureDashboard(): Dashboard
