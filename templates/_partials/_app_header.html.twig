@@ -1,4 +1,5 @@
 <header class="app-header">
+    <input type="checkbox" id="app-burger-toggle" class="app-burger-input" aria-label="Ouvrir/fermer le menu">
     <div class="app-header-inner">
         <a href="{{ path('app_dashboard') }}" class="app-brand" aria-label="La Récrée Tech">
             <svg class="app-brand-svg" viewBox="0 0 280 280" aria-hidden="true">
@@ -15,14 +16,20 @@
             <span>la <em>récrée</em> tech<span class="dot">.</span></span>
         </a>
 
+        <label for="app-burger-toggle" class="app-burger" aria-label="Menu">
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+            <span aria-hidden="true"></span>
+        </label>
+
         <nav class="app-nav" aria-label="Navigation">
             <a href="{{ path('app_dashboard') }}" {% if active_nav == 'dashboard' %}aria-current="page"{% endif %}>Mes formations</a>
             <a href="{{ path('app_catalogue') }}" {% if active_nav == 'catalogue' %}aria-current="page"{% endif %}>Catalogue</a>
             <a href="{{ path('app_community') }}" {% if active_nav == 'community' %}aria-current="page"{% endif %}>Communauté</a>
-            {% if app.user.isAdmin %}<a href="{{ path('admin') }}" style="color: var(--rose);">Admin</a>{% endif %}
+            {% if app.user.isAdmin %}<a href="{{ path('admin') }}" class="app-nav-admin">Admin</a>{% endif %}
         </nav>
 
-        <div style="display: flex; align-items: center;">
+        <div class="app-header-right">
             <div class="app-user-menu">
                 <span class="app-avatar" aria-hidden="true">{{ app.user.firstName|first }}</span>
                 <span class="app-user-name">{{ app.user.firstName }}</span>
