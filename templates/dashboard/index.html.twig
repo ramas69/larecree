@@ -26,7 +26,7 @@
                 <a href="{{ path('app_dashboard') }}">Mes formations</a>
                 <a href="#">Catalogue</a>
                 <a href="#">Communauté</a>
-                {% if app.user.isAdmin %}<a href="#" style="color: var(--rose);">Admin</a>{% endif %}
+                {% if app.user.isAdmin %}<a href="{{ path('admin') }}" style="color: var(--rose);">Admin</a>{% endif %}
             </nav>
 
             <div style="display: flex; align-items: center;">
