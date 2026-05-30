@@ -24,6 +24,8 @@ final class StripeCheckoutService
 {
     private const SENDER_EMAIL = 'hello@larecreetech.com';
     private const SENDER_NAME  = 'La Récrée Tech';
+    /** Destinataire des notifications d'inscription (à adapter si besoin). */
+    private const ADMIN_EMAIL  = 'hello@larecreetech.com';
 
     public function __construct(
         private readonly string $stripeSecretKey,
@@ -203,6 +205,24 @@ final class StripeCheckoutService
         }
 
         $this->sendWelcomeEmail($user, $formation, $resetToken);
+        $this->sendAdminNotification($user, $formation, $payment, $existingEnrollment !== null);
+    }
+
+    private function sendAdminNotification(User $user, Formation $formation, Payment $payment, bool $alreadyEnrolled): void
+    {
+        $email = (new TemplatedEmail())
+            ->from(new Address(self::SENDER_EMAIL, self::SENDER_NAME))
+            ->to(self::ADMIN_EMAIL)
+            ->subject(sprintf('💸 Nouvelle inscription — %s (%s)', $formation->getTitle(), $user->getEmail()))
+            ->htmlTemplate('emails/admin_new_enrollment.html.twig')
+            ->context([
+                'user'            => $user,
+                'formation'       => $formation,
+                'payment'         => $payment,
+                'alreadyEnrolled' => $alreadyEnrolled,
+            ]);
+
+        $this->mailer->send($email);
     }
 
     private function findEnrollment(User $user, Formation $formation): ?Enrollment
