@@ -5,39 +5,7 @@
 {% block body %}
 <div class="app-shell">
 
-    <header class="app-header">
-        <div class="app-header-inner">
-            <a href="{{ path('app_dashboard') }}" class="app-brand" aria-label="La Récrée Tech">
-                <svg class="app-brand-svg" viewBox="0 0 280 280" aria-hidden="true">
-                    <g transform="translate(20, 20)">
-                        <path d="M 120 0 A 100 100 0 0 1 207 50 L 190 60 A 80 80 0 0 0 120 20 Z" fill="#C8395E"/>
-                        <path d="M 207 50 A 100 100 0 0 1 207 150 L 190 140 A 80 80 0 0 0 190 60 Z" fill="#C8395E"/>
-                        <path d="M 207 150 A 100 100 0 0 1 120 200 L 120 180 A 80 80 0 0 0 190 140 Z" fill="none" stroke="#C8395E" stroke-width="3" opacity="0.4"/>
-                        <path d="M 120 200 A 100 100 0 0 1 33 150 L 50 140 A 80 80 0 0 0 120 180 Z" fill="none" stroke="#C8395E" stroke-width="3" opacity="0.4"/>
-                        <path d="M 33 150 A 100 100 0 0 1 33 50 L 50 60 A 80 80 0 0 0 50 140 Z" fill="none" stroke="#C8395E" stroke-width="3" opacity="0.4"/>
-                        <path d="M 33 50 A 100 100 0 0 1 120 0 L 120 20 A 80 80 0 0 0 50 60 Z" fill="none" stroke="#C8395E" stroke-width="3" opacity="0.4"/>
-                        <text x="120" y="118" font-family="Fraunces, Georgia, serif" font-size="36" font-weight="500" font-style="italic" fill="#C8395E" text-anchor="middle" letter-spacing="-1.5">récrée</text>
-                    </g>
-                </svg>
-                <span>la <em>récrée</em> tech<span class="dot">.</span></span>
-            </a>
-
-            <nav class="app-nav" aria-label="Navigation">
-                <a href="{{ path('app_dashboard') }}">Mes formations</a>
-                <a href="#">Catalogue</a>
-                <a href="#">Communauté</a>
-                {% if app.user.isAdmin %}<a href="{{ path('admin') }}" style="color: var(--rose);">Admin</a>{% endif %}
-            </nav>
-
-            <div style="display: flex; align-items: center;">
-                <div class="app-user-menu">
-                    <span class="app-avatar" aria-hidden="true">{{ app.user.firstName|first }}</span>
-                    <span class="app-user-name">{{ app.user.firstName }}</span>
-                </div>
-                <a href="{{ path('app_logout') }}" class="app-logout">Déconnexion</a>
-            </div>
-        </div>
-    </header>
+    {% include '_partials/_app_header.html.twig' with { active_nav: 'dashboard' } %}
 
     <main class="app-main">
 
@@ -102,7 +70,7 @@
                         <span>Vue {{ cur.lastWatchedAt|date('d/m/Y') }}</span>
                     </div>
 
-                    <a href="#" class="dash-continue-cta">▶ Reprendre la leçon</a>
+                    <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}" class="dash-continue-cta">▶ Reprendre la leçon</a>
                 </div>
             </div>
         </section>
@@ -114,7 +82,7 @@
                 <h2 class="dash-section-title">
                     {% if snapshot.enrollmentSnapshots|length > 1 %}Tes <em>parcours</em>{% else %}Ton <em>parcours</em>{% endif %}
                 </h2>
-                <a href="#" class="dash-section-action">Catalogue →</a>
+                <a href="{{ path('app_catalogue') }}" class="dash-section-action">Catalogue →</a>
             </div>
 
             {% for es in snapshot.enrollmentSnapshots %}
@@ -151,7 +119,7 @@
 
                 <div class="dash-progress-map-foot">
                     <span>Dernier module validé : <strong>{{ pm.lastCompletedTitle ?? '—' }}</strong></span>
-                    <a href="#">→ Voir détail formation</a>
+                    <a href="{{ path('app_formation_show', { slug: formation.slug }) }}">→ Voir détail formation</a>
                 </div>
             </div>
             {% endfor %}
