@@ -1,7 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
+use App\Dashboard\DashboardData;
+use App\Entity\User;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -11,9 +15,15 @@ final class DashboardController extends AbstractController
 {
     #[Route('/dashboard', name: 'app_dashboard')]
     #[IsGranted('IS_AUTHENTICATED_FULLY')]
-    public function index(): Response
+    public function index(DashboardData $dashboardData): Response
     {
-        return $this->render('dashboard/index.html.twig');
+        /** @var User $user */
+        $user = $this->getUser();
+        $snapshot = $dashboardData->forUser($user);
+
+        return $this->render('dashboard/index.html.twig', [
+            'snapshot' => $snapshot,
+        ]);
     }
 
     #[Route('/', name: 'app_home')]
