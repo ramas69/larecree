@@ -109,7 +109,7 @@ final class StudentJourneyTest extends WebTestCase
         $client = $this->bootWithFixtures();
         $this->loginAsRama($client);
 
-        $client->request('GET', '/formations/claude-2026/projects/m3-l2');
+        $client->request('GET', '/formations/claude-2026/cerveau-externe/m3-l2');
 
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('.lp-player-frame iframe');
@@ -127,11 +127,11 @@ final class StudentJourneyTest extends WebTestCase
         $formation = $em->getRepository(Formation::class)->findOneBy(['slug' => 'claude-2026']);
         self::assertNotNull($formation);
 
-        $client->request('GET', '/formations/claude-2026/artifacts/m4-l1');
+        $client->request('GET', '/formations/claude-2026/produire-livrables/m4-l1');
         $token = $client->getCrawler()->filter('input[name="_token"]')->attr('value');
         self::assertNotEmpty($token);
 
-        $client->request('POST', '/formations/claude-2026/artifacts/m4-l1/complete', [
+        $client->request('POST', '/formations/claude-2026/produire-livrables/m4-l1/complete', [
             '_token' => $token,
         ]);
         self::assertResponseRedirects();
@@ -146,7 +146,7 @@ final class StudentJourneyTest extends WebTestCase
 
         $lesson = null;
         foreach ($enrollment->getFormation()->getModules() as $m) {
-            if ($m->getSlug() === 'artifacts') {
+            if ($m->getSlug() === 'produire-livrables') {
                 foreach ($m->getLessons() as $l) {
                     if ($l->getSlug() === 'm4-l1') {
                         $lesson = $l;
