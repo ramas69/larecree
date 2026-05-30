@@ -46,11 +46,10 @@ final class StripeCheckoutService
      */
     public function createSession(Formation $formation): StripeSession
     {
-        $successUrl = $this->urlGenerator->generate(
-            'app_checkout_success',
-            ['session_id' => '{CHECKOUT_SESSION_ID}'],
-            UrlGeneratorInterface::ABSOLUTE_URL,
-        );
+        // Stripe needs LITERAL "{CHECKOUT_SESSION_ID}" in the URL; UrlGenerator
+        // would URL-encode the braces, so build it manually.
+        $successUrl = $this->urlGenerator->generate('app_checkout_success', [], UrlGeneratorInterface::ABSOLUTE_URL)
+            .'?session_id={CHECKOUT_SESSION_ID}';
         $cancelUrl = $this->urlGenerator->generate('app_checkout_cancel', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
         $session = $this->client()->checkout->sessions->create([
