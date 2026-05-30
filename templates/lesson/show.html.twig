@@ -3,34 +3,39 @@
 {% block title %}{{ lesson.title }} — {{ formation.title }}{% endblock %}
 
 {% block body %}
+{% set isDone = progress and progress.isCompleted %}
+{% set watched = progress ? progress.watchedSeconds : 0 %}
+{% set total = lesson.durationSeconds %}
+{% set pct = progress ? progress.percentWatched : 0 %}
+
 <div class="app-shell lp-shell">
 
     {% include '_partials/_app_header.html.twig' with { active_nav: 'catalogue' } %}
 
-    {% set isDone = progress and progress.isCompleted %}
-    {% set watched = progress ? progress.watchedSeconds : 0 %}
-    {% set total = lesson.durationSeconds %}
-    {% set pct = progress ? progress.percentWatched : 0 %}
-    {% set dots = 5 %}
-    {% set filledDots = (pct / 100 * dots)|round(0, 'floor') %}
+    <main class="lp-cinema">
 
-    <main class="lp-cockpit">
-
-        {# ===== LEFT — Studio ===== #}
-        <section class="lp-stage">
-
-            <nav class="lp-stage-crumbs" aria-label="Fil d'Ariane">
-                <span class="lp-stage-crumbs-mark">✱</span>
-                <a href="{{ path('app_catalogue') }}">catalogue</a>
+        {# ============ TOP STRIP ============ #}
+        <div class="lp-strip">
+            <nav class="lp-strip-crumbs" aria-label="Fil d'Ariane">
+                <a href="{{ path('app_catalogue') }}">◄ Catalogue</a>
                 <span aria-hidden="true">·</span>
-                <a href="{{ path('app_formation_show', { slug: formation.slug }) }}">{{ formation.title|lower }}</a>
+                <a href="{{ path('app_formation_show', { slug: formation.slug }) }}">{{ formation.title }}</a>
                 <span aria-hidden="true">·</span>
-                <span>m{{ '%02d'|format(module.displayOrder) }}</span>
-                <span aria-hidden="true">·</span>
-                <span class="is-current">l{{ '%02d'|format(lesson.displayOrder) }}</span>
+                <span>M{{ '%02d'|format(module.displayOrder) }} · {{ module.title }}</span>
             </nav>
 
-            <div class="lp-stage-player">
+            <div class="lp-strip-meta">
+                <span class="lp-strip-chrono">{{ '%02d'|format(total // 60) }}:{{ '%02d'|format(total % 60) }}</span>
+                <span class="lp-strip-caveat">leçon {{ lesson.displayOrder }}</span>
+            </div>
+        </div>
+
+        {# ============ CINEMASCOPE PLAYER ============ #}
+        <section class="lp-screen" aria-label="Lecteur vidéo">
+            <div class="lp-curtain lp-curtain-left" aria-hidden="true"></div>
+            <div class="lp-curtain lp-curtain-right" aria-hidden="true"></div>
+
+            <div class="lp-screen-bezel">
                 <div class="lp-player-frame">
                     <iframe
                         src="https://player.vimeo.com/video/{{ lesson.vimeoVideoId }}?title=0&byline=0&portrait=0"
@@ -39,197 +44,177 @@
                         allowfullscreen
                         loading="lazy"></iframe>
                 </div>
-                {% if pct > 0 and not isDone %}
-                    <span class="lp-stage-tag-caveat" aria-hidden="true">tu en es à {{ pct }}%</span>
-                {% elseif isDone %}
-                    <span class="lp-stage-tag-caveat is-done" aria-hidden="true">✓ terminée</span>
-                {% endif %}
             </div>
-
-            {# HUD bar #}
-            <output class="lp-hud" aria-label="Tableau de bord lecteur">
-                <div class="lp-hud-cell">
-                    <span class="lp-hud-label">⏱ position</span>
-                    <span class="lp-hud-value">{{ '%02d'|format(watched // 60) }}:{{ '%02d'|format(watched % 60) }} / {{ '%02d'|format(total // 60) }}:{{ '%02d'|format(total % 60) }}</span>
-                </div>
-                <div class="lp-hud-cell">
-                    <span class="lp-hud-label">▪ progression</span>
-                    <span class="lp-hud-dots" aria-label="{{ pct }} %">
-                        {% for i in 1..dots %}
-                            <span class="lp-hud-dot {{ i <= filledDots ? 'is-filled' : '' }}"></span>
-                        {% endfor %}
-                        <em>{{ pct }}%</em>
-                    </span>
-                </div>
-                <div class="lp-hud-cell lp-hud-cell-meta">
-                    <span class="lp-hud-label">★ leçon</span>
-                    <span class="lp-hud-value">{{ lesson.displayOrder }} / {{ moduleStats.totalCount }}</span>
-                </div>
-            </output>
-
-            <h1 class="lp-stage-title">{{ lesson.title }}</h1>
-
-            {# Toggle switch terminer #}
-            <div class="lp-switch-row">
-                {% if isDone %}
-                    <div class="lp-switch is-on">
-                        <span class="lp-switch-track"><span class="lp-switch-handle"></span></span>
-                        <span class="lp-switch-label">
-                            <span class="lp-switch-led" aria-hidden="true"></span>
-                            <strong>Terminé</strong>
-                            <em>· le {{ progress.completedAt|date('d/m/Y') }}</em>
-                        </span>
-                    </div>
-                {% else %}
-                    <form method="post" action="{{ path('app_lesson_complete', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}" class="lp-switch is-off">
-                        <input type="hidden" name="_token" value="{{ csrf_token('lesson_complete_' ~ lesson.slug) }}">
-                        <button type="submit" class="lp-switch-track" aria-label="Marquer la leçon comme terminée">
-                            <span class="lp-switch-handle"></span>
-                        </button>
-                        <span class="lp-switch-label">
-                            <span class="lp-switch-led" aria-hidden="true"></span>
-                            <strong>Marquer comme terminée</strong>
-                            <em>· bascule pour confirmer</em>
-                        </span>
-                    </form>
-                {% endif %}
-            </div>
-
-            {% for message in app.flashes('success') %}
-                <div class="lp-flash">
-                    <span class="lp-flash-icon" aria-hidden="true">●</span>
-                    {{ message }}
-                </div>
-            {% endfor %}
-
-            {# Tabs Notes / Ressources / Discussion — pure CSS radio hack #}
-            <div class="lp-tabs">
-                <input type="radio" id="lp-tab-notes" name="lp-tabs" class="lp-tab-input" checked>
-                <input type="radio" id="lp-tab-resources" name="lp-tabs" class="lp-tab-input">
-                <input type="radio" id="lp-tab-discussion" name="lp-tabs" class="lp-tab-input">
-
-                <nav class="lp-tabs-nav" aria-label="Sections leçon">
-                    <label for="lp-tab-notes" class="lp-tab">▸ Notes</label>
-                    <label for="lp-tab-resources" class="lp-tab">▸ Ressources <em>{{ lesson.resources|length }}</em></label>
-                    <label for="lp-tab-discussion" class="lp-tab">▸ Discussion</label>
-                </nav>
-
-                <div class="lp-tab-panels">
-                    <section class="lp-tab-panel" data-tab="notes" aria-label="Notes">
-                        {% if lesson.description %}
-                            <p class="lp-notes-paragraph">{{ lesson.description }}</p>
-                        {% else %}
-                            <p class="lp-notes-empty">Pas de notes pour cette leçon.</p>
-                        {% endif %}
-
-                        <div class="lp-notes-rule" aria-hidden="true"></div>
-
-                        <p class="lp-notes-meta">
-                            <span>Module M{{ '%02d'|format(module.displayOrder) }} · {{ module.title }}</span>
-                            <span>{{ moduleStats.doneCount }} / {{ moduleStats.totalCount }} leçons terminées · {{ moduleStats.percent }} %</span>
-                        </p>
-                    </section>
-
-                    <section class="lp-tab-panel" data-tab="resources" aria-label="Ressources">
-                        {% if lesson.resources|length > 0 %}
-                            <ul class="lp-resources-list">
-                                {% for r in lesson.resources %}
-                                    {% set isFile = r.type.value == 'file' %}
-                                    {% set href = isFile ? r.filePath : r.url %}
-                                    <li class="lp-resource {{ isFile ? 'is-file' : 'is-link' }}">
-                                        <span class="lp-resource-icon" aria-hidden="true">{{ isFile ? '📄' : '🔗' }}</span>
-                                        <div class="lp-resource-body">
-                                            <span class="lp-resource-kind">{{ isFile ? 'PDF · à télécharger' : 'Lien externe' }}</span>
-                                            <strong>{{ r.title }}</strong>
-                                        </div>
-                                        {% if href %}
-                                            <a class="lp-resource-cta" href="{{ href }}" {{ isFile ? '' : 'target="_blank" rel="noopener"' }}>
-                                                {{ isFile ? 'Télécharger →' : 'Ouvrir →' }}
-                                            </a>
-                                        {% endif %}
-                                    </li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <p class="lp-notes-empty">Pas encore de ressources liées à cette leçon.</p>
-                        {% endif %}
-                    </section>
-
-                    <section class="lp-tab-panel" data-tab="discussion" aria-label="Discussion">
-                        <p class="lp-notes-empty">
-                            La discussion arrive bientôt. Tu pourras poser tes questions à la communauté
-                            et lire celles des autres élèves.
-                        </p>
-                    </section>
-                </div>
-            </div>
-
-            {# Footer nav prev/next minimal #}
-            <nav class="lp-stage-nav" aria-label="Navigation leçons">
-                {% if prevLesson %}
-                    <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: prevLesson.module.slug, lessonSlug: prevLesson.slug }) }}" class="lp-stage-nav-link">
-                        <span>◄ précédente</span>
-                        <strong>{{ prevLesson.title }}</strong>
-                    </a>
-                {% else %}
-                    <span class="lp-stage-nav-link is-disabled">
-                        <span>◄ précédente</span>
-                        <strong>début de la formation</strong>
-                    </span>
-                {% endif %}
-
-                {% if nextLesson %}
-                    <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: nextLesson.module.slug, lessonSlug: nextLesson.slug }) }}" class="lp-stage-nav-link lp-stage-nav-next">
-                        <span>suivante ►</span>
-                        <strong>{{ nextLesson.title }}</strong>
-                    </a>
-                {% else %}
-                    <span class="lp-stage-nav-link is-disabled lp-stage-nav-next">
-                        <span>suivante ►</span>
-                        <strong>fin de la formation 🎉</strong>
-                    </span>
-                {% endif %}
-            </nav>
-
         </section>
 
-        {# ===== RIGHT — Terminal cockpit ===== #}
-        <aside class="lp-console" aria-label="Plan du module">
-            <div class="lp-console-grid" aria-hidden="true"></div>
+        {# ============ HEADLINE ============ #}
+        <header class="lp-headline">
+            <span class="lp-headline-mark">★</span>
+            <div class="lp-headline-body">
+                <span class="lp-headline-eyebrow">Leçon {{ '%02d'|format(lesson.displayOrder) }} · M{{ '%02d'|format(module.displayOrder) }} {{ module.title }}</span>
+                <h1 class="lp-headline-title">{{ lesson.title }}</h1>
+            </div>
+        </header>
 
-            <header class="lp-console-head">
-                <span class="lp-console-eyebrow">▌ Module</span>
-                <span class="lp-console-num">M{{ '%02d'|format(module.displayOrder) }}</span>
-                <h3 class="lp-console-title">{{ module.title }}</h3>
-                <span class="lp-console-meta">{{ moduleStats.totalCount }} leçons · {{ moduleStats.percent }} %</span>
-                <progress class="lp-console-progress" max="100" value="{{ moduleStats.percent }}" aria-label="Progression module">{{ moduleStats.percent }} %</progress>
-            </header>
+        {% for message in app.flashes('success') %}
+            <div class="lp-flash">
+                <span class="lp-flash-icon" aria-hidden="true">✓</span>
+                {{ message }}
+            </div>
+        {% endfor %}
 
-            <ol class="lp-console-list">
-                {% for l in allLessonsInModule %}
-                    {% set isCurrent = l == lesson %}
-                    {% set lp = progressByLessonId[l.id] ?? null %}
-                    {% set lDone = lp and lp.isCompleted %}
-                    {% set lStarted = lp and lp.percentWatched > 0 and not lDone %}
-                    <li class="lp-console-item {{ isCurrent ? 'is-current' : '' }} {{ lDone ? 'is-done' : '' }} {{ lStarted ? 'is-started' : '' }}">
-                        <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: l.slug }) }}">
-                            <span class="lp-console-prefix" aria-hidden="true">{% if lDone %}✓{% elseif isCurrent %}►{% else %}>{% endif %}</span>
-                            <span class="lp-console-idx">{{ '%02d'|format(loop.index) }}</span>
-                            <span class="lp-console-text">{{ l.title|lower }}</span>
-                            <span class="lp-console-dur">{{ l.durationFormatted }}</span>
-                        </a>
-                    </li>
-                {% endfor %}
-            </ol>
+        {# ============ DESCRIPTION CARD (papier vélin) ============ #}
+        {% if lesson.description %}
+            <section class="lp-vellum" aria-label="Description">
+                <span class="lp-vellum-eyebrow">— À retenir</span>
+                <h2 class="lp-vellum-title">Au programme de cette leçon</h2>
+                <p>{{ lesson.description }}</p>
+            </section>
+        {% endif %}
 
-            <a href="{{ path('app_formation_show', { slug: formation.slug }) }}" class="lp-console-back">◀ retour formation</a>
+        {# ============ RESOURCES — chips horizontales ============ #}
+        {% if lesson.resources|length > 0 %}
+            <section class="lp-chips-section" aria-label="Ressources">
+                <header class="lp-chips-head">
+                    <span class="lp-chips-eyebrow">— Ressources</span>
+                    <h2 class="lp-chips-title">À télécharger · liens utiles</h2>
+                </header>
+                <div class="lp-chips-scroller">
+                    <ul class="lp-chips">
+                        {% for r in lesson.resources %}
+                            {% set isFile = r.type.value == 'file' %}
+                            {% set href = isFile ? r.filePath : r.url %}
+                            <li class="lp-chip {{ isFile ? 'is-file' : 'is-link' }}">
+                                {% if href %}
+                                    <a href="{{ href }}" {{ isFile ? '' : 'target="_blank" rel="noopener"' }}>
+                                        <span class="lp-chip-icon" aria-hidden="true">{{ isFile ? '📄' : '🔗' }}</span>
+                                        <span class="lp-chip-body">
+                                            <span class="lp-chip-kind">{{ isFile ? 'PDF' : 'Lien' }}</span>
+                                            <strong>{{ r.title }}</strong>
+                                            <em>{{ isFile ? 'Télécharger →' : 'Ouvrir →' }}</em>
+                                        </span>
+                                    </a>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+        {% endif %}
 
-            <span class="lp-console-blink" aria-hidden="true">_</span>
-        </aside>
+        {# ============ NAV PREV/NEXT en bas ============ #}
+        <nav class="lp-bigjump" aria-label="Navigation leçons">
+            {% if prevLesson %}
+                <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: prevLesson.module.slug, lessonSlug: prevLesson.slug }) }}" class="lp-bigjump-link">
+                    <span class="lp-bigjump-arrow">◄</span>
+                    <span>
+                        <small>Leçon précédente</small>
+                        <strong>{{ prevLesson.title }}</strong>
+                    </span>
+                </a>
+            {% else %}
+                <span class="lp-bigjump-link is-disabled">
+                    <span class="lp-bigjump-arrow">◄</span>
+                    <span>
+                        <small>Précédente</small>
+                        <strong>Début de la formation</strong>
+                    </span>
+                </span>
+            {% endif %}
+
+            {% if nextLesson %}
+                <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: nextLesson.module.slug, lessonSlug: nextLesson.slug }) }}" class="lp-bigjump-link lp-bigjump-next">
+                    <span>
+                        <small>Leçon suivante</small>
+                        <strong>{{ nextLesson.title }}</strong>
+                    </span>
+                    <span class="lp-bigjump-arrow">►</span>
+                </a>
+            {% else %}
+                <span class="lp-bigjump-link lp-bigjump-next is-disabled">
+                    <span>
+                        <small>Suivante</small>
+                        <strong>Fin de la formation 🎉</strong>
+                    </span>
+                    <span class="lp-bigjump-arrow">►</span>
+                </span>
+            {% endif %}
+        </nav>
 
     </main>
 
-    <footer class="app-footer">
+    {# ============ DOCK STICKY EN BAS ============ #}
+    {# Drawer toggle (hidden checkbox) #}
+    <input type="checkbox" id="lp-drawer-toggle" class="lp-drawer-input">
+
+    <section class="lp-dock" aria-label="Barre d'action leçon">
+        <div class="lp-dock-inner">
+            <div class="lp-dock-status">
+                {% if isDone %}
+                    <span class="lp-dock-pill is-done">● Terminée</span>
+                    <span class="lp-dock-meta">le {{ progress.completedAt|date('d/m/Y') }}</span>
+                {% elseif pct > 0 %}
+                    <span class="lp-dock-pill is-progress">▶ En cours</span>
+                    <span class="lp-dock-meta">{{ pct }}% · vue {{ progress.lastWatchedAt|date('d/m/Y') }}</span>
+                {% else %}
+                    <span class="lp-dock-pill">○ À voir</span>
+                    <span class="lp-dock-meta">{{ lesson.durationFormatted }}</span>
+                {% endif %}
+            </div>
+
+            {% if not isDone %}
+                <form method="post" action="{{ path('app_lesson_complete', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}" class="lp-dock-complete">
+                    <input type="hidden" name="_token" value="{{ csrf_token('lesson_complete_' ~ lesson.slug) }}">
+                    <button type="submit">
+                        <span aria-hidden="true">✓</span> Marquer comme terminée
+                    </button>
+                </form>
+            {% endif %}
+
+            <label for="lp-drawer-toggle" class="lp-dock-drawer-trigger">
+                <span aria-hidden="true">☰</span> Plan du module
+                <em class="lp-dock-drawer-count">{{ moduleStats.doneCount }}/{{ moduleStats.totalCount }}</em>
+            </label>
+        </div>
+    </section>
+
+    {# ============ DRAWER SIDE ============ #}
+    <label for="lp-drawer-toggle" class="lp-drawer-overlay" aria-label="Fermer le plan"></label>
+
+    <aside class="lp-drawer" aria-label="Plan du module">
+        <header class="lp-drawer-head">
+            <div>
+                <span class="lp-drawer-eyebrow">— Module {{ '%02d'|format(module.displayOrder) }}</span>
+                <h3 class="lp-drawer-title">{{ module.title }}</h3>
+                <p class="lp-drawer-meta">{{ moduleStats.totalCount }} leçons · {{ moduleStats.percent }} %</p>
+            </div>
+            <label for="lp-drawer-toggle" class="lp-drawer-close" aria-label="Fermer">✕</label>
+        </header>
+
+        <progress class="lp-drawer-progress" max="100" value="{{ moduleStats.percent }}" aria-label="Progression module">{{ moduleStats.percent }} %</progress>
+
+        <ol class="lp-drawer-list">
+            {% for l in allLessonsInModule %}
+                {% set isCurrent = l == lesson %}
+                {% set lp = progressByLessonId[l.id] ?? null %}
+                {% set lDone = lp and lp.isCompleted %}
+                {% set lStarted = lp and lp.percentWatched > 0 and not lDone %}
+                <li class="lp-drawer-item {{ isCurrent ? 'is-current' : '' }} {{ lDone ? 'is-done' : '' }} {{ lStarted ? 'is-started' : '' }}">
+                    <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: l.slug }) }}">
+                        <span class="lp-drawer-mark" aria-hidden="true">{% if lDone %}✓{% elseif isCurrent %}▶{% else %}{{ loop.index }}{% endif %}</span>
+                        <span class="lp-drawer-text">
+                            <strong>{{ l.title }}</strong>
+                            <em>{{ l.durationFormatted }}{% if lStarted %} · {{ lp.percentWatched }} %{% endif %}</em>
+                        </span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ol>
+
+        <a href="{{ path('app_formation_show', { slug: formation.slug }) }}" class="lp-drawer-back">↩ Voir la formation complète</a>
+    </aside>
+
+    <footer class="app-footer lp-cinema-footer">
         © 2026 La Récrée Tech · app.larecreetech.com
     </footer>
 
