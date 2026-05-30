@@ -1,0 +1,82 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ formation.title }} — La Récrée Tech{% endblock %}
+
+{% block body %}
+<div class="app-shell">
+
+    {% include '_partials/_app_header.html.twig' with { active_nav: 'catalogue' } %}
+
+    <main class="app-main">
+
+        <section class="dash-hero" style="display: flex; flex-direction: column; gap: 0.4rem;">
+            <span class="dash-hero-caveat">— {{ formation.subtitle ?? 'formation' }}</span>
+            <h1 class="dash-hero-title" style="font-size: clamp(2rem, 4vw, 3.2rem);">{{ formation.title }}</h1>
+            {% if formation.description %}
+                <p class="dash-hero-sub">{{ formation.description }}</p>
+            {% endif %}
+            <div style="display: flex; gap: 2rem; margin-top: 0.6rem; align-items: baseline;">
+                <span><strong>{{ formation.modules|length }}</strong> modules</span>
+                <span><strong>{{ formation.priceFormatted }}</strong></span>
+                {% if enrollment %}
+                    <span style="color: var(--rose);"><strong>✓ Inscrit·e</strong>{% if enrollment.isVipGranted %} · VIP{% endif %}</span>
+                {% endif %}
+            </div>
+        </section>
+
+        <section class="dash-section">
+            <div class="dash-section-head">
+                <h2 class="dash-section-title">Le <em>programme</em></h2>
+            </div>
+
+            <div class="formation-programme">
+                {% for module in formation.modules %}
+                    <article class="programme-module">
+                        <header class="programme-module-head">
+                            <span class="programme-module-num">M{{ '%02d'|format(module.displayOrder) }}</span>
+                            <div>
+                                <h3 class="programme-module-title">{{ module.title }}</h3>
+                                {% if module.description %}<p class="programme-module-sub">{{ module.description }}</p>{% endif %}
+                            </div>
+                            <span class="programme-module-count">{{ module.lessons|length }} leçons</span>
+                        </header>
+
+                        <ol class="programme-lessons">
+                            {% for lesson in module.lessons %}
+                                {% set done = completedLessonIds[lesson.id] ?? false %}
+                                <li class="programme-lesson {{ done ? 'is-done' : '' }}">
+                                    <span class="programme-lesson-mark" aria-hidden="true">{{ done ? '✓' : loop.index }}</span>
+                                    <div class="programme-lesson-body">
+                                        <strong>{{ lesson.title }}</strong>
+                                        <span>{{ lesson.durationFormatted }}</span>
+                                    </div>
+                                    {% if enrollment %}
+                                        <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}" class="programme-lesson-cta">
+                                            {{ done ? 'Revoir' : 'Lire' }} →
+                                        </a>
+                                    {% else %}
+                                        <span class="programme-lesson-lock" aria-label="Verrouillée">🔒</span>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ol>
+                    </article>
+                {% endfor %}
+            </div>
+
+            {% if not enrollment %}
+                <div style="margin-top: 2rem; padding: 1.5rem; border: 1px dashed var(--rose); border-radius: 12px; text-align: center;">
+                    <p style="margin: 0 0 0.8rem;"><strong>Pas encore inscrit·e à cette formation.</strong></p>
+                    <a href="#" class="dash-continue-cta">→ Pré-inscription / Stripe</a>
+                </div>
+            {% endif %}
+        </section>
+
+    </main>
+
+    <footer class="app-footer">
+        © 2026 La Récrée Tech · app.larecreetech.com
+    </footer>
+
+</div>
+{% endblock %}

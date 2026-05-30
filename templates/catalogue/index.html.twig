@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Catalogue — La Récrée Tech{% endblock %}
+
+{% block body %}
+<div class="app-shell">
+
+    {% include '_partials/_app_header.html.twig' with { active_nav: 'catalogue' } %}
+
+    <main class="app-main">
+
+        <section class="dash-hero">
+            <span class="dash-hero-caveat">notre catalogue</span>
+            <h1 class="dash-hero-title">Choisis ta <em>prochaine</em> formation.</h1>
+            <p class="dash-hero-sub">Toutes nos formations Récrée Tech, des fondations Claude au design produit.</p>
+        </section>
+
+        <section class="dash-section">
+            <div class="catalogue-grid">
+                {% for formation in formations %}
+                    {% set enrolled = enrolledFormationIds[formation.id] ?? false %}
+                    <article class="catalogue-card {{ enrolled ? 'is-enrolled' : '' }}">
+                        <div class="catalogue-card-cover" aria-hidden="true">
+                            <span class="catalogue-card-cover-mark">{{ formation.title|first }}</span>
+                            {% if enrolled %}
+                                <span class="catalogue-card-badge">✓ Inscrit·e</span>
+                            {% endif %}
+                        </div>
+                        <div class="catalogue-card-body">
+                            <span class="catalogue-card-eyebrow">— Formation</span>
+                            <h2 class="catalogue-card-title">{{ formation.title }}</h2>
+                            {% if formation.subtitle %}
+                                <p class="catalogue-card-sub">{{ formation.subtitle }}</p>
+                            {% endif %}
+                            <div class="catalogue-card-meta">
+                                <span>{{ formation.modules|length }} modules</span>
+                                <span class="catalogue-card-price">{{ formation.priceFormatted }}</span>
+                            </div>
+                            <a href="{{ path('app_formation_show', { slug: formation.slug }) }}" class="catalogue-card-cta">
+                                {{ enrolled ? '▶ Reprendre' : '→ Découvrir' }}
+                            </a>
+                        </div>
+                    </article>
+                {% else %}
+                    <p>Aucune formation publiée pour le moment.</p>
+                {% endfor %}
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="app-footer">
+        © 2026 La Récrée Tech · app.larecreetech.com
+    </footer>
+
+</div>
+{% endblock %}

@@ -1,0 +1,33 @@
+<header class="app-header">
+    <div class="app-header-inner">
+        <a href="{{ path('app_dashboard') }}" class="app-brand" aria-label="La Récrée Tech">
+            <svg class="app-brand-svg" viewBox="0 0 280 280" aria-hidden="true">
+                <g transform="translate(20, 20)">
+                    <path d="M 120 0 A 100 100 0 0 1 207 50 L 190 60 A 80 80 0 0 0 120 20 Z" fill="#C8395E"/>
+                    <path d="M 207 50 A 100 100 0 0 1 207 150 L 190 140 A 80 80 0 0 0 190 60 Z" fill="#C8395E"/>
+                    <path d="M 207 150 A 100 100 0 0 1 120 200 L 120 180 A 80 80 0 0 0 190 140 Z" fill="none" stroke="#C8395E" stroke-width="3" opacity="0.4"/>
+                    <path d="M 120 200 A 100 100 0 0 1 33 150 L 50 140 A 80 80 0 0 0 120 180 Z" fill="none" stroke="#C8395E" stroke-width="3" opacity="0.4"/>
+                    <path d="M 33 150 A 100 100 0 0 1 33 50 L 50 60 A 80 80 0 0 0 50 140 Z" fill="none" stroke="#C8395E" stroke-width="3" opacity="0.4"/>
+                    <path d="M 33 50 A 100 100 0 0 1 120 0 L 120 20 A 80 80 0 0 0 50 60 Z" fill="none" stroke="#C8395E" stroke-width="3" opacity="0.4"/>
+                    <text x="120" y="118" font-family="Fraunces, Georgia, serif" font-size="36" font-weight="500" font-style="italic" fill="#C8395E" text-anchor="middle" letter-spacing="-1.5">récrée</text>
+                </g>
+            </svg>
+            <span>la <em>récrée</em> tech<span class="dot">.</span></span>
+        </a>
+
+        <nav class="app-nav" aria-label="Navigation">
+            <a href="{{ path('app_dashboard') }}" {% if active_nav == 'dashboard' %}aria-current="page"{% endif %}>Mes formations</a>
+            <a href="{{ path('app_catalogue') }}" {% if active_nav == 'catalogue' %}aria-current="page"{% endif %}>Catalogue</a>
+            <a href="#">Communauté</a>
+            {% if app.user.isAdmin %}<a href="{{ path('admin') }}" style="color: var(--rose);">Admin</a>{% endif %}
+        </nav>
+
+        <div style="display: flex; align-items: center;">
+            <div class="app-user-menu">
+                <span class="app-avatar" aria-hidden="true">{{ app.user.firstName|first }}</span>
+                <span class="app-user-name">{{ app.user.firstName }}</span>
+            </div>
+            <a href="{{ path('app_logout') }}" class="app-logout">Déconnexion</a>
+        </div>
+    </div>
+</header>

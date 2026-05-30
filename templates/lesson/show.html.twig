@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ lesson.title }} — {{ formation.title }}{% endblock %}
+
+{% block body %}
+<div class="app-shell">
+
+    {% include '_partials/_app_header.html.twig' with { active_nav: 'catalogue' } %}
+
+    <main class="app-main lesson-layout">
+
+        <div class="lesson-breadcrumb">
+            <a href="{{ path('app_catalogue') }}">Catalogue</a>
+            <span>›</span>
+            <a href="{{ path('app_formation_show', { slug: formation.slug }) }}">{{ formation.title }}</a>
+            <span>›</span>
+            <span>M{{ '%02d'|format(module.displayOrder) }} · {{ module.title }}</span>
+        </div>
+
+        {% for message in app.flashes('success') %}
+            <div class="lesson-flash">{{ message }}</div>
+        {% endfor %}
+
+        <div class="lesson-grid">
+
+            <article class="lesson-main">
+                <header class="lesson-header">
+                    <span class="lesson-eyebrow">— Leçon {{ lesson.displayOrder }} · {{ lesson.durationFormatted }}</span>
+                    <h1 class="lesson-title">{{ lesson.title }}</h1>
+                </header>
+
+                <div class="lesson-player">
+                    <div class="lesson-player-frame">
+                        <iframe
+                            src="https://player.vimeo.com/video/{{ lesson.vimeoVideoId }}?title=0&byline=0&portrait=0"
+                            title="{{ lesson.title }}"
+                            frameborder="0"
+                            allow="autoplay; fullscreen; picture-in-picture"
+                            allowfullscreen
+                            loading="lazy"></iframe>
+                    </div>
+                </div>
+
+                {% if lesson.description %}
+                    <section class="lesson-description">
+                        <h2>Description</h2>
+                        <p>{{ lesson.description }}</p>
+                    </section>
+                {% endif %}
+
+                <section class="lesson-actions">
+                    {% set isDone = progress and progress.isCompleted %}
+                    {% if isDone %}
+                        <span class="lesson-done-badge">✓ Leçon terminée le {{ progress.completedAt|date('d/m/Y') }}</span>
+                    {% else %}
+                        <form method="post" action="{{ path('app_lesson_complete', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}" class="lesson-complete-form">
+                            <input type="hidden" name="_token" value="{{ csrf_token('lesson_complete_' ~ lesson.slug) }}">
+                            <button type="submit" class="lesson-complete-cta">✓ Marquer comme terminée</button>
+                        </form>
+                    {% endif %}
+
+                    <nav class="lesson-nav-buttons" aria-label="Navigation leçons">
+                        {% if prevLesson %}
+                            <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: prevLesson.module.slug, lessonSlug: prevLesson.slug }) }}" class="lesson-nav-prev">← Précédente</a>
+                        {% else %}
+                            <span class="lesson-nav-disabled">← Précédente</span>
+                        {% endif %}
+                        {% if nextLesson %}
+                            <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: nextLesson.module.slug, lessonSlug: nextLesson.slug }) }}" class="lesson-nav-next">Suivante →</a>
+                        {% else %}
+                            <span class="lesson-nav-disabled">Suivante →</span>
+                        {% endif %}
+                    </nav>
+                </section>
+            </article>
+
+            <aside class="lesson-sidebar" aria-label="Leçons du module">
+                <h3 class="lesson-sidebar-title">M{{ '%02d'|format(module.displayOrder) }} · {{ module.title }}</h3>
+                <ol class="lesson-sidebar-list">
+                    {% for l in allLessonsInModule %}
+                        {% set isCurrent = l == lesson %}
+                        <li class="lesson-sidebar-item {{ isCurrent ? 'is-current' : '' }}">
+                            <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: l.slug }) }}">
+                                <span class="lesson-sidebar-num">{{ loop.index }}</span>
+                                <span class="lesson-sidebar-text">
+                                    <strong>{{ l.title }}</strong>
+                                    <em>{{ l.durationFormatted }}</em>
+                                </span>
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ol>
+            </aside>
+
+        </div>
+
+    </main>
+
+    <footer class="app-footer">
+        © 2026 La Récrée Tech · app.larecreetech.com
+    </footer>
+
+</div>
+{% endblock %}
