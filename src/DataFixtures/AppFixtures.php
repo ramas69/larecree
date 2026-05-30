@@ -10,6 +10,8 @@ use App\Entity\Formation;
 use App\Entity\Lesson;
 use App\Entity\LessonProgress;
 use App\Entity\Module;
+use App\Entity\Resource;
+use App\Entity\ResourceType;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -133,12 +135,32 @@ final class AppFixtures extends Fixture
                     ->setDisplayOrder($li);
                 $module->addLesson($lesson);
                 $manager->persist($lesson);
+                $this->seedLessonResources($manager, $lesson, $i + 1, $li);
                 $lessons[] = $lesson;
             }
             $lessonsByModule[$i] = $lessons;
         }
 
         return $lessonsByModule;
+    }
+
+    private function seedLessonResources(ObjectManager $manager, Lesson $lesson, int $moduleIdx, int $lessonIdx): void
+    {
+        $pdf = (new Resource())
+            ->setLesson($lesson)
+            ->setType(ResourceType::File)
+            ->setTitle('Fiche récap — Leçon '.$lessonIdx)
+            ->setFilePath('/files/lessons/m'.$moduleIdx.'-l'.$lessonIdx.'.pdf')
+            ->setDisplayOrder(1);
+        $manager->persist($pdf);
+
+        $link = (new Resource())
+            ->setLesson($lesson)
+            ->setType(ResourceType::Link)
+            ->setTitle('Lien utile — Aller plus loin')
+            ->setUrl('https://docs.anthropic.com/')
+            ->setDisplayOrder(2);
+        $manager->persist($link);
     }
 
     private function enroll(

@@ -97,11 +97,22 @@
                 {% if lesson.resources|length > 0 %}
                     <section class="lp-resources">
                         <span class="lp-resources-eyebrow">— Ressources</span>
-                        <h2 class="lp-resources-title">À télécharger</h2>
-                        <ul>
+                        <h2 class="lp-resources-title">À télécharger · liens utiles</h2>
+                        <ul class="lp-resources-list">
                             {% for r in lesson.resources %}
-                                <li>
-                                    {% if r.url %}<a href="{{ r.url }}" target="_blank" rel="noopener">{{ r.title }}</a>{% else %}<span>{{ r.title }}</span>{% endif %}
+                                {% set isFile = r.type.value == 'file' %}
+                                {% set href = isFile ? r.filePath : r.url %}
+                                <li class="lp-resource {{ isFile ? 'is-file' : 'is-link' }}">
+                                    <span class="lp-resource-icon" aria-hidden="true">{{ isFile ? '📄' : '🔗' }}</span>
+                                    <div class="lp-resource-body">
+                                        <span class="lp-resource-kind">{{ isFile ? 'PDF · à télécharger' : 'Lien externe' }}</span>
+                                        <strong>{{ r.title }}</strong>
+                                    </div>
+                                    {% if href %}
+                                        <a class="lp-resource-cta" href="{{ href }}" {{ isFile ? '' : 'target="_blank" rel="noopener"' }}>
+                                            {{ isFile ? 'Télécharger →' : 'Ouvrir →' }}
+                                        </a>
+                                    {% endif %}
                                 </li>
                             {% endfor %}
                         </ul>

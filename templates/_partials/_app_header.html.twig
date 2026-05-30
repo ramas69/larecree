@@ -18,7 +18,7 @@
         <nav class="app-nav" aria-label="Navigation">
             <a href="{{ path('app_dashboard') }}" {% if active_nav == 'dashboard' %}aria-current="page"{% endif %}>Mes formations</a>
             <a href="{{ path('app_catalogue') }}" {% if active_nav == 'catalogue' %}aria-current="page"{% endif %}>Catalogue</a>
-            <a href="#">Communauté</a>
+            <a href="{{ path('app_community') }}" {% if active_nav == 'community' %}aria-current="page"{% endif %}>Communauté</a>
             {% if app.user.isAdmin %}<a href="{{ path('admin') }}" style="color: var(--rose);">Admin</a>{% endif %}
         </nav>
 

@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Communauté — La Récrée Tech{% endblock %}
+
+{% block body %}
+<div class="app-shell">
+
+    {% include '_partials/_app_header.html.twig' with { active_nav: 'community' } %}
+
+    <main class="app-main">
+
+        <section class="comm-hero">
+            <span class="comm-hero-caveat">on est là, tout le temps</span>
+            <h1 class="comm-hero-title">La <em>communauté</em>.</h1>
+            <p class="comm-hero-sub">Un Discord vivant, à vie. Des gens qui pigent de quoi tu parles, qui débloquent ton bug à 23h et qui célèbrent ton premier « ça marche ». Tu n'apprends pas tout·e seul·e.</p>
+            <a href="{{ discordInvite }}" class="comm-cta" target="_blank" rel="noopener">
+                <span aria-hidden="true">▶</span> Rejoindre le Discord
+            </a>
+            <span class="comm-hero-note">Gratuit · à vie · réservé aux membres La Récrée Tech</span>
+        </section>
+
+        <section class="comm-section">
+            <span class="eyebrow">— Les salons</span>
+            <h2 class="comm-section-title">Là où ça se <em>passe</em></h2>
+            <div class="comm-channels">
+                {% for channel in channels %}
+                <div class="comm-channel">
+                    <span class="comm-channel-name">{{ channel.name }}</span>
+                    <p class="comm-channel-desc">{{ channel.desc }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="comm-section">
+            <span class="eyebrow">— Démarrer</span>
+            <h2 class="comm-section-title">Trois pas pour <em>être dedans</em></h2>
+            <div class="comm-steps">
+                {% for step in steps %}
+                <div class="comm-step">
+                    <span class="comm-step-num">{{ step.num }}</span>
+                    <h3 class="comm-step-title">{{ step.title }}</h3>
+                    <p class="comm-step-desc">{{ step.desc }}</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="comm-section">
+            <span class="eyebrow">— L'état d'esprit</span>
+            <h2 class="comm-section-title">Les <em>règles du jeu</em></h2>
+            <ul class="comm-rules">
+                {% for rule in rules %}
+                <li class="comm-rule">{{ rule }}</li>
+                {% endfor %}
+            </ul>
+        </section>
+
+        <section class="comm-section">
+            <span class="eyebrow">— Wins de la communauté</span>
+            <h2 class="comm-section-title">Ce que les autres <em>ont shippé</em></h2>
+            <div class="comm-wins">
+                {% for win in wins %}
+                <figure class="comm-win">
+                    <blockquote class="comm-win-quote">« {{ win.quote }} »</blockquote>
+                    <figcaption class="comm-win-author">
+                        <strong>{{ win.author }}</strong>
+                        <span>{{ win.project }}</span>
+                    </figcaption>
+                </figure>
+                {% endfor %}
+            </div>
+        </section>
+
+        <section class="comm-outro">
+            <h2 class="comm-outro-title">Ta place t'<em>attend</em>.</h2>
+            <a href="{{ discordInvite }}" class="comm-cta" target="_blank" rel="noopener">
+                <span aria-hidden="true">▶</span> Rejoindre le Discord
+            </a>
+        </section>
+
+    </main>
+
+    <footer class="app-footer">
+        © 2026 La Récrée Tech · app.larecreetech.com
+    </footer>
+
+</div>
+{% endblock %}
