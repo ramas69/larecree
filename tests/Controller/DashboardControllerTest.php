@@ -40,8 +40,8 @@ final class DashboardControllerTest extends WebTestCase
         self::assertSelectorTextContains('.dash-section-title', 'Reprendre');
         // currentProgress = la plus récente non terminée (Design M02 L01 ou Claude M03 L02)
         self::assertSelectorExists('.dash-continue-eyebrow');
-        // Au moins une carte de parcours par formation
-        self::assertGreaterThanOrEqual(2, $client->getCrawler()->filter('.dash-progress-map')->count());
+        // Au moins une carte de parcours (Rama inscrit à Claude)
+        self::assertGreaterThanOrEqual(1, $client->getCrawler()->filter('.dash-progress-map')->count());
         // progress map
         self::assertSelectorExists('.map-marker.is-done');
         self::assertSelectorExists('.map-marker.is-current');

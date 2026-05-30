@@ -20,7 +20,7 @@ final class FormationController extends AbstractController
     public function show(string $slug, FormationRepository $formations, EnrollmentRepository $enrollments): Response
     {
         $formation = $formations->findBySlug($slug);
-        if ($formation === null || !$formation->isPublished()) {
+        if ($formation === null || !$formation->isPublished() || $formation->isComingSoon()) {
             throw new NotFoundHttpException('Formation introuvable.');
         }
 

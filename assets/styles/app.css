@@ -1258,6 +1258,63 @@ h1, h2, h3, h4 {
   background: #B22F50;
 }
 
+/* COMING SOON */
+.cat-card.is-coming { opacity: 0.92; }
+.cat-card.is-coming .cat-card-cover-fallback { filter: grayscale(0.4); }
+.cat-card.is-coming .cat-card-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(31, 48, 37, 0.2) 0%, rgba(31, 48, 37, 0.55) 100%);
+  pointer-events: none;
+}
+.cat-card-badge.is-coming {
+  background: #FCFAF5;
+  color: var(--ink, #1F3025);
+  border: 1px solid #1F3025;
+  box-shadow: 0 4px 12px -4px rgba(31, 48, 37, 0.45);
+}
+.cat-card-coming-row {
+  margin-top: 0.6rem;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.8rem 1rem;
+  background: rgba(31, 48, 37, 0.05);
+  border: 1px dashed rgba(31, 48, 37, 0.2);
+  border-radius: 10px;
+}
+.cat-card-coming-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  color: var(--ink-soft);
+  text-transform: uppercase;
+}
+.cat-card-coming-date {
+  font-family: 'Caveat', cursive;
+  font-size: 1.6rem;
+  color: var(--rose);
+  line-height: 1;
+}
+.cat-card-cta.is-disabled,
+.cat-card-cta[disabled] {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid rgba(31, 48, 37, 0.25);
+  cursor: not-allowed;
+  font-family: 'Manrope', sans-serif;
+}
+.cat-card-cta.is-disabled:hover,
+.cat-card-cta[disabled]:hover {
+  background: rgba(31, 48, 37, 0.04);
+  color: var(--ink);
+  transform: none;
+}
+
+/* Cover wrapper (used when no link, e.g. coming-soon) */
+.cat-card-cover-wrapper { display: block; }
+
 /* PROGRAMME FORMATION */
 .formation-programme { display: flex; flex-direction: column; gap: 1.2rem; }
 .programme-module { background: #fff; border: 1px solid #efe9df; border-radius: 14px; overflow: hidden; }
