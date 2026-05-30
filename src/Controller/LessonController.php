@@ -40,6 +40,16 @@ final class LessonController extends AbstractController
         $allLessonsInModule = $module->getLessons()->toArray();
         [$prevLesson, $nextLesson] = $this->resolveSiblings($formation, $lesson);
 
+        $progressByLessonId = [];
+        foreach ($enrollment->getProgresses() as $p) {
+            $l = $p->getLesson();
+            if ($l !== null) {
+                $progressByLessonId[$l->getId()] = $p;
+            }
+        }
+
+        $moduleStats = $this->computeModuleStats($allLessonsInModule, $progressByLessonId);
+
         return $this->render('lesson/show.html.twig', [
             'formation'          => $formation,
             'module'             => $module,
@@ -47,9 +57,42 @@ final class LessonController extends AbstractController
             'enrollment'         => $enrollment,
             'progress'           => $progress,
             'allLessonsInModule' => $allLessonsInModule,
+            'progressByLessonId' => $progressByLessonId,
+            'moduleStats'        => $moduleStats,
             'prevLesson'         => $prevLesson,
             'nextLesson'         => $nextLesson,
         ]);
+    }
+
+    /**
+     * @param Lesson[] $lessons
+     * @param array<int, LessonProgress> $progressByLessonId
+     * @return array{percent: int, doneCount: int, totalCount: int, totalSeconds: int}
+     */
+    private function computeModuleStats(array $lessons, array $progressByLessonId): array
+    {
+        $total = count($lessons);
+        $done = 0;
+        $sum = 0;
+        $totalSeconds = 0;
+        foreach ($lessons as $l) {
+            $totalSeconds += $l->getDurationSeconds();
+            $p = $progressByLessonId[$l->getId()] ?? null;
+            if ($p === null) {
+                continue;
+            }
+            $sum += $p->getPercentWatched();
+            if ($p->isCompleted()) {
+                $done++;
+            }
+        }
+
+        return [
+            'percent'      => $total > 0 ? (int) round($sum / $total) : 0,
+            'doneCount'    => $done,
+            'totalCount'   => $total,
+            'totalSeconds' => $totalSeconds,
+        ];
     }
 
     #[Route('/formations/{slug}/{moduleSlug}/{lessonSlug}/complete', name: 'app_lesson_complete', methods: ['POST'])]
