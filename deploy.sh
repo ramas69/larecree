@@ -32,7 +32,7 @@ ok() {
     echo -e "${GREEN}✓ $1${RESET}"
 }
 
-trap 'echo -e "${RED}✗ Échec à l'étape précédente. Arrêt.${RESET}"; exit 1' ERR
+trap 'echo -e "${RED}x Echec a l etape precedente. Arret.${RESET}"; exit 1' ERR
 
 cd "$(dirname "$0")"
 
