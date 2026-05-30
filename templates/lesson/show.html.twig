@@ -39,20 +39,49 @@
             </div>
         </header>
 
-        {# ============ CINEMASCOPE PLAYER ============ #}
+        {# ============ CINEMASCOPE PLAYER + RESOURCES (2 col) ============ #}
         <section class="lp-screen" aria-label="Lecteur vidéo">
             <div class="lp-curtain lp-curtain-left" aria-hidden="true"></div>
             <div class="lp-curtain lp-curtain-right" aria-hidden="true"></div>
 
-            <div class="lp-screen-bezel">
-                <div class="lp-player-frame">
-                    <iframe
-                        src="https://player.vimeo.com/video/{{ lesson.vimeoVideoId }}?title=0&byline=0&portrait=0"
-                        title="{{ lesson.title }}"
-                        allow="autoplay; fullscreen; picture-in-picture"
-                        allowfullscreen
-                        loading="lazy"></iframe>
+            <div class="lp-screen-grid">
+                <div class="lp-screen-bezel">
+                    <div class="lp-player-frame">
+                        <iframe
+                            src="https://player.vimeo.com/video/{{ lesson.vimeoVideoId }}?title=0&byline=0&portrait=0"
+                            title="{{ lesson.title }}"
+                            allow="autoplay; fullscreen; picture-in-picture"
+                            allowfullscreen
+                            loading="lazy"></iframe>
+                    </div>
                 </div>
+
+                {% if lesson.resources|length > 0 %}
+                    <aside class="lp-resources-side" aria-label="Ressources">
+                        <header class="lp-resources-side-head">
+                            <span class="lp-resources-side-eyebrow">— Ressources</span>
+                            <h2 class="lp-resources-side-title">À télécharger · liens</h2>
+                        </header>
+                        <ul class="lp-resources-side-list">
+                            {% for r in lesson.resources %}
+                                {% set isFile = r.type.value == 'file' %}
+                                {% set href = isFile ? r.filePath : r.url %}
+                                <li class="lp-resource-side {{ isFile ? 'is-file' : 'is-link' }}">
+                                    {% if href %}
+                                        <a href="{{ href }}" {{ isFile ? '' : 'target="_blank" rel="noopener"' }}>
+                                            <span class="lp-resource-side-icon" aria-hidden="true">{{ isFile ? '📄' : '🔗' }}</span>
+                                            <span class="lp-resource-side-body">
+                                                <span class="lp-resource-side-kind">{{ isFile ? 'PDF' : 'Lien' }}</span>
+                                                <strong>{{ r.title }}</strong>
+                                                <em>{{ isFile ? 'Télécharger →' : 'Ouvrir →' }}</em>
+                                            </span>
+                                        </a>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </aside>
+                {% endif %}
             </div>
         </section>
 
@@ -69,36 +98,6 @@
                 <span class="lp-vellum-eyebrow">— À retenir</span>
                 <h2 class="lp-vellum-title">Au programme de cette leçon</h2>
                 <p>{{ lesson.description }}</p>
-            </section>
-        {% endif %}
-
-        {# ============ RESOURCES — chips horizontales ============ #}
-        {% if lesson.resources|length > 0 %}
-            <section class="lp-chips-section" aria-label="Ressources">
-                <header class="lp-chips-head">
-                    <span class="lp-chips-eyebrow">— Ressources</span>
-                    <h2 class="lp-chips-title">À télécharger · liens utiles</h2>
-                </header>
-                <div class="lp-chips-scroller">
-                    <ul class="lp-chips">
-                        {% for r in lesson.resources %}
-                            {% set isFile = r.type.value == 'file' %}
-                            {% set href = isFile ? r.filePath : r.url %}
-                            <li class="lp-chip {{ isFile ? 'is-file' : 'is-link' }}">
-                                {% if href %}
-                                    <a href="{{ href }}" {{ isFile ? '' : 'target="_blank" rel="noopener"' }}>
-                                        <span class="lp-chip-icon" aria-hidden="true">{{ isFile ? '📄' : '🔗' }}</span>
-                                        <span class="lp-chip-body">
-                                            <span class="lp-chip-kind">{{ isFile ? 'PDF' : 'Lien' }}</span>
-                                            <strong>{{ r.title }}</strong>
-                                            <em>{{ isFile ? 'Télécharger →' : 'Ouvrir →' }}</em>
-                                        </span>
-                                    </a>
-                                {% endif %}
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
             </section>
         {% endif %}
 
