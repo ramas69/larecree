@@ -59,7 +59,6 @@ final class StripeCheckoutService
         $params = [
             'success_url'          => $successUrl,
             'cancel_url'           => $cancelUrl,
-            'customer_creation'    => 'always',
             'billing_address_collection' => 'auto',
             'allow_promotion_codes' => true,
             'metadata' => [
@@ -70,6 +69,7 @@ final class StripeCheckoutService
         ];
 
         if ($plan === '3x') {
+            // mode subscription : Stripe crée le Customer automatiquement, customer_creation n'est PAS autorisé ici.
             // Abonnement mensuel × 3 → cancel auto après 3 charges (géré dans handleSessionCompleted).
             $perMonthCents = $this->perMonthCents($formation->getPriceCents());
             $params['mode'] = 'subscription';
@@ -94,6 +94,7 @@ final class StripeCheckoutService
             ];
         } else {
             $params['mode'] = 'payment';
+            $params['customer_creation'] = 'always';
             $params['line_items'] = [[
                 'quantity'   => 1,
                 'price_data' => [
