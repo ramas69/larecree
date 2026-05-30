@@ -30,6 +30,15 @@
             </div>
         </div>
 
+        {# ============ HEADLINE ============ #}
+        <header class="lp-headline">
+            <span class="lp-headline-mark">★</span>
+            <div class="lp-headline-body">
+                <span class="lp-headline-eyebrow">Leçon {{ '%02d'|format(lesson.displayOrder) }} · M{{ '%02d'|format(module.displayOrder) }} {{ module.title }}</span>
+                <h1 class="lp-headline-title">{{ lesson.title }}</h1>
+            </div>
+        </header>
+
         {# ============ CINEMASCOPE PLAYER ============ #}
         <section class="lp-screen" aria-label="Lecteur vidéo">
             <div class="lp-curtain lp-curtain-left" aria-hidden="true"></div>
@@ -46,15 +55,6 @@
                 </div>
             </div>
         </section>
-
-        {# ============ HEADLINE ============ #}
-        <header class="lp-headline">
-            <span class="lp-headline-mark">★</span>
-            <div class="lp-headline-body">
-                <span class="lp-headline-eyebrow">Leçon {{ '%02d'|format(lesson.displayOrder) }} · M{{ '%02d'|format(module.displayOrder) }} {{ module.title }}</span>
-                <h1 class="lp-headline-title">{{ lesson.title }}</h1>
-            </div>
-        </header>
 
         {% for message in app.flashes('success') %}
             <div class="lp-flash">
