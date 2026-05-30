@@ -9,40 +9,80 @@
 
     <main class="app-main">
 
-        <section class="dash-hero">
-            <span class="dash-hero-caveat">notre catalogue</span>
-            <h1 class="dash-hero-title">Choisis ta <em>prochaine</em> formation.</h1>
-            <p class="dash-hero-sub">Toutes nos formations Récrée Tech, des fondations Claude au design produit.</p>
+        <section class="cat-hero">
+            <div class="cat-hero-grid" aria-hidden="true"></div>
+            <div class="cat-hero-inner">
+                <span class="cat-hero-caveat">notre catalogue</span>
+                <h1 class="cat-hero-title">Choisis ta <em>prochaine</em> formation.</h1>
+                <p class="cat-hero-sub">Toutes nos formations Récrée Tech, des fondations Claude au design produit.</p>
+
+                <ul class="cat-hero-stats">
+                    <li><strong>{{ totalFormations }}</strong><span>formation{{ totalFormations > 1 ? 's' : '' }}</span></li>
+                    <li><strong>{{ totalModules }}</strong><span>modules</span></li>
+                    <li><strong>{{ totalLessons }}</strong><span>leçons</span></li>
+                    {% if enrolledCount > 0 %}
+                        <li class="is-mine"><strong>{{ enrolledCount }}</strong><span>{{ enrolledCount > 1 ? 'à toi' : 'à toi' }}</span></li>
+                    {% endif %}
+                </ul>
+            </div>
         </section>
 
-        <section class="dash-section">
-            <div class="catalogue-grid">
-                {% for formation in formations %}
-                    {% set enrolled = enrolledFormationIds[formation.id] ?? false %}
-                    {% set coverPath = formation.slug == 'claude-2026' ? '/images/modules/module-01-ouverture.png' : null %}
-                    <article class="catalogue-card {{ enrolled ? 'is-enrolled' : '' }}">
-                        <div class="catalogue-card-cover" aria-hidden="true">
-                            {% if coverPath %}
-                                <img src="{{ coverPath }}" alt="" class="catalogue-card-cover-img" loading="lazy">
-                            {% else %}
-                                <span class="catalogue-card-cover-mark">{{ formation.title|first }}</span>
-                            {% endif %}
-                            {% if enrolled %}
-                                <span class="catalogue-card-badge">✓ Inscrit·e</span>
-                            {% endif %}
-                        </div>
-                        <div class="catalogue-card-body">
-                            <span class="catalogue-card-eyebrow">— Formation</span>
-                            <h2 class="catalogue-card-title">{{ formation.title }}</h2>
-                            {% if formation.subtitle %}
-                                <p class="catalogue-card-sub">{{ formation.subtitle }}</p>
-                            {% endif %}
-                            <div class="catalogue-card-meta">
-                                <span>{{ formation.modules|length }} modules</span>
-                                <span class="catalogue-card-price">{{ formation.priceFormatted }}</span>
+        <section class="cat-grid-section">
+            <div class="cat-section-head">
+                <h2 class="cat-section-title">— Les <em>formations</em></h2>
+                <span class="cat-section-hint">★ Triées par ordre de sortie</span>
+            </div>
+
+            <div class="cat-grid">
+                {% for card in cards %}
+                    {% set f = card.formation %}
+                    {% set cover = f.slug == 'claude-2026' ? '/images/modules/module-01-ouverture.png' : null %}
+                    <article class="cat-card {{ card.enrolled ? 'is-enrolled' : '' }} {{ card.vipGranted ? 'is-vip' : '' }}">
+
+                        <a href="{{ path('app_formation_show', { slug: f.slug }) }}" class="cat-card-cover-link" aria-label="Voir {{ f.title }}">
+                            <div class="cat-card-cover">
+                                {% if cover %}
+                                    <img src="{{ cover }}" alt="" loading="lazy">
+                                {% else %}
+                                    <div class="cat-card-cover-fallback">
+                                        <span class="cat-card-cover-grid" aria-hidden="true"></span>
+                                        <span class="cat-card-cover-eyebrow">★ La Récré Tech · Formation</span>
+                                        <span class="cat-card-cover-num">{{ '%02d'|format(loop.index) }}</span>
+                                        <span class="cat-card-cover-title">{{ f.title }}</span>
+                                        {% if f.subtitle %}<span class="cat-card-cover-sub">{{ f.subtitle }}</span>{% endif %}
+                                    </div>
+                                {% endif %}
+                                <div class="cat-card-cover-overlay" aria-hidden="true"></div>
+                                {% if card.enrolled %}
+                                    <span class="cat-card-badge {{ card.vipGranted ? 'is-vip' : '' }}">{{ card.vipGranted ? '★ VIP' : '✓ Inscrit·e' }}</span>
+                                {% endif %}
                             </div>
-                            <a href="{{ path('app_formation_show', { slug: formation.slug }) }}" class="catalogue-card-cta">
-                                {{ enrolled ? '▶ Reprendre' : '→ Découvrir' }}
+                        </a>
+
+                        <div class="cat-card-body">
+                            <span class="cat-card-eyebrow">— Formation · {{ card.modulesCount }} modules · {{ card.totalDurationFormatted }}</span>
+                            <h3 class="cat-card-title">
+                                <a href="{{ path('app_formation_show', { slug: f.slug }) }}">{{ f.title }}</a>
+                            </h3>
+                            {% if f.subtitle %}<p class="cat-card-sub">{{ f.subtitle }}</p>{% endif %}
+
+                            {% if card.enrolled %}
+                                <div class="cat-card-progress">
+                                    <progress class="cat-card-progress-bar" max="100" value="{{ card.progressPercent }}" aria-label="Progression formation {{ f.title }}">{{ card.progressPercent }} %</progress>
+                                    <div class="cat-card-progress-meta">
+                                        <span><strong>{{ card.progressPercent }} %</strong> de la formation</span>
+                                        <span>{{ card.completedLessonsCount }} / {{ card.lessonsCount }} leçons</span>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="cat-card-price-row">
+                                    <span class="cat-card-price-label">Tarif</span>
+                                    <span class="cat-card-price">{{ f.priceFormatted }}</span>
+                                </div>
+                            {% endif %}
+
+                            <a href="{{ path('app_formation_show', { slug: f.slug }) }}" class="cat-card-cta {{ card.enrolled ? 'is-resume' : '' }}">
+                                {{ card.enrolled ? '▶ Reprendre la formation' : 'Découvrir le programme →' }}
                             </a>
                         </div>
                     </article>
