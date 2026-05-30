@@ -74,6 +74,41 @@
                 </div>
             </div>
         </section>
+        {% elseif snapshot.enrollmentSnapshots|length > 0 %}
+            {% set firstEnrollment = snapshot.enrollmentSnapshots[0].enrollment %}
+            {% set firstFormation = firstEnrollment.formation %}
+            {% set firstModule = firstFormation.modules|first %}
+            {% set firstLesson = firstModule ? firstModule.lessons|first : null %}
+            {% if firstLesson %}
+            <section class="dash-section">
+                <div class="dash-section-head">
+                    <h2 class="dash-section-title">Bienvenue, <em>commence</em> par ici</h2>
+                    <a href="{{ path('app_formation_show', { slug: firstFormation.slug }) }}" class="dash-section-action">Voir le programme →</a>
+                </div>
+
+                <div class="dash-continue">
+                    <div class="dash-continue-thumb" aria-hidden="true">
+                        <div class="dash-continue-thumb-play">▶</div>
+                        <span class="dash-continue-thumb-time">{{ firstLesson.durationFormatted }}</span>
+                    </div>
+                    <div class="dash-continue-body">
+                        <span class="dash-continue-eyebrow">★ {{ firstFormation.title }} · M{{ '%02d'|format(firstModule.displayOrder) }} · Leçon {{ firstLesson.displayOrder }}</span>
+                        <h3>{{ firstLesson.title }}</h3>
+                        <p class="dash-continue-meta">Ta toute première leçon — {{ firstLesson.durationFormatted }}. Allez, on y va.</p>
+
+                        <div class="dash-progress-bar">
+                            <div class="dash-progress-bar-fill" style="width: 0%;"></div>
+                        </div>
+                        <div class="dash-progress-meta">
+                            <span><strong>0 %</strong> de la formation</span>
+                            <span>{{ snapshot.enrollmentSnapshots[0].progressMap.totalCount ?? snapshot.enrollmentSnapshots[0].progressMap.totalModulesCount }} modules au programme</span>
+                        </div>
+
+                        <a href="{{ path('app_lesson_show', { slug: firstFormation.slug, moduleSlug: firstModule.slug, lessonSlug: firstLesson.slug }) }}" class="dash-continue-cta">▶ Commencer la formation</a>
+                    </div>
+                </div>
+            </section>
+            {% endif %}
         {% endif %}
 
         {% if snapshot.enrollmentSnapshots|length > 0 %}
