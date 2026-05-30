@@ -24,7 +24,6 @@ final class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        // Users
         $admin = $this->makeUser('admin@larecreetech.com', 'admin', 'Admin', 'Rama', ['ROLE_ADMIN']);
         $vip   = $this->makeUser('vip@larecreetech.com', 'vip', 'VIP', 'Test', ['ROLE_VIP']);
         $rama  = $this->makeUser('rama@hallia.ai', 'rama', 'Rama', 'Soumare', ['ROLE_STUDENT']);
@@ -33,7 +32,32 @@ final class AppFixtures extends Fixture
         $manager->persist($vip);
         $manager->persist($rama);
 
-        // Formation Claude — 8 modules
+        [$claude, $claudeLessons] = $this->seedClaudeFormation($manager);
+        [$design, $designLessons] = $this->seedDesignFormation($manager);
+
+        // Rama : enrollment Stripe sur Claude + progression M01+M02 done, M03L1 done, M03L2 47 %
+        $ramaClaude = $this->enroll($manager, $rama, $claude, EnrollmentSource::Stripe, 39700, 'cs_test_claude', 'pi_test_claude');
+        $this->markModuleCompleted($manager, $ramaClaude, $claudeLessons[0]);
+        $this->markModuleCompleted($manager, $ramaClaude, $claudeLessons[1]);
+        $this->markLessonCompleted($manager, $ramaClaude, $claudeLessons[2][0]);
+        $this->recordPartialWatch($manager, $ramaClaude, $claudeLessons[2][1], 47);
+
+        // VIP : enrollment Vip gratuit sur Claude
+        $this->enroll($manager, $vip, $claude, EnrollmentSource::Vip);
+
+        // Rama : enrollment Stripe sur Design + M01 done, M02L1 30 %
+        $ramaDesign = $this->enroll($manager, $rama, $design, EnrollmentSource::Stripe, 29700, 'cs_test_design', 'pi_test_design');
+        $this->markModuleCompleted($manager, $ramaDesign, $designLessons[0]);
+        $this->recordPartialWatch($manager, $ramaDesign, $designLessons[1][0], 30);
+
+        $manager->flush();
+    }
+
+    /**
+     * @return array{0: Formation, 1: array<int, array<int, Lesson>>}
+     */
+    private function seedClaudeFormation(ObjectManager $manager): array
+    {
         $claude = (new Formation())
             ->setSlug('claude-2026')
             ->setTitle('Formation Claude 2026')
@@ -56,80 +80,114 @@ final class AppFixtures extends Fixture
             ['Finale : ton agent personnel',       'agent-personnel'],
         ];
 
-        $modules = [];
+        return [$claude, $this->seedModules($manager, $claude, $modulesSpec, lessonsPerModule: 4, vimeoPrefix: '9999')];
+    }
+
+    /**
+     * @return array{0: Formation, 1: array<int, array<int, Lesson>>}
+     */
+    private function seedDesignFormation(ObjectManager $manager): array
+    {
+        $design = (new Formation())
+            ->setSlug('design-web-2026')
+            ->setTitle('Design Web 2026')
+            ->setSubtitle('De Figma à la prod sans drama')
+            ->setDescription('Atelier express en 4 modules pour designer avec rigueur produit.')
+            ->setPriceCents(29700)
+            ->setCurrency('EUR')
+            ->setPublished(true)
+            ->setDisplayOrder(2);
+        $manager->persist($design);
+
+        $modulesSpec = [
+            ['Fondamentaux visuels',       'fondamentaux-visuels'],
+            ['Système de design',          'systeme-design'],
+            ['Composants & Storybook',     'composants-storybook'],
+            ['Finale : portfolio produit', 'portfolio-produit'],
+        ];
+
+        return [$design, $this->seedModules($manager, $design, $modulesSpec, lessonsPerModule: 3, vimeoPrefix: '8888')];
+    }
+
+    /**
+     * @param list<array{0: string, 1: string}> $modulesSpec
+     * @return array<int, array<int, Lesson>> indexed by module index, value = list of lessons
+     */
+    private function seedModules(ObjectManager $manager, Formation $formation, array $modulesSpec, int $lessonsPerModule, string $vimeoPrefix): array
+    {
+        $lessonsByModule = [];
         foreach ($modulesSpec as $i => [$title, $slug]) {
-            $mod = (new Module())
+            $module = (new Module())
                 ->setSlug($slug)
                 ->setTitle($title)
                 ->setDescription('Module '.($i + 1).' — '.$title)
                 ->setDisplayOrder($i + 1);
-            $claude->addModule($mod);
-            $manager->persist($mod);
-            $modules[] = $mod;
-        }
+            $formation->addModule($module);
+            $manager->persist($module);
 
-        // 4 leçons par module
-        $lessonsByModule = [];
-        foreach ($modules as $mi => $mod) {
-            $lessonsByModule[$mi] = [];
-            for ($li = 1; $li <= 4; $li++) {
+            $lessons = [];
+            for ($li = 1; $li <= $lessonsPerModule; $li++) {
                 $lesson = (new Lesson())
-                    ->setSlug('m'.($mi + 1).'-l'.$li)
-                    ->setTitle('Leçon '.$li.' — '.$mod->getTitle())
-                    ->setVimeoVideoId('9999'.($mi + 1).$li)
+                    ->setSlug('m'.($i + 1).'-l'.$li)
+                    ->setTitle('Leçon '.$li.' — '.$module->getTitle())
+                    ->setVimeoVideoId($vimeoPrefix.($i + 1).$li)
                     ->setDescription('Contenu pédagogique de la leçon '.$li.'.')
                     ->setDurationSeconds(60 * (8 + $li * 2))
                     ->setDisplayOrder($li);
-                $mod->addLesson($lesson);
+                $module->addLesson($lesson);
                 $manager->persist($lesson);
-                $lessonsByModule[$mi][] = $lesson;
+                $lessons[] = $lesson;
             }
+            $lessonsByModule[$i] = $lessons;
         }
 
-        // Enrollment Rama → Claude (Stripe)
+        return $lessonsByModule;
+    }
+
+    private function enroll(
+        ObjectManager $manager,
+        User $user,
+        Formation $formation,
+        EnrollmentSource $source,
+        ?int $amountCents = null,
+        ?string $stripeSessionId = null,
+        ?string $stripePaymentIntentId = null,
+    ): Enrollment {
         $enrollment = (new Enrollment())
-            ->setUser($rama)
-            ->setFormation($claude)
-            ->setSource(EnrollmentSource::Stripe)
-            ->setAmountCents(39700)
-            ->setStripeSessionId('cs_test_demo')
-            ->setStripePaymentIntentId('pi_test_demo');
+            ->setUser($user)
+            ->setFormation($formation)
+            ->setSource($source)
+            ->setAmountCents($amountCents)
+            ->setStripeSessionId($stripeSessionId)
+            ->setStripePaymentIntentId($stripePaymentIntentId);
         $manager->persist($enrollment);
 
-        // Enrollment VIP → Claude (Vip)
-        $vipEnrollment = (new Enrollment())
-            ->setUser($vip)
-            ->setFormation($claude)
-            ->setSource(EnrollmentSource::Vip);
-        $manager->persist($vipEnrollment);
+        return $enrollment;
+    }
 
-        // Progression Rama : M01 + M02 complets ; M03 leçon 1 complète, leçon 2 à 47 %
-        foreach ($lessonsByModule[0] as $lesson) {
-            $p = (new LessonProgress())->setEnrollment($enrollment)->setLesson($lesson);
-            $p->recordWatch($lesson->getDurationSeconds(), 100);
-            $p->markCompleted();
-            $manager->persist($p);
+    /**
+     * @param list<Lesson> $lessons
+     */
+    private function markModuleCompleted(ObjectManager $manager, Enrollment $enrollment, array $lessons): void
+    {
+        foreach ($lessons as $lesson) {
+            $this->markLessonCompleted($manager, $enrollment, $lesson);
         }
-        foreach ($lessonsByModule[1] as $lesson) {
-            $p = (new LessonProgress())->setEnrollment($enrollment)->setLesson($lesson);
-            $p->recordWatch($lesson->getDurationSeconds(), 100);
-            $p->markCompleted();
-            $manager->persist($p);
-        }
-        // M03 leçon 1 complète
-        $m3l1 = $lessonsByModule[2][0];
-        $p = (new LessonProgress())->setEnrollment($enrollment)->setLesson($m3l1);
-        $p->recordWatch($m3l1->getDurationSeconds(), 100);
-        $p->markCompleted();
-        $manager->persist($p);
+    }
 
-        // M03 leçon 2 — en cours à 47 %
-        $m3l2 = $lessonsByModule[2][1];
-        $p = (new LessonProgress())->setEnrollment($enrollment)->setLesson($m3l2);
-        $p->recordWatch((int) round($m3l2->getDurationSeconds() * 0.47), 47);
-        $manager->persist($p);
+    private function markLessonCompleted(ObjectManager $manager, Enrollment $enrollment, Lesson $lesson): void
+    {
+        $progress = (new LessonProgress())->setEnrollment($enrollment)->setLesson($lesson);
+        $progress->recordWatch($lesson->getDurationSeconds(), 100);
+        $progress->markCompleted();
+        $manager->persist($progress);
+    }
 
-        $manager->flush();
+    private function recordPartialWatch(ObjectManager $manager, Enrollment $enrollment, Lesson $lesson, int $percent): void
+    {
+        $progress = (new LessonProgress())->setEnrollment($enrollment)->setLesson($lesson);
+        $progress->recordWatch((int) round($lesson->getDurationSeconds() * $percent / 100), $percent);
+        $manager->persist($progress);
     }
 
     /**
