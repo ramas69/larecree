@@ -2530,6 +2530,17 @@ h1, h2, h3, h4 {
 @media (max-width: 1024px) {
   .lesson-grid { grid-template-columns: 1fr; }
   .lesson-sidebar { position: static; }
+
+  /* Resources sidebar stacked under player — let content flow naturally */
+  .lp-resources-side {
+    align-self: stretch;
+    min-height: 0;
+  }
+  .lp-resources-side-list {
+    overflow-y: visible;
+    flex: 0 0 auto;
+    max-height: none;
+  }
 }
 
 /* ============ MOBILE (≤ 720px) ============ */

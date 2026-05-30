@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Repository;
 
 use App\Entity\Enrollment;
+use App\Entity\EnrollmentSource;
 use App\Entity\Formation;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -43,5 +44,15 @@ final class EnrollmentRepository extends ServiceEntityRepository
             ->setParameter('formation', $formation)
             ->getQuery()
             ->getOneOrNullResult();
+    }
+
+    public function countBySource(EnrollmentSource $source): int
+    {
+        return (int) $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->andWhere('e.source = :source')
+            ->setParameter('source', $source)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }
