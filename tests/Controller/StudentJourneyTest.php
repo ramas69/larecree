@@ -61,12 +61,22 @@ final class StudentJourneyTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.cat-hero-title', 'prochaine');
-        // 2 formations seedées, toutes 2 catalogued
+        // 2 formations seedées : Claude (enrollée par Rama) + Manus (coming soon)
         self::assertGreaterThanOrEqual(2, $client->getCrawler()->filter('.cat-card')->count());
-        // Rama est inscrit aux 2 → 2 cards marquées
-        self::assertGreaterThanOrEqual(2, $client->getCrawler()->filter('.cat-card.is-enrolled')->count());
-        // Hero stats présentes
+        self::assertGreaterThanOrEqual(1, $client->getCrawler()->filter('.cat-card.is-enrolled')->count());
+        self::assertGreaterThanOrEqual(1, $client->getCrawler()->filter('.cat-card.is-coming')->count());
+        self::assertSelectorTextContains('.cat-card-badge.is-coming', 'Bientôt');
         self::assertSelectorExists('.cat-hero-stats');
+    }
+
+    public function testComingSoonFormationShowReturns404(): void
+    {
+        $client = $this->bootWithFixtures();
+        $this->loginAsRama($client);
+
+        $client->request('GET', '/formations/manus-2026');
+
+        self::assertResponseStatusCodeSame(404);
     }
 
     public function testFormationShowDisplaysProgrammeAndDoneMarkers(): void
@@ -88,10 +98,10 @@ final class StudentJourneyTest extends WebTestCase
         $client = $this->bootWithFixtures();
         $this->loginAsVip($client);
 
-        // VIP inscrit à Claude mais pas à Design → 403
-        $client->request('GET', '/formations/design-web-2026/fondamentaux-visuels/m1-l1');
+        // VIP inscrit à Claude, Manus est coming-soon → 404 (gated avant access denied)
+        $client->request('GET', '/formations/manus-2026/decouvrir-manus/m1-l1');
 
-        self::assertResponseStatusCodeSame(403);
+        self::assertResponseStatusCodeSame(404);
     }
 
     public function testLessonShowRendersVimeoPlayer(): void

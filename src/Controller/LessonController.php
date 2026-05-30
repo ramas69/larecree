@@ -38,7 +38,7 @@ final class LessonController extends AbstractController
 
         $progress = $progresses->findOneByEnrollmentAndLesson($enrollment, $lesson);
         $allLessonsInModule = $module->getLessons()->toArray();
-        [$prevLesson, $nextLesson] = $this->resolveSiblings($formation, $module, $lesson);
+        [$prevLesson, $nextLesson] = $this->resolveSiblings($formation, $lesson);
 
         return $this->render('lesson/show.html.twig', [
             'formation'          => $formation,
@@ -99,7 +99,7 @@ final class LessonController extends AbstractController
         EnrollmentRepository $enrollments,
     ): array {
         $formation = $formations->findBySlug($slug);
-        if ($formation === null || !$formation->isPublished()) {
+        if ($formation === null || !$formation->isPublished() || $formation->isComingSoon()) {
             throw new NotFoundHttpException('Formation introuvable.');
         }
 
@@ -138,7 +138,7 @@ final class LessonController extends AbstractController
     /**
      * @return array{0: ?Lesson, 1: ?Lesson}
      */
-    private function resolveSiblings(\App\Entity\Formation $formation, Module $currentModule, Lesson $currentLesson): array
+    private function resolveSiblings(\App\Entity\Formation $formation, Lesson $currentLesson): array
     {
         $orderedLessons = [];
         foreach ($formation->getModules() as $m) {

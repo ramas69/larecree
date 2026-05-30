@@ -36,9 +36,10 @@
             <div class="cat-grid">
                 {% for card in cards %}
                     {% set f = card.formation %}
-                    <article class="cat-card {{ card.enrolled ? 'is-enrolled' : '' }} {{ card.vipGranted ? 'is-vip' : '' }}">
+                    {% set comingSoon = f.isComingSoon %}
+                    <article class="cat-card {{ card.enrolled ? 'is-enrolled' : '' }} {{ card.vipGranted ? 'is-vip' : '' }} {{ comingSoon ? 'is-coming' : '' }}">
 
-                        <a href="{{ path('app_formation_show', { slug: f.slug }) }}" class="cat-card-cover-link" aria-label="Voir {{ f.title }}">
+                        <div class="cat-card-cover-wrapper">
                             <div class="cat-card-cover">
                                 <div class="cat-card-cover-fallback">
                                     <span class="cat-card-cover-grid" aria-hidden="true"></span>
@@ -48,20 +49,33 @@
                                     {% if f.subtitle %}<span class="cat-card-cover-sub">{{ f.subtitle }}</span>{% endif %}
                                 </div>
                                 <div class="cat-card-cover-overlay" aria-hidden="true"></div>
-                                {% if card.enrolled %}
+                                {% if comingSoon %}
+                                    <span class="cat-card-badge is-coming">⏳ Bientôt</span>
+                                {% elseif card.enrolled %}
                                     <span class="cat-card-badge {{ card.vipGranted ? 'is-vip' : '' }}">{{ card.vipGranted ? '★ VIP' : '✓ Inscrit·e' }}</span>
                                 {% endif %}
                             </div>
-                        </a>
+                        </div>
 
                         <div class="cat-card-body">
-                            <span class="cat-card-eyebrow">— Formation · {{ card.modulesCount }} modules · {{ card.totalDurationFormatted }}</span>
+                            <span class="cat-card-eyebrow">
+                                — Formation · {{ card.modulesCount }} modules · {{ card.totalDurationFormatted }}
+                            </span>
                             <h3 class="cat-card-title">
-                                <a href="{{ path('app_formation_show', { slug: f.slug }) }}">{{ f.title }}</a>
+                                {% if comingSoon %}
+                                    <span>{{ f.title }}</span>
+                                {% else %}
+                                    <a href="{{ path('app_formation_show', { slug: f.slug }) }}">{{ f.title }}</a>
+                                {% endif %}
                             </h3>
                             {% if f.subtitle %}<p class="cat-card-sub">{{ f.subtitle }}</p>{% endif %}
 
-                            {% if card.enrolled %}
+                            {% if comingSoon %}
+                                <div class="cat-card-coming-row">
+                                    <span class="cat-card-coming-label">— Sortie prévue</span>
+                                    <span class="cat-card-coming-date">Bientôt</span>
+                                </div>
+                            {% elseif card.enrolled %}
                                 <div class="cat-card-progress">
                                     <progress class="cat-card-progress-bar" max="100" value="{{ card.progressPercent }}" aria-label="Progression formation {{ f.title }}">{{ card.progressPercent }} %</progress>
                                     <div class="cat-card-progress-meta">
@@ -76,9 +90,13 @@
                                 </div>
                             {% endif %}
 
-                            <a href="{{ path('app_formation_show', { slug: f.slug }) }}" class="cat-card-cta {{ card.enrolled ? 'is-resume' : '' }}">
-                                {{ card.enrolled ? '▶ Reprendre la formation' : 'Découvrir le programme →' }}
-                            </a>
+                            {% if comingSoon %}
+                                <button type="button" class="cat-card-cta is-disabled" disabled>Préviens-moi à la sortie</button>
+                            {% else %}
+                                <a href="{{ path('app_formation_show', { slug: f.slug }) }}" class="cat-card-cta {{ card.enrolled ? 'is-resume' : '' }}">
+                                    {{ card.enrolled ? '▶ Reprendre la formation' : 'Découvrir le programme →' }}
+                                </a>
+                            {% endif %}
                         </div>
                     </article>
                 {% else %}

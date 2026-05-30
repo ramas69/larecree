@@ -33,7 +33,7 @@ final class AppFixtures extends Fixture
         $manager->persist($rama);
 
         [$claude, $claudeLessons] = $this->seedClaudeFormation($manager);
-        [$design, $designLessons] = $this->seedDesignFormation($manager);
+        $this->seedManusFormation($manager);
 
         // Rama : enrollment Stripe sur Claude + progression M01+M02 done, M03L1 done, M03L2 47 %
         $ramaClaude = $this->enroll($manager, $rama, $claude, EnrollmentSource::Stripe, 39700, 'cs_test_claude', 'pi_test_claude');
@@ -44,11 +44,6 @@ final class AppFixtures extends Fixture
 
         // VIP : enrollment Vip gratuit sur Claude
         $this->enroll($manager, $vip, $claude, EnrollmentSource::Vip);
-
-        // Rama : enrollment Stripe sur Design + M01 done, M02L1 30 %
-        $ramaDesign = $this->enroll($manager, $rama, $design, EnrollmentSource::Stripe, 29700, 'cs_test_design', 'pi_test_design');
-        $this->markModuleCompleted($manager, $ramaDesign, $designLessons[0]);
-        $this->recordPartialWatch($manager, $ramaDesign, $designLessons[1][0], 30);
 
         $manager->flush();
     }
@@ -83,30 +78,30 @@ final class AppFixtures extends Fixture
         return [$claude, $this->seedModules($manager, $claude, $modulesSpec, lessonsPerModule: 4, vimeoPrefix: '9999')];
     }
 
-    /**
-     * @return array{0: Formation, 1: array<int, array<int, Lesson>>}
-     */
-    private function seedDesignFormation(ObjectManager $manager): array
+    private function seedManusFormation(ObjectManager $manager): Formation
     {
-        $design = (new Formation())
-            ->setSlug('design-web-2026')
-            ->setTitle('Design Web 2026')
-            ->setSubtitle('De Figma à la prod sans drama')
-            ->setDescription('Atelier express en 4 modules pour designer avec rigueur produit.')
-            ->setPriceCents(29700)
+        $manus = (new Formation())
+            ->setSlug('manus-2026')
+            ->setTitle('Formation Manus 2026')
+            ->setSubtitle('L\'agent IA qui exécute pendant que tu fais autre chose.')
+            ->setDescription('Découvre Manus, le co-pilote autonome qui transforme tes intentions en livrables. Bientôt disponible.')
+            ->setPriceCents(34700)
             ->setCurrency('EUR')
             ->setPublished(true)
+            ->setComingSoon(true)
             ->setDisplayOrder(2);
-        $manager->persist($design);
+        $manager->persist($manus);
 
         $modulesSpec = [
-            ['Fondamentaux visuels',       'fondamentaux-visuels',  'Tout part de la grille, du rythme typo, du contraste.'],
-            ['Système de design',          'systeme-design',        'Tokens, composants, gouvernance — ta vraie scalabilité.'],
-            ['Composants & Storybook',     'composants-storybook',  'Un composant, mille usages — sans casser la maintenance.'],
-            ['Finale : portfolio produit', 'portfolio-produit',     'Ce qui te fait recruter — pas Dribbble.'],
+            ['Découvrir Manus',          'decouvrir-manus',       'Comprendre l\'agent : ce qu\'il fait vraiment, ce qu\'il ne fait pas.'],
+            ['Brief & garde-fous',       'brief-garde-fous',      'Lui parler comme à un junior brillant qu\'on ne supervise pas.'],
+            ['Automatisations métier',   'automatisations-metier','Plug Manus dans tes outils — il livre, tu valides.'],
+            ['Finale : ton bras droit',  'bras-droit',            'Ton workflow où Manus devient un membre de ton équipe.'],
         ];
 
-        return [$design, $this->seedModules($manager, $design, $modulesSpec, lessonsPerModule: 3, vimeoPrefix: '8888')];
+        $this->seedModules($manager, $manus, $modulesSpec, lessonsPerModule: 3, vimeoPrefix: '7777');
+
+        return $manus;
     }
 
     /**

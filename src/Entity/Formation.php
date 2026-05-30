@@ -46,6 +46,9 @@ class Formation
     #[ORM\Column(options: ['default' => false])]
     private bool $published = false;
 
+    #[ORM\Column(options: ['default' => false])]
+    private bool $comingSoon = false;
+
     #[ORM\Column]
     private int $displayOrder = 0;
 
@@ -185,6 +188,17 @@ class Formation
     public function setPublished(bool $published): static
     {
         $this->published = $published;
+        return $this;
+    }
+
+    public function isComingSoon(): bool
+    {
+        return $this->comingSoon;
+    }
+
+    public function setComingSoon(bool $comingSoon): static
+    {
+        $this->comingSoon = $comingSoon;
         return $this;
     }
 
