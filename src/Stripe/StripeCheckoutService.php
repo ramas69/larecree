@@ -52,8 +52,9 @@ final class StripeCheckoutService
             .'?session_id={CHECKOUT_SESSION_ID}';
         $cancelUrl = $this->urlGenerator->generate('app_checkout_cancel', [], UrlGeneratorInterface::ABSOLUTE_URL);
 
+        $currency = strtolower($formation->getCurrency());
+
         $params = [
-            'mode'                 => 'payment',
             'success_url'          => $successUrl,
             'cancel_url'           => $cancelUrl,
             'customer_creation'    => 'always',
@@ -64,24 +65,44 @@ final class StripeCheckoutService
                 'formation_id'   => (string) $formation->getId(),
                 'plan'           => $plan,
             ],
-            'line_items' => [[
+        ];
+
+        if ($plan === '3x') {
+            // Abonnement mensuel × 3 → cancel auto après 3 charges (géré dans handleSessionCompleted).
+            $perMonthCents = $this->perMonthCents($formation->getPriceCents());
+            $params['mode'] = 'subscription';
+            $params['line_items'] = [[
                 'quantity'   => 1,
                 'price_data' => [
-                    'currency'     => strtolower($formation->getCurrency()),
+                    'currency'     => $currency,
+                    'unit_amount'  => $perMonthCents,
+                    'recurring'    => ['interval' => 'month'],
+                    'product_data' => [
+                        'name'        => $formation->getTitle().' — 3 mensualités',
+                        'description' => 'Plan en 3 fois — accès immédiat, débit auto chaque mois pendant 2 mois supplémentaires.',
+                    ],
+                ],
+            ]];
+            $params['subscription_data'] = [
+                'metadata' => [
+                    'formation_slug' => $formation->getSlug(),
+                    'formation_id'   => (string) $formation->getId(),
+                    'plan'           => '3x',
+                ],
+            ];
+        } else {
+            $params['mode'] = 'payment';
+            $params['line_items'] = [[
+                'quantity'   => 1,
+                'price_data' => [
+                    'currency'     => $currency,
                     'unit_amount'  => $formation->getPriceCents(),
                     'product_data' => [
                         'name'        => $formation->getTitle(),
                         'description' => $formation->getSubtitle() ?? '',
                     ],
                 ],
-            ]],
-        ];
-
-        if ($plan === '3x') {
-            // Paiement en 3 fois via Klarna (à activer dans Stripe Dashboard → Settings → Payment methods).
-            // Klarna gère la division en 3 mensualités côté user, Stripe te paie le total moins la commission.
-            $params['payment_method_types'] = ['card', 'klarna'];
-            $params['payment_method_options']['klarna']['preferred_locale'] = 'fr-FR';
+            ]];
         }
 
         $session = $this->client()->checkout->sessions->create($params);
@@ -89,12 +110,22 @@ final class StripeCheckoutService
         $payment = (new Payment())
             ->setFormation($formation)
             ->setStripeSessionId($session->id)
-            ->setAmountCents($formation->getPriceCents())
+            ->setAmountCents($plan === '3x' ? $this->perMonthCents($formation->getPriceCents()) * 3 : $formation->getPriceCents())
             ->setCurrency(strtoupper($formation->getCurrency()));
         $this->em->persist($payment);
         $this->em->flush();
 
         return $session;
+    }
+
+    /**
+     * Mensualité pour plan 3x. Round up to nearest 5€ to keep amounts clean (ex 397€ → 135€/mois).
+     */
+    private function perMonthCents(int $totalCents): int
+    {
+        $third = $totalCents / 3;
+        // arrondir au prochain 500 cents (= 5€) supérieur
+        return (int) (ceil($third / 500) * 500);
     }
 
     /**
@@ -166,6 +197,11 @@ final class StripeCheckoutService
         $payment->setStatus(PaymentStatus::Succeeded);
         $this->em->flush();
 
+        // Plan 3x : Stripe va re-charger 2x à J+30 et J+60. Programme l'arrêt après la 3e charge.
+        if ($session->mode === 'subscription' && is_string($session->subscription)) {
+            $this->scheduleSubscriptionCancelAfter3Cycles($session->subscription);
+        }
+
         $this->sendWelcomeEmail($user, $formation, $resetToken);
     }
 
@@ -178,6 +214,22 @@ final class StripeCheckoutService
         }
 
         return null;
+    }
+
+    /**
+     * Stripe a déjà encaissé 1 mensualité. On veut 2 charges supplémentaires (mois 2 et mois 3) puis stop.
+     * → cancel_at = now + ~90 jours (un peu moins que 3 cycles pleins pour ne pas déclencher la 4e).
+     */
+    private function scheduleSubscriptionCancelAfter3Cycles(string $subscriptionId): void
+    {
+        try {
+            $cancelAt = (new \DateTimeImmutable('+89 days'))->getTimestamp();
+            $this->client()->subscriptions->update($subscriptionId, [
+                'cancel_at' => $cancelAt,
+            ]);
+        } catch (\Throwable) {
+            // silencieux : si Stripe rejette l'update, l'abonnement continue (admin peut cancel manuellement).
+        }
     }
 
     private function guessFirstNameFromSession(StripeSession $session): string

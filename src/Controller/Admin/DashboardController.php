@@ -12,6 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\ColorScheme;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -26,9 +27,11 @@ class DashboardController extends AbstractDashboardController
     private const BRAND_HEAD = <<<'HTML'
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
         <style>
-            body, body.ea-light {
+            /* Variables thème EA — mêmes sélecteurs que le core, chargées après donc prioritaires */
+            :root,
+            [data-bs-theme=light] {
                 --bs-primary: #C8395E;
                 --bs-primary-rgb: 200, 57, 94;
                 --bs-link-color: #C8395E;
@@ -46,23 +49,68 @@ class DashboardController extends AbstractDashboardController
                 --text-color: #14110D;
                 --body-bg: #FCFAF5;
                 --content-bg: #FCFAF5;
+                --bs-body-bg: #FCFAF5;
                 --sidebar-bg: #1F3025;
                 --sidebar-border-color: #1F3025;
                 --sidebar-logo-color: #FCFAF5;
                 --sidebar-menu-color: rgba(252, 250, 245, 0.78);
                 --sidebar-menu-icon-color: rgba(252, 250, 245, 0.55);
                 --sidebar-menu-header-color: #E8587A;
-                --sidebar-menu-active-item-bg: rgba(200, 57, 94, 0.22);
+                --sidebar-menu-active-item-bg: rgba(200, 57, 94, 0.25);
                 --sidebar-menu-active-item-color: #FCFAF5;
                 --bs-body-font-family: 'Manrope', system-ui, -apple-system, sans-serif;
             }
-            body { background: var(--body-bg); }
-            .main-header .logo, .app-logo, .navbar-brand { font-family: 'Fraunces', Georgia, serif !important; }
-            .content-header h1, .content-header-title, h1.title, .ea-content h1 {
+
+            /* Base */
+            body.ea { background: #FCFAF5; font-family: 'Manrope', system-ui, sans-serif; }
+            .content { background: #FCFAF5; }
+
+            /* Sidebar tableau noir */
+            .sidebar { background: #1F3025 !important; border-color: rgba(252, 250, 245, 0.08) !important; }
+            .sidebar .logo, .sidebar .logo a, .sidebar .logo span {
+                color: #FCFAF5 !important;
+                font-family: 'Fraunces', Georgia, serif !important;
+            }
+            .menu .menu-item .menu-item-contents { color: rgba(252, 250, 245, 0.78) !important; }
+            .menu .menu-item .menu-icon { color: rgba(252, 250, 245, 0.5) !important; }
+            .menu .menu-header {
+                color: #E8587A !important;
+                font-family: 'DM Mono', monospace;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+            }
+            .menu .menu-item:hover .menu-item-contents { color: #FCFAF5 !important; }
+            .menu .menu-item:hover .menu-icon { color: rgba(252, 250, 245, 0.85) !important; }
+            .menu .menu-item.active .menu-item-contents {
+                background: rgba(200, 57, 94, 0.28) !important;
+                color: #FCFAF5 !important;
+                border-radius: 8px;
+            }
+            .menu .menu-item.active .menu-icon { color: #E8587A !important; }
+
+            /* Titres en Fraunces */
+            .content-header-title,
+            .content-header-title *,
+            h1.title {
                 font-family: 'Fraunces', Georgia, serif !important;
                 font-weight: 500 !important;
                 letter-spacing: -0.02em;
+                color: #14110D;
             }
+
+            /* Boutons + liens rose framboise */
+            .btn-primary {
+                background: #C8395E !important;
+                border-color: #C8395E !important;
+                color: #FCFAF5 !important;
+            }
+            .btn-primary:hover, .btn-primary:focus {
+                background: #A82248 !important;
+                border-color: #A82248 !important;
+            }
+            a { color: #C8395E; }
+            a:hover { color: #A82248; }
+            .badge.badge-primary, .badge-primary { background: #C8395E !important; color: #FCFAF5 !important; }
         </style>
         HTML;
 
@@ -102,7 +150,9 @@ class DashboardController extends AbstractDashboardController
     {
         return Dashboard::new()
             ->setTitle('<span style="font-family:Fraunces,Georgia,serif;font-weight:500;">la <em style="font-style:italic;color:#E8587A;">récrée</em> tech<span style="color:#C8395E;">.</span></span>')
-            ->setFaviconPath('favicon.ico');
+            ->setFaviconPath('favicon.ico')
+            ->setDefaultColorScheme(ColorScheme::LIGHT)
+            ->disableDarkMode();
     }
 
     public function configureAssets(): Assets
