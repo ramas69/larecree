@@ -74,7 +74,7 @@
         {% set cur = snapshot.currentProgress %}
         {% set lesson = cur.lesson %}
         {% set module = lesson.module %}
-        {% set formation = snapshot.primaryEnrollment.formation %}
+        {% set formation = module.formation %}
         {% set total = lesson.durationSeconds %}
         {% set watched = cur.watchedSeconds %}
         {% set remaining = (total - watched) > 0 ? (total - watched) : 0 %}
@@ -108,18 +108,21 @@
         </section>
         {% endif %}
 
-        {% if snapshot.progressMap %}
-        {% set pm = snapshot.progressMap %}
-        {% set formation = snapshot.primaryEnrollment.formation %}
+        {% if snapshot.enrollmentSnapshots|length > 0 %}
         <section class="dash-section">
             <div class="dash-section-head">
-                <h2 class="dash-section-title">Ton <em>parcours</em></h2>
-                <a href="#" class="dash-section-action">Voir formation →</a>
+                <h2 class="dash-section-title">
+                    {% if snapshot.enrollmentSnapshots|length > 1 %}Tes <em>parcours</em>{% else %}Ton <em>parcours</em>{% endif %}
+                </h2>
+                <a href="#" class="dash-section-action">Catalogue →</a>
             </div>
 
-            <div class="dash-progress-map" aria-label="Carte de progression {{ formation.title }}">
+            {% for es in snapshot.enrollmentSnapshots %}
+            {% set pm = es.progressMap %}
+            {% set formation = es.enrollment.formation %}
+            <div class="dash-progress-map" aria-label="Carte de progression {{ formation.title }}" {% if not loop.first %}style="margin-top: 1.5rem;"{% endif %}>
                 <div class="dash-progress-map-title">
-                    <span>— <strong>{{ formation.title }}</strong></span>
+                    <span>— <strong>{{ formation.title }}</strong> {% if es.enrollment.isVipGranted %}<em style="color: var(--rose);">· VIP</em>{% endif %}</span>
                     <span><em>Progression : {{ pm.overallPercent }} %</em> · {{ pm.doneModulesCount }} modules validés sur {{ pm.totalModulesCount }}</span>
                 </div>
 
@@ -151,6 +154,7 @@
                     <a href="#">→ Voir détail formation</a>
                 </div>
             </div>
+            {% endfor %}
         </section>
         {% endif %}
 
