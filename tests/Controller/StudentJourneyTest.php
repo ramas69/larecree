@@ -112,7 +112,7 @@ final class StudentJourneyTest extends WebTestCase
         $client->request('GET', '/formations/claude-2026/projects/m3-l2');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorExists('.lesson-player-frame iframe');
+        self::assertSelectorExists('.lp-player-frame iframe');
         // Vimeo id seedé pour M03L2 (Claude prefix 9999, module 3, leçon 2 → 999932)
         self::assertStringContainsString('player.vimeo.com/video/999932', (string) $client->getResponse()->getContent());
     }
