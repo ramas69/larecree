@@ -1,0 +1,38 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Merci pour ton inscription — La Récrée Tech{% endblock %}
+
+{% block body %}
+<div class="auth-page">
+
+    <header class="auth-header">
+        <a href="https://larecreetech.com" class="auth-brand"><span>la <em>récrée</em> tech.</span></a>
+    </header>
+
+    <main class="auth-main">
+        <div class="auth-card">
+            <span class="auth-eyebrow">— Paiement confirmé</span>
+            <h1 class="auth-title">Bienvenue ✨</h1>
+
+            {% if formation %}
+                <p class="auth-sub">
+                    Ton inscription à <strong>{{ formation.title }}</strong> est validée.
+                </p>
+            {% else %}
+                <p class="auth-sub">Ton paiement a été reçu.</p>
+            {% endif %}
+
+            <p class="auth-sub">
+                Tu vas recevoir un email dans quelques minutes avec un lien magique pour <strong>choisir ton mot de passe</strong> et accéder à ta formation.
+            </p>
+
+            <p class="auth-sub" style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--ink-soft);">
+                Vérifie aussi tes spams si tu ne le vois pas.
+            </p>
+
+            <a href="https://larecreetech.com" class="auth-btn">← Retour au site</a>
+        </div>
+    </main>
+
+</div>
+{% endblock %}
