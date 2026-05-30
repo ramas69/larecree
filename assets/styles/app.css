@@ -1073,19 +1073,18 @@ h1, h2, h3, h4 {
 .cat-card-cover-num {
   align-self: center;
   font-family: 'Fraunces', serif;
-  font-size: 2.4rem;
+  font-size: 5rem;
   font-weight: 400;
   line-height: 1;
-  color: rgba(252, 250, 245, 0.85);
-  letter-spacing: 0.02em;
+  color: #FCFAF5;
 }
 .cat-card-cover-title {
   font-family: 'Fraunces', serif;
   font-style: italic;
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   font-weight: 500;
-  color: #FCFAF5;
-  line-height: 1.15;
+  color: var(--rose);
+  line-height: 1.1;
 }
 .cat-card-cover-sub {
   font-family: 'Fraunces', serif;
