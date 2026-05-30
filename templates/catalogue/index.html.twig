@@ -19,9 +19,14 @@
             <div class="catalogue-grid">
                 {% for formation in formations %}
                     {% set enrolled = enrolledFormationIds[formation.id] ?? false %}
+                    {% set coverPath = formation.slug == 'claude-2026' ? '/images/modules/module-01-ouverture.png' : null %}
                     <article class="catalogue-card {{ enrolled ? 'is-enrolled' : '' }}">
                         <div class="catalogue-card-cover" aria-hidden="true">
-                            <span class="catalogue-card-cover-mark">{{ formation.title|first }}</span>
+                            {% if coverPath %}
+                                <img src="{{ coverPath }}" alt="" class="catalogue-card-cover-img" loading="lazy">
+                            {% else %}
+                                <span class="catalogue-card-cover-mark">{{ formation.title|first }}</span>
+                            {% endif %}
                             {% if enrolled %}
                                 <span class="catalogue-card-badge">✓ Inscrit·e</span>
                             {% endif %}

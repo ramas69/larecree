@@ -70,14 +70,14 @@ final class AppFixtures extends Fixture
         $manager->persist($claude);
 
         $modulesSpec = [
-            ['Premiers pas avec Claude',           'premiers-pas'],
-            ['Le prompt parfait',                  'prompt-parfait'],
-            ['Configurer un Project comme un·e pro', 'projects'],
-            ['Documents, fichiers, contexte long', 'documents-contexte'],
-            ['Artifacts et code',                  'artifacts-code'],
-            ['Workflows quotidiens',               'workflows-quotidiens'],
-            ['Claude pour ton métier',             'claude-metier'],
-            ['Finale : ton agent personnel',       'agent-personnel'],
+            ['Démarrer avec Claude',                 'demarrer',             'La fondation — tu ne peux rien construire dessus sans ça.'],
+            ['Le prompt parfait',                    'prompt-parfait',       'La compétence qui sépare ceux qui galèrent de ceux qui pilotent.'],
+            ['Projects : ton bureau Claude',         'projects',             'Arrête de tout réexpliquer à Claude à chaque conversation.'],
+            ['Artifacts : créer des choses',         'artifacts',            'Documents, code, visuels — Claude livre, pas juste discute.'],
+            ['Cowork : Skills & Plugins',            'skills-plugins',       'Le game changer non-dev de 2026.'],
+            ['Cowork : Connectors & Routines',       'connectors-routines',  'Claude bosse pendant que tu dors.'],
+            ['Claude Design',                        'claude-design',        'Tes visuels en chattant. Tu vas être en avance.'],
+            ['Combiner tout pour ton métier',        'combiner-metier',      'La synthèse. Ce qui transforme une compétence en business.'],
         ];
 
         return [$claude, $this->seedModules($manager, $claude, $modulesSpec, lessonsPerModule: 4, vimeoPrefix: '9999')];
@@ -100,27 +100,29 @@ final class AppFixtures extends Fixture
         $manager->persist($design);
 
         $modulesSpec = [
-            ['Fondamentaux visuels',       'fondamentaux-visuels'],
-            ['Système de design',          'systeme-design'],
-            ['Composants & Storybook',     'composants-storybook'],
-            ['Finale : portfolio produit', 'portfolio-produit'],
+            ['Fondamentaux visuels',       'fondamentaux-visuels',  'Tout part de la grille, du rythme typo, du contraste.'],
+            ['Système de design',          'systeme-design',        'Tokens, composants, gouvernance — ta vraie scalabilité.'],
+            ['Composants & Storybook',     'composants-storybook',  'Un composant, mille usages — sans casser la maintenance.'],
+            ['Finale : portfolio produit', 'portfolio-produit',     'Ce qui te fait recruter — pas Dribbble.'],
         ];
 
         return [$design, $this->seedModules($manager, $design, $modulesSpec, lessonsPerModule: 3, vimeoPrefix: '8888')];
     }
 
     /**
-     * @param list<array{0: string, 1: string}> $modulesSpec
+     * @param list<array{0: string, 1: string, 2?: string}> $modulesSpec
      * @return array<int, array<int, Lesson>> indexed by module index, value = list of lessons
      */
     private function seedModules(ObjectManager $manager, Formation $formation, array $modulesSpec, int $lessonsPerModule, string $vimeoPrefix): array
     {
         $lessonsByModule = [];
-        foreach ($modulesSpec as $i => [$title, $slug]) {
+        foreach ($modulesSpec as $i => $spec) {
+            [$title, $slug] = $spec;
+            $description = $spec[2] ?? 'Module '.($i + 1).' — '.$title;
             $module = (new Module())
                 ->setSlug($slug)
                 ->setTitle($title)
-                ->setDescription('Module '.($i + 1).' — '.$title)
+                ->setDescription($description)
                 ->setDisplayOrder($i + 1);
             $formation->addModule($module);
             $manager->persist($module);

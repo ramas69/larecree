@@ -31,7 +31,13 @@
 
             <div class="formation-programme">
                 {% for module in formation.modules %}
+                    {% set coverPath = formation.slug == 'claude-2026' ? '/images/modules/module-%02d-ouverture.png'|format(module.displayOrder) : null %}
                     <article class="programme-module">
+                        {% if coverPath %}
+                            <div class="programme-module-cover" aria-hidden="true">
+                                <img src="{{ coverPath }}" alt="" loading="lazy">
+                            </div>
+                        {% endif %}
                         <header class="programme-module-head">
                             <span class="programme-module-num">M{{ '%02d'|format(module.displayOrder) }}</span>
                             <div>
