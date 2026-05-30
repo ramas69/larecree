@@ -1396,30 +1396,15 @@ h1, h2, h3, h4 {
   line-height: 1;
 }
 
-/* CINEMASCOPE SCREEN */
+/* SCREEN — fond clair (cream), même que le reste de la page */
 .lp-screen {
   position: relative;
-  background: #0d1814;
-  padding: 0.6rem clamp(1rem, 4vw, 3rem) 1.8rem;
+  background: var(--cream, #FCFAF5);
+  padding: 1.6rem clamp(1rem, 4vw, 3rem) 2rem;
   isolation: isolate;
   overflow: hidden;
 }
-.lp-curtain {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: clamp(40px, 6vw, 110px);
-  pointer-events: none;
-  z-index: 0;
-}
-.lp-curtain-left {
-  left: 0;
-  background: linear-gradient(90deg, rgba(13, 24, 20, 1) 0%, rgba(13, 24, 20, 0) 100%);
-}
-.lp-curtain-right {
-  right: 0;
-  background: linear-gradient(270deg, rgba(13, 24, 20, 1) 0%, rgba(13, 24, 20, 0) 100%);
-}
+.lp-curtain { display: none; }
 .lp-screen-grid {
   position: relative;
   z-index: 1;
@@ -1472,11 +1457,11 @@ h1, h2, h3, h4 {
   border: 0;
 }
 
-/* RESOURCES SIDEBAR (à côté du player) */
+/* RESOURCES SIDEBAR (à côté du player, fond clair) */
 .lp-resources-side {
-  background: rgba(252, 250, 245, 0.04);
-  border: 1px solid rgba(252, 250, 245, 0.12);
-  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #efe9df;
+  border-radius: 10px;
   padding: 1.1rem 1.1rem 1.2rem;
   align-self: stretch;
   display: flex;
@@ -1484,7 +1469,7 @@ h1, h2, h3, h4 {
   gap: 0.9rem;
   min-height: 0;
 }
-.lp-resources-side-head { padding-bottom: 0.6rem; border-bottom: 1px dashed rgba(252, 250, 245, 0.18); }
+.lp-resources-side-head { padding-bottom: 0.7rem; border-bottom: 1px dashed rgba(31, 48, 37, 0.15); }
 .lp-resources-side-eyebrow {
   font-family: 'DM Mono', monospace;
   font-size: 10px;
@@ -1494,9 +1479,9 @@ h1, h2, h3, h4 {
 }
 .lp-resources-side-title {
   font-family: 'Fraunces', serif;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
   font-weight: 500;
-  color: #FCFAF5;
+  color: var(--ink);
   margin: 0.3rem 0 0;
   line-height: 1.2;
 }
@@ -1506,36 +1491,33 @@ h1, h2, h3, h4 {
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.55rem;
   overflow-y: auto;
   flex: 1;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(252, 250, 245, 0.2) transparent;
 }
 .lp-resource-side a {
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 0.7rem;
   align-items: center;
-  padding: 0.6rem 0.7rem;
-  border-radius: 4px;
+  padding: 0.7rem 0.8rem;
+  border-radius: 8px;
   text-decoration: none;
-  color: #FCFAF5;
-  background: transparent;
-  border: 1px solid transparent;
+  color: var(--ink);
+  background: var(--cream, #FCFAF5);
+  border: 1px solid #efe9df;
   transition: background .15s ease, border-color .15s ease, transform .15s ease;
 }
 .lp-resource-side a:hover {
-  background: rgba(252, 250, 245, 0.06);
   border-color: var(--rose);
   transform: translateX(2px);
 }
 .lp-resource-side-icon {
   width: 34px;
   height: 34px;
-  border-radius: 4px;
-  background: rgba(252, 250, 245, 0.08);
-  border: 1px solid rgba(252, 250, 245, 0.18);
+  border-radius: 6px;
+  background: #fff;
+  border: 1px solid #efe9df;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1543,8 +1525,8 @@ h1, h2, h3, h4 {
   flex-shrink: 0;
 }
 .lp-resource-side.is-file .lp-resource-side-icon {
-  background: rgba(200, 57, 94, 0.18);
-  border-color: rgba(200, 57, 94, 0.4);
+  background: rgba(200, 57, 94, 0.1);
+  border-color: rgba(200, 57, 94, 0.3);
 }
 .lp-resource-side-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .lp-resource-side-kind {
@@ -1552,13 +1534,13 @@ h1, h2, h3, h4 {
   font-size: 9px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: rgba(252, 250, 245, 0.55);
+  color: var(--ink-soft);
 }
 .lp-resource-side-body strong {
   font-family: 'Manrope', sans-serif;
   font-size: 0.88rem;
   font-weight: 600;
-  color: #FCFAF5;
+  color: var(--ink);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
