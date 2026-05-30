@@ -1444,7 +1444,7 @@ h1, h2, h3, h4 {
 .lp-screen-bezel::after { bottom: 6px; right: 6px; border-left: 0; border-top: 0; }
 .lp-player-frame {
   position: relative;
-  aspect-ratio: 21 / 9;
+  aspect-ratio: 16 / 9;
   background: #000;
   border-radius: 2px;
   overflow: hidden;
