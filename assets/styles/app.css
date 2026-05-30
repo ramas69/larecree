@@ -1420,13 +1420,25 @@ h1, h2, h3, h4 {
   right: 0;
   background: linear-gradient(270deg, rgba(13, 24, 20, 1) 0%, rgba(13, 24, 20, 0) 100%);
 }
+.lp-screen-grid {
+  position: relative;
+  z-index: 1;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+  gap: 1.4rem;
+  align-items: start;
+}
+@media (max-width: 1024px) {
+  .lp-screen-grid { grid-template-columns: 1fr; }
+}
 .lp-screen-bezel {
   position: relative;
   background: #1F3025;
   padding: 10px;
   border-radius: 6px;
-  max-width: 1400px;
-  margin: 0 auto;
+  margin: 0;
   box-shadow:
     0 24px 60px -24px rgba(0, 0, 0, 0.7),
     0 0 0 1px rgba(252, 250, 245, 0.05);
@@ -1460,15 +1472,127 @@ h1, h2, h3, h4 {
   border: 0;
 }
 
+/* RESOURCES SIDEBAR (à côté du player) */
+.lp-resources-side {
+  background: rgba(252, 250, 245, 0.04);
+  border: 1px solid rgba(252, 250, 245, 0.12);
+  border-radius: 6px;
+  padding: 1.1rem 1.1rem 1.2rem;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-height: 0;
+}
+.lp-resources-side-head { padding-bottom: 0.6rem; border-bottom: 1px dashed rgba(252, 250, 245, 0.18); }
+.lp-resources-side-eyebrow {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--rose);
+  text-transform: uppercase;
+}
+.lp-resources-side-title {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #FCFAF5;
+  margin: 0.3rem 0 0;
+  line-height: 1.2;
+}
+.lp-resources-side-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  overflow-y: auto;
+  flex: 1;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(252, 250, 245, 0.2) transparent;
+}
+.lp-resource-side a {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.7rem;
+  align-items: center;
+  padding: 0.6rem 0.7rem;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #FCFAF5;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: background .15s ease, border-color .15s ease, transform .15s ease;
+}
+.lp-resource-side a:hover {
+  background: rgba(252, 250, 245, 0.06);
+  border-color: var(--rose);
+  transform: translateX(2px);
+}
+.lp-resource-side-icon {
+  width: 34px;
+  height: 34px;
+  border-radius: 4px;
+  background: rgba(252, 250, 245, 0.08);
+  border: 1px solid rgba(252, 250, 245, 0.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.lp-resource-side.is-file .lp-resource-side-icon {
+  background: rgba(200, 57, 94, 0.18);
+  border-color: rgba(200, 57, 94, 0.4);
+}
+.lp-resource-side-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.lp-resource-side-kind {
+  font-family: 'DM Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(252, 250, 245, 0.55);
+}
+.lp-resource-side-body strong {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #FCFAF5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.lp-resource-side-body em {
+  font-style: normal;
+  font-family: 'DM Mono', monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--rose);
+  text-transform: uppercase;
+}
+
 /* HEADLINE under screen */
 .lp-headline {
+  background: #1F3025;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   display: flex;
   align-items: flex-start;
   gap: 1.2rem;
-  padding: 2rem clamp(1rem, 4vw, 3rem) 1.4rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  width: 100%;
+  padding: 1.8rem clamp(1rem, 4vw, 3rem) 1.8rem;
+}
+.lp-headline::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(252, 250, 245, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(252, 250, 245, 0.04) 1px, transparent 1px);
+  background-size: 50px 50px;
+  z-index: -1;
 }
 .lp-headline-mark {
   font-family: 'Fraunces', serif;
@@ -1478,13 +1602,13 @@ h1, h2, h3, h4 {
   line-height: 1;
   margin-top: 0.4rem;
 }
-.lp-headline-body { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+.lp-headline-body { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; max-width: 1400px; }
 .lp-headline-eyebrow {
   font-family: 'DM Mono', monospace;
   font-size: 11px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--ink-soft);
+  color: rgba(252, 250, 245, 0.55);
 }
 .lp-headline-title {
   font-family: 'Fraunces', serif;
@@ -1493,7 +1617,7 @@ h1, h2, h3, h4 {
   letter-spacing: -0.02em;
   line-height: 1.05;
   margin: 0;
-  color: var(--ink);
+  color: #FCFAF5;
 }
 
 /* FLASH */
