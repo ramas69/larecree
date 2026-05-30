@@ -137,4 +137,9 @@ class Resource
                 ->addViolation();
         }
     }
+
+    public function __toString(): string
+    {
+        return $this->title ?? 'Ressource #'.($this->id ?? 'nouvelle');
+    }
 }

@@ -227,4 +227,9 @@ class Lesson
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->title ?? 'Leçon #'.($this->id ?? 'nouvelle');
+    }
 }

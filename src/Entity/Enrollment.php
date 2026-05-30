@@ -167,4 +167,12 @@ class Enrollment
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        $userPart = $this->user?->getEmail() ?? '—';
+        $formationPart = $this->formation?->getTitle() ?? '—';
+
+        return $userPart.' · '.$formationPart;
+    }
 }
