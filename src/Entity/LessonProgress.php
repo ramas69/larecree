@@ -126,4 +126,11 @@ class LessonProgress
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        $lessonPart = $this->lesson?->getTitle() ?? '—';
+
+        return $lessonPart.' · '.$this->percentWatched.' %';
+    }
 }

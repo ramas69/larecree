@@ -299,4 +299,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        $name = trim(($this->firstName ?? '').' '.($this->lastName ?? ''));
+
+        return $name !== '' ? $name.' <'.($this->email ?? '?').'>' : ($this->email ?? 'User #'.($this->id ?? 'nouveau'));
+    }
 }

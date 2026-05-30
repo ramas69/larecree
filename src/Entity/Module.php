@@ -157,4 +157,11 @@ class Module
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        $prefix = $this->displayOrder > 0 ? sprintf('M%02d', $this->displayOrder).' · ' : '';
+
+        return $prefix.($this->title ?? 'Module #'.($this->id ?? 'nouveau'));
+    }
 }

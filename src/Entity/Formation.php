@@ -282,4 +282,9 @@ class Formation
 
         return $this;
     }
+
+    public function __toString(): string
+    {
+        return $this->title ?? 'Formation #'.($this->id ?? 'nouveau');
+    }
 }
