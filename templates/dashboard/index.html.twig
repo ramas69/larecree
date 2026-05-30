@@ -50,26 +50,34 @@
         <section class="dash-stats">
             <div class="dash-stat">
                 <span class="dash-stat-label">— Formations</span>
-                <div class="dash-stat-value">0</div>
+                <div class="dash-stat-value">{{ snapshot.enrollmentsInProgressCount }}</div>
                 <span class="dash-stat-hint">en cours</span>
             </div>
             <div class="dash-stat">
                 <span class="dash-stat-label">— Heures vidéo</span>
-                <div class="dash-stat-value">0h</div>
+                <div class="dash-stat-value">{{ snapshot.totalWatchedHours }}</div>
                 <span class="dash-stat-hint">accumulées</span>
             </div>
             <div class="dash-stat">
                 <span class="dash-stat-label">— Progression</span>
-                <div class="dash-stat-value">—</div>
+                <div class="dash-stat-value">{{ snapshot.averageProgressPercent }}%</div>
                 <span class="dash-stat-hint">moyenne</span>
             </div>
             <div class="dash-stat">
                 <span class="dash-stat-label">— Certificats</span>
-                <div class="dash-stat-value">0</div>
+                <div class="dash-stat-value">{{ snapshot.certificatesCount }}</div>
                 <span class="dash-stat-hint">obtenus</span>
             </div>
         </section>
 
+        {% if snapshot.currentProgress %}
+        {% set cur = snapshot.currentProgress %}
+        {% set lesson = cur.lesson %}
+        {% set module = lesson.module %}
+        {% set formation = snapshot.primaryEnrollment.formation %}
+        {% set total = lesson.durationSeconds %}
+        {% set watched = cur.watchedSeconds %}
+        {% set remaining = (total - watched) > 0 ? (total - watched) : 0 %}
         <section class="dash-section">
             <div class="dash-section-head">
                 <h2 class="dash-section-title">Reprendre <em>où tu en étais</em></h2>
@@ -79,94 +87,72 @@
             <div class="dash-continue">
                 <div class="dash-continue-thumb" aria-hidden="true">
                     <div class="dash-continue-thumb-play">▶</div>
-                    <span class="dash-continue-thumb-time">14:32</span>
+                    <span class="dash-continue-thumb-time">{{ lesson.durationFormatted }}</span>
                 </div>
                 <div class="dash-continue-body">
-                    <span class="dash-continue-eyebrow">★ Formation Claude · M03 · Leçon 04</span>
-                    <h3>Configurer un <em>Project</em> comme un·e pro</h3>
-                    <p class="dash-continue-meta">Tu en es à 6 min 47 s sur 14 min 32 s · 8 min restantes</p>
+                    <span class="dash-continue-eyebrow">★ {{ formation.title }} · M{{ '%02d'|format(module.displayOrder) }} · Leçon {{ lesson.displayOrder }}</span>
+                    <h3>{{ lesson.title }}</h3>
+                    <p class="dash-continue-meta">Tu en es à {{ (watched // 60) }} min {{ (watched % 60) }} s sur {{ lesson.durationFormatted }} · {{ (remaining // 60) }} min restantes</p>
 
                     <div class="dash-progress-bar">
-                        <div class="dash-progress-bar-fill" style="width: 47%;"></div>
+                        <div class="dash-progress-bar-fill" style="width: {{ cur.percentWatched }}%;"></div>
                     </div>
                     <div class="dash-progress-meta">
-                        <span><strong>47 %</strong> de la leçon</span>
-                        <span>Vue il y a 2 jours</span>
+                        <span><strong>{{ cur.percentWatched }} %</strong> de la leçon</span>
+                        <span>Vue {{ cur.lastWatchedAt|date('d/m/Y') }}</span>
                     </div>
 
                     <a href="#" class="dash-continue-cta">▶ Reprendre la leçon</a>
                 </div>
             </div>
         </section>
+        {% endif %}
 
+        {% if snapshot.progressMap %}
+        {% set pm = snapshot.progressMap %}
+        {% set formation = snapshot.primaryEnrollment.formation %}
         <section class="dash-section">
             <div class="dash-section-head">
                 <h2 class="dash-section-title">Ton <em>parcours</em></h2>
                 <a href="#" class="dash-section-action">Voir formation →</a>
             </div>
 
-            <div class="dash-progress-map" aria-label="Carte de progression Formation Claude">
+            <div class="dash-progress-map" aria-label="Carte de progression {{ formation.title }}">
                 <div class="dash-progress-map-title">
-                    <span>— <strong>Formation Claude 2026</strong></span>
-                    <span><em>Progression : 28 %</em> · 2 modules validés sur 8</span>
+                    <span>— <strong>{{ formation.title }}</strong></span>
+                    <span><em>Progression : {{ pm.overallPercent }} %</em> · {{ pm.doneModulesCount }} modules validés sur {{ pm.totalModulesCount }}</span>
                 </div>
 
                 <div class="map-track">
-                    <div class="map-node">
-                        <span class="map-marker is-done" title="Module 01 validé">✓</span>
-                        <span class="map-label">M01</span>
-                    </div>
-                    <div class="map-connector is-done"></div>
-
-                    <div class="map-node">
-                        <span class="map-marker is-done" title="Module 02 validé">✓</span>
-                        <span class="map-label">M02</span>
-                    </div>
-                    <div class="map-connector"></div>
-
-                    <div class="map-node">
-                        <span class="map-marker is-current" title="Module 03 en cours">03</span>
-                        <span class="map-label">M03</span>
-                        <span class="map-pct">47%</span>
-                    </div>
-                    <div class="map-connector"></div>
-
-                    <div class="map-node">
-                        <span class="map-marker">04</span>
-                        <span class="map-label">M04</span>
-                    </div>
-                    <div class="map-connector"></div>
-
-                    <div class="map-node">
-                        <span class="map-marker">05</span>
-                        <span class="map-label">M05</span>
-                    </div>
-                    <div class="map-connector"></div>
-
-                    <div class="map-node">
-                        <span class="map-marker">06</span>
-                        <span class="map-label">M06</span>
-                    </div>
-                    <div class="map-connector"></div>
-
-                    <div class="map-node">
-                        <span class="map-marker">07</span>
-                        <span class="map-label">M07</span>
-                    </div>
-                    <div class="map-connector"></div>
-
-                    <div class="map-node">
-                        <span class="map-marker is-finale" title="Module 08 — Finale">★</span>
-                        <span class="map-label">M08</span>
-                    </div>
+                    {% for item in pm.items %}
+                        <div class="map-node">
+                            {% if item.state == 'done' %}
+                                <span class="map-marker is-done" title="Module {{ item.label }} validé">✓</span>
+                            {% elseif item.state == 'finale-done' %}
+                                <span class="map-marker is-finale" title="Module {{ item.label }} — Finale validée">★</span>
+                            {% elseif item.state == 'current' %}
+                                <span class="map-marker is-current" title="Module {{ item.label }} en cours">{{ '%02d'|format(item.index) }}</span>
+                            {% elseif item.state == 'finale' %}
+                                <span class="map-marker is-finale" title="Module {{ item.label }} — Finale">★</span>
+                            {% else %}
+                                <span class="map-marker">{{ '%02d'|format(item.index) }}</span>
+                            {% endif %}
+                            <span class="map-label">{{ item.label }}</span>
+                            {% if item.state == 'current' %}<span class="map-pct">{{ item.percent }}%</span>{% endif %}
+                        </div>
+                        {% if not loop.last %}
+                            <div class="map-connector {{ item.state in ['done', 'finale-done'] ? 'is-done' : '' }}"></div>
+                        {% endif %}
+                    {% endfor %}
                 </div>
 
                 <div class="dash-progress-map-foot">
-                    <span>Dernier module validé : <strong>M02 — Le prompt parfait</strong></span>
+                    <span>Dernier module validé : <strong>{{ pm.lastCompletedTitle ?? '—' }}</strong></span>
                     <a href="#">→ Voir détail formation</a>
                 </div>
             </div>
         </section>
+        {% endif %}
 
         <section class="dash-section">
             <div class="dash-section-head">
