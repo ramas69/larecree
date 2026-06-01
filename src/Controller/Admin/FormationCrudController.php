@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
@@ -38,8 +39,14 @@ final class FormationCrudController extends AbstractCrudController
         yield TextField::new('subtitle', 'Sous-titre')->hideOnIndex();
         yield TextareaField::new('description')->hideOnIndex();
         yield MoneyField::new('priceCents', 'Prix')->setCurrency('EUR')->setStoredAsCents(true);
-        yield TextField::new('coverImage', 'Image')->hideOnIndex();
-        yield TextField::new('vimeoFolderId', 'Vimeo Folder')->hideOnIndex();
+        yield ImageField::new('coverImage', 'Image de couverture')
+            ->setUploadDir('public/uploads/formations')
+            ->setBasePath('/uploads/formations')
+            ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
+            ->setHelp('JPG ou PNG, format paysage 16:9 idéal. Laisse vide pour la couverture par défaut.')
+            ->setRequired(false)
+            ->hideOnIndex();
+        yield TextField::new('vimeoFolderId', 'Dossier Vimeo (optionnel)')->hideOnIndex();
         yield BooleanField::new('published', 'Publié');
         yield IntegerField::new('displayOrder', 'Ordre');
     }
