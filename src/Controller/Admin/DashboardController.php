@@ -172,7 +172,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkTo(FormationCrudController::class, 'Formations', 'fa fa-graduation-cap');
         yield MenuItem::linkTo(ModuleCrudController::class, 'Modules', 'fa fa-folder');
         yield MenuItem::linkTo(LessonCrudController::class, 'Leçons', 'fa fa-play-circle');
-        yield MenuItem::linkTo(ResourceCrudController::class, 'Ressources', 'fa fa-link');
 
         yield MenuItem::section('Progression');
         yield MenuItem::linkTo(LessonProgressCrudController::class, 'Progressions leçon', 'fa fa-chart-line');
