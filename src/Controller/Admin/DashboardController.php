@@ -147,13 +147,23 @@ class DashboardController extends AbstractDashboardController
                 table: { contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'] },
                 language: 'fr'
             };
+            var tries = 0;
             function initCKEditors() {
-                if (typeof CKEDITOR === 'undefined' || !CKEDITOR.ClassicEditor) {
+                var Editor = (window.CKEDITOR && window.CKEDITOR.ClassicEditor) || window.ClassicEditor;
+                if (!Editor) {
+                    if (tries++ > 40) { console.error('[cke] CKEDITOR introuvable après 6s — CDN bloqué ?'); return; }
                     return window.setTimeout(initCKEditors, 150);
                 }
-                document.querySelectorAll('textarea.ckeditor:not([data-cke-ready])').forEach(function (el) {
+                var nodes = document.querySelectorAll('textarea.ckeditor:not([data-cke-ready])');
+                console.log('[cke] editor prêt, textareas trouvés =', nodes.length);
+                nodes.forEach(function (el) {
                     el.setAttribute('data-cke-ready', '1');
-                    CKEDITOR.ClassicEditor.create(el, CONFIG).catch(function (err) { console.error(err); });
+                    Editor.create(el, CONFIG).then(function () {
+                        console.log('[cke] OK', el.id);
+                    }).catch(function (err) {
+                        console.error('[cke] config custom KO, fallback défaut:', err && err.message ? err.message : err);
+                        Editor.create(el).catch(function (e2) { console.error('[cke] fallback KO:', e2); });
+                    });
                 });
             }
             initCKEditors();
