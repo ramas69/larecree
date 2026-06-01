@@ -28,6 +28,8 @@ class DashboardController extends AbstractDashboardController
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.css">
+        <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.js"></script>
         <style>
             /* Variables thème EA — mêmes sélecteurs que le core, chargées après donc prioritaires */
             :root,
@@ -120,44 +122,44 @@ class DashboardController extends AbstractDashboardController
      * (upload via /admin/upload-image), tableaux, citations. Licence GPL (gratuit).
      */
     private const CKEDITOR_BODY = <<<'HTML'
-        <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.js"></script>
-        <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.css">
         <script>
         (function () {
+            var CONFIG = {
+                toolbar: {
+                    items: [
+                        'undo', 'redo', '|',
+                        'heading', '|',
+                        'fontColor', 'fontBackgroundColor', '|',
+                        'bold', 'italic', 'underline', 'strikethrough', '|',
+                        'alignment', '|',
+                        'bulletedList', 'numberedList', '|',
+                        'outdent', 'indent', '|',
+                        'link', 'blockQuote', 'insertImage', 'insertTable', 'mediaEmbed', '|',
+                        'removeFormat'
+                    ],
+                    shouldNotGroupWhenFull: true
+                },
+                alignment: { options: ['left', 'center', 'right', 'justify'] },
+                simpleUpload: { uploadUrl: '/admin/upload-image' },
+                image: {
+                    toolbar: ['imageStyle:inline', 'imageStyle:block', 'imageStyle:side', '|', 'toggleImageCaption', 'imageTextAlternative', '|', 'resizeImage']
+                },
+                table: { contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'] },
+                language: 'fr'
+            };
             function initCKEditors() {
-                if (typeof CKEDITOR === 'undefined' || !CKEDITOR.ClassicEditor) { return; }
+                if (typeof CKEDITOR === 'undefined' || !CKEDITOR.ClassicEditor) {
+                    return window.setTimeout(initCKEditors, 150);
+                }
                 document.querySelectorAll('textarea.ckeditor:not([data-cke-ready])').forEach(function (el) {
                     el.setAttribute('data-cke-ready', '1');
-                    CKEDITOR.ClassicEditor.create(el, {
-                        toolbar: {
-                            items: [
-                                'undo', 'redo', '|',
-                                'heading', '|',
-                                'fontColor', 'fontBackgroundColor', '|',
-                                'bold', 'italic', 'underline', 'strikethrough', '|',
-                                'alignment', '|',
-                                'bulletedList', 'numberedList', '|',
-                                'outdent', 'indent', '|',
-                                'link', 'blockQuote', 'insertImage', 'insertTable', 'mediaEmbed', '|',
-                                'removeFormat'
-                            ],
-                            shouldNotGroupWhenFull: true
-                        },
-                        alignment: { options: ['left', 'center', 'right', 'justify'] },
-                        simpleUpload: { uploadUrl: '/admin/upload-image' },
-                        image: {
-                            toolbar: ['imageStyle:inline', 'imageStyle:block', 'imageStyle:side', '|', 'toggleImageCaption', 'imageTextAlternative', '|', 'resizeImage']
-                        },
-                        table: { contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'] },
-                        language: 'fr'
-                    }).catch(function (err) { console.error(err); });
+                    CKEDITOR.ClassicEditor.create(el, CONFIG).catch(function (err) { console.error(err); });
                 });
             }
-            if (document.readyState === 'loading') {
-                document.addEventListener('DOMContentLoaded', function () { setTimeout(initCKEditors, 300); });
-            } else {
-                setTimeout(initCKEditors, 300);
-            }
+            initCKEditors();
+            // EasyAdmin navigue via Turbo : ré-initialiser après chaque navigation.
+            document.addEventListener('turbo:load', initCKEditors);
+            document.addEventListener('turbo:render', initCKEditors);
         })();
         </script>
         HTML;
