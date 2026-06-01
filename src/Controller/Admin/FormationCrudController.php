@@ -8,6 +8,7 @@ use App\Entity\Formation;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
@@ -35,21 +36,44 @@ final class FormationCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield IdField::new('id')->hideOnForm();
-        yield TextField::new('title', 'Titre');
-        yield SlugField::new('slug')->setTargetFieldName('title');
-        yield TextField::new('subtitle', 'Sous-titre')->hideOnIndex();
-        yield TextareaField::new('description')->setFormTypeOption('attr', ['class' => 'ckeditor'])->hideOnIndex();
-        yield MoneyField::new('priceCents', 'Prix')->setCurrency('EUR')->setStoredAsCents(true);
+        // Vue liste
+        yield IdField::new('id')->onlyOnIndex();
+        yield IntegerField::new('displayOrder', '#')->onlyOnIndex();
+        yield TextField::new('title', 'Titre')->onlyOnIndex();
+        yield MoneyField::new('priceCents', 'Prix')->setCurrency('EUR')->setStoredAsCents(true)->onlyOnIndex();
+        yield BooleanField::new('published', 'Publié')->onlyOnIndex();
+        yield BooleanField::new('comingSoon', 'Bientôt')->onlyOnIndex();
+
+        // Formulaire : 2 colonnes
+        yield FormField::addColumn(8);
+        yield FormField::addFieldset('Informations')->setIcon('fa fa-circle-info');
+        yield TextField::new('title', 'Titre')->onlyOnForms();
+        yield SlugField::new('slug')->setTargetFieldName('title')->onlyOnForms()
+            ->setHelp('Généré depuis le titre. Sert d\'URL (/formations/<slug>).');
+        yield TextField::new('subtitle', 'Sous-titre')->onlyOnForms()
+            ->setHelp('Phrase d\'accroche affichée sous le titre.');
+        yield TextareaField::new('description')
+            ->setFormTypeOption('attr', ['class' => 'ckeditor'])
+            ->setHelp('Présentation de la formation (éditeur riche).')
+            ->onlyOnForms();
+
+        yield FormField::addColumn(4);
+        yield FormField::addFieldset('Tarif & visuel')->setIcon('fa fa-tag');
+        yield MoneyField::new('priceCents', 'Prix')->setCurrency('EUR')->setStoredAsCents(true)->onlyOnForms();
         yield ImageField::new('coverImage', 'Image de couverture')
             ->setUploadDir('public/uploads/formations')
             ->setBasePath('/uploads/formations')
             ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
-            ->setHelp('JPG ou PNG, format paysage 16:9 idéal. Laisse vide pour la couverture par défaut.')
+            ->setHelp('JPG/PNG paysage 16:9. Vide = couverture par défaut.')
             ->setRequired(false)
-            ->hideOnIndex();
-        yield TextField::new('vimeoFolderId', 'Dossier Vimeo (optionnel)')->hideOnIndex();
-        yield BooleanField::new('published', 'Publié');
-        yield IntegerField::new('displayOrder', 'Ordre');
+            ->onlyOnForms();
+
+        yield FormField::addFieldset('Publication')->setIcon('fa fa-rocket');
+        yield BooleanField::new('published', 'Publié')->onlyOnForms()
+            ->setHelp('Visible dans le catalogue.');
+        yield BooleanField::new('comingSoon', 'Bientôt disponible')->onlyOnForms()
+            ->setHelp('Badge « Bientôt » + accès leçons bloqué.');
+        yield IntegerField::new('displayOrder', 'Ordre d\'affichage')->onlyOnForms();
+        yield TextField::new('vimeoFolderId', 'Dossier Vimeo (optionnel)')->onlyOnForms();
     }
 }
