@@ -112,6 +112,20 @@ class DashboardController extends AbstractDashboardController
             a { color: #C8395E; }
             a:hover { color: #A82248; }
             .badge.badge-primary, .badge-primary { background: #C8395E !important; color: #FCFAF5 !important; }
+
+            /* CKEditor — hauteur + intégration DA */
+            .ck.ck-editor { width: 100%; }
+            .ck-editor__editable, .ck.ck-content { min-height: 360px; }
+            .ck.ck-editor__editable_inline { padding: 1rem 1.2rem; }
+            .ck.ck-toolbar { border-radius: 8px 8px 0 0 !important; background: #FCFAF5 !important; }
+            .ck.ck-editor__main > .ck-editor__editable { border-radius: 0 0 8px 8px !important; }
+            .ck.ck-editor__editable.ck-focused { border-color: #C8395E !important; box-shadow: 0 0 0 2px rgba(200,57,94,0.15) !important; }
+            .ck.ck-button.ck-on, .ck.ck-button:active { background: rgba(200,57,94,0.12) !important; color: #C8395E !important; }
+            .ck-content h2 { font-family: 'Fraunces', Georgia, serif; }
+            .ck-content h3 { font-family: 'Fraunces', Georgia, serif; }
+            .ck-content a { color: #C8395E; }
+            /* textarea brut (avant init / fallback) plus haut */
+            textarea.ckeditor { min-height: 320px; }
         </style>
         HTML;
 
