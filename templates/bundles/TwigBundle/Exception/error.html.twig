@@ -1,0 +1,8 @@
+{% extends '_error_base.html.twig' %}
+
+{% block title %}Erreur{% endblock %}
+{% block eyebrow %}— Erreur {{ status_code }}{% endblock %}
+{% block code %}{{ status_code }}{% endblock %}
+{% block caveat %}petite pause{% endblock %}
+{% block heading %}Quelque chose s'est <em>mal passé</em>.{% endblock %}
+{% block message %}{{ status_text|default('Une erreur est survenue.') }} Reprends ton parcours ou reviens un peu plus tard.{% endblock %}
