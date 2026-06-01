@@ -34,7 +34,7 @@ final class LessonCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
-        yield FormField::addPanel('Leçon')->setIcon('fa fa-play-circle');
+        yield FormField::addFieldset('Leçon')->setIcon('fa fa-play-circle');
         yield IdField::new('id')->hideOnForm();
         yield AssociationField::new('module');
         yield TextField::new('title', 'Titre');
@@ -49,7 +49,7 @@ final class LessonCrudController extends AbstractCrudController
             ->hideOnIndex();
         yield IntegerField::new('displayOrder', 'Ordre');
 
-        yield FormField::addPanel('Ressources de la leçon')
+        yield FormField::addFieldset('Ressources de la leçon')
             ->setIcon('fa fa-link')
             ->setHelp('Ajoute autant de ressources que tu veux : fiches PDF, liens utiles. Chacune a un titre.');
         yield CollectionField::new('resources', 'Ressources')
