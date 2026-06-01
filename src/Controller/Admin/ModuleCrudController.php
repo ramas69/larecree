@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
@@ -36,6 +37,13 @@ final class ModuleCrudController extends AbstractCrudController
         yield TextField::new('title', 'Titre');
         yield SlugField::new('slug')->setTargetFieldName('title');
         yield TextareaField::new('description')->hideOnIndex();
+        yield ImageField::new('coverImage', 'Image d\'ouverture')
+            ->setUploadDir('public/uploads/modules')
+            ->setBasePath('/uploads/modules')
+            ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
+            ->setHelp('Visuel d\'ouverture du module (16:9). Laisse vide pour la couverture par défaut.')
+            ->setRequired(false)
+            ->hideOnIndex();
         yield IntegerField::new('displayOrder', 'Ordre');
     }
 }
