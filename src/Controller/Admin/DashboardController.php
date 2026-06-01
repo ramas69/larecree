@@ -28,7 +28,6 @@ class DashboardController extends AbstractDashboardController
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.css">
         <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.js"></script>
         <style>
             /* Variables thème EA — mêmes sélecteurs que le core, chargées après donc prioritaires */
@@ -144,8 +143,10 @@ class DashboardController extends AbstractDashboardController
                 removePlugins: [
                     'RealTimeCollaborativeEditing', 'RealTimeCollaborativeComments',
                     'RealTimeCollaborativeRevisionHistory', 'RealTimeCollaborativeTrackChanges',
-                    'PresenceList', 'Comments', 'TrackChanges', 'TrackChangesData', 'RevisionHistory',
-                    'Pagination', 'WProofreader', 'MathType', 'CKBox', 'CKFinder', 'EasyImage', 'CloudServices'
+                    'PresenceList', 'Comments', 'CommentsRepository', 'TrackChanges', 'TrackChangesData',
+                    'RevisionHistory', 'RevisionHistoryAdapter', 'Pagination', 'WProofreader', 'MathType',
+                    'CKBox', 'CKBoxUtils', 'CKBoxImageEdit', 'CKFinder', 'CKFinderUploadAdapter',
+                    'EasyImage', 'CloudServices', 'CloudServicesCommentsAdapter', 'ExportPdf', 'ExportWord'
                 ],
                 image: {
                     toolbar: ['imageStyle:inline', 'imageStyle:block', 'imageStyle:side', '|', 'toggleImageCaption', 'imageTextAlternative', '|', 'resizeImage']
