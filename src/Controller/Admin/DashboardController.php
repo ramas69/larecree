@@ -146,7 +146,10 @@ class DashboardController extends AbstractDashboardController
                     'PresenceList', 'Comments', 'CommentsRepository', 'TrackChanges', 'TrackChangesData',
                     'RevisionHistory', 'RevisionHistoryAdapter', 'Pagination', 'WProofreader', 'MathType',
                     'CKBox', 'CKBoxUtils', 'CKBoxImageEdit', 'CKFinder', 'CKFinderUploadAdapter',
-                    'EasyImage', 'CloudServices', 'CloudServicesCommentsAdapter', 'ExportPdf', 'ExportWord'
+                    'EasyImage', 'CloudServices', 'CloudServicesCommentsAdapter', 'ExportPdf', 'ExportWord',
+                    'DocumentOutline', 'DocumentOutlineUI', 'TableOfContents', 'FormatPainter',
+                    'SlashCommand', 'Template', 'PasteFromOfficeEnhanced', 'CaseChange',
+                    'MultiLevelList', 'AIAssistant', 'Mermaid', 'Pagination', 'PaginationData'
                 ],
                 image: {
                     toolbar: ['imageStyle:inline', 'imageStyle:block', 'imageStyle:side', '|', 'toggleImageCaption', 'imageTextAlternative', '|', 'resizeImage']
