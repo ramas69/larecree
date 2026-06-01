@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex">
+    <title>{% block title %}Erreur{% endblock %} — La Récrée Tech</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600&family=DM+Mono:wght@400;500&family=Caveat:wght@600&display=swap" rel="stylesheet">
+    <style>
+        :root { --rose: #C8395E; --rose-deep: #B22F50; --ink: #1F3025; --cream: #FCFAF5; --ink-soft: #5a6862; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Manrope', sans-serif; background: #1F3025; color: #FCFAF5; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; position: relative; overflow: hidden; }
+        .err-grid { position: absolute; inset: 0; background-image: linear-gradient(rgba(252,250,245,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(252,250,245,0.04) 1px, transparent 1px); background-size: 60px 60px; z-index: 0; }
+        .err-card { position: relative; z-index: 1; max-width: 540px; text-align: center; }
+        .err-eyebrow { font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: 0.18em; text-transform: uppercase; color: var(--rose); }
+        .err-code { font-family: 'Fraunces', serif; font-size: clamp(5rem, 18vw, 9rem); font-weight: 400; line-height: 1; margin: 8px 0 4px; color: #FCFAF5; }
+        .err-caveat { font-family: 'Caveat', cursive; font-size: 1.8rem; color: var(--rose); transform: rotate(-2deg); display: inline-block; margin-bottom: 16px; }
+        .err-title { font-family: 'Fraunces', serif; font-style: italic; font-size: clamp(1.5rem, 5vw, 2.2rem); font-weight: 500; line-height: 1.2; margin-bottom: 14px; color: #FCFAF5; }
+        .err-text { font-size: 1rem; line-height: 1.6; color: rgba(252,250,245,0.78); margin-bottom: 28px; }
+        .err-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .err-btn { display: inline-flex; align-items: center; gap: 8px; padding: 13px 24px; border-radius: 99px; text-decoration: none; font-weight: 600; font-size: 0.95rem; transition: transform .15s ease, background .15s ease; }
+        .err-btn-primary { background: var(--rose); color: #fff; }
+        .err-btn-primary:hover { background: var(--rose-deep); transform: translateY(-1px); }
+        .err-btn-ghost { border: 1px solid rgba(252,250,245,0.25); color: #FCFAF5; }
+        .err-btn-ghost:hover { border-color: var(--rose); transform: translateY(-1px); }
+        .err-brand { position: absolute; top: 24px; left: 24px; z-index: 1; font-family: 'Fraunces', serif; font-style: italic; font-size: 18px; color: var(--rose); text-decoration: none; }
+        .err-brand em { color: var(--rose); }
+    </style>
+</head>
+<body>
+    <div class="err-grid" aria-hidden="true"></div>
+    <a href="https://larecreetech.com" class="err-brand">la <em>récrée</em> tech.</a>
+    <div class="err-card">
+        <span class="err-eyebrow">{% block eyebrow %}— Erreur{% endblock %}</span>
+        <div class="err-code">{% block code %}Oups{% endblock %}</div>
+        <span class="err-caveat">{% block caveat %}c'est pas toi, c'est nous{% endblock %}</span>
+        <h1 class="err-title">{% block heading %}Une erreur est survenue.{% endblock %}</h1>
+        <p class="err-text">{% block message %}{% endblock %}</p>
+        <div class="err-actions">
+            {% block actions %}
+                <a href="{{ path('app_dashboard') }}" class="err-btn err-btn-primary">→ Mon espace</a>
+                <a href="https://larecreetech.com" class="err-btn err-btn-ghost">Retour au site</a>
+            {% endblock %}
+        </div>
+    </div>
+</body>
+</html>
