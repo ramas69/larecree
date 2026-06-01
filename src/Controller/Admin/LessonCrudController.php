@@ -14,7 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 final class LessonCrudController extends AbstractCrudController
@@ -44,7 +44,7 @@ final class LessonCrudController extends AbstractCrudController
             ->hideOnIndex();
         yield IntegerField::new('durationSeconds', 'Durée (secondes)')
             ->setHelp('Durée de la vidéo en secondes (ex : 540 = 9 min).');
-        yield TextareaField::new('description')
+        yield TextEditorField::new('description')
             ->setHelp('Ce qui est couvert + l\'exercice « À toi de jouer » à la fin.')
             ->hideOnIndex();
         yield IntegerField::new('displayOrder', 'Ordre');
