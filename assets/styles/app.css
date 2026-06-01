@@ -1765,6 +1765,15 @@ h1, h2, h3, h4 {
 .lp-vellum-body h1,
 .lp-vellum-body h2,
 .lp-vellum-body h3 { font-family: 'Fraunces', serif; font-weight: 500; margin: 1rem 0 0.5rem; color: var(--ink); }
+.lp-vellum-body img,
+.lp-vellum-body figure.image img { max-width: 100%; height: auto; border-radius: 10px; display: block; }
+.lp-vellum-body figure { margin: 1rem 0; }
+.lp-vellum-body figure.image-style-side { float: right; max-width: 50%; margin-left: 1rem; }
+.lp-vellum-body figcaption { font-size: 0.85rem; color: var(--ink-soft); text-align: center; margin-top: 0.4rem; }
+.lp-vellum-body blockquote { border-left: 3px solid var(--rose); padding-left: 1rem; margin: 1rem 0; font-style: italic; color: var(--ink-soft); }
+.lp-vellum-body table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+.lp-vellum-body td, .lp-vellum-body th { border: 1px solid #efe9df; padding: 0.5rem 0.7rem; }
+.lp-vellum-body th { background: var(--cream, #FCFAF5); font-weight: 600; }
 
 /* CHIPS SECTION */
 .lp-chips-section {
