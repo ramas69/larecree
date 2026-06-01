@@ -29,3 +29,7 @@ services:
     App\Stripe\StripeWebhookHandler:
         arguments:
             $stripeWebhookSecret: '%env(STRIPE_WEBHOOK_SECRET)%'
+
+    App\Command\ImportClaudeCoversCommand:
+        arguments:
+            $projectDir: '%kernel.project_dir%'
