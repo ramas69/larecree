@@ -114,6 +114,54 @@ class DashboardController extends AbstractDashboardController
         </style>
         HTML;
 
+    /**
+     * CKEditor 5 (super-build CDN, global CKEDITOR) initialisé sur les textarea.ckeditor.
+     * Toolbar riche : titres, couleurs texte/fond, alignement, listes, liens, images
+     * (upload via /admin/upload-image), tableaux, citations. Licence GPL (gratuit).
+     */
+    private const CKEDITOR_BODY = <<<'HTML'
+        <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.js"></script>
+        <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.css">
+        <script>
+        (function () {
+            function initCKEditors() {
+                if (typeof CKEDITOR === 'undefined' || !CKEDITOR.ClassicEditor) { return; }
+                document.querySelectorAll('textarea.ckeditor:not([data-cke-ready])').forEach(function (el) {
+                    el.setAttribute('data-cke-ready', '1');
+                    CKEDITOR.ClassicEditor.create(el, {
+                        toolbar: {
+                            items: [
+                                'undo', 'redo', '|',
+                                'heading', '|',
+                                'fontColor', 'fontBackgroundColor', '|',
+                                'bold', 'italic', 'underline', 'strikethrough', '|',
+                                'alignment', '|',
+                                'bulletedList', 'numberedList', '|',
+                                'outdent', 'indent', '|',
+                                'link', 'blockQuote', 'insertImage', 'insertTable', 'mediaEmbed', '|',
+                                'removeFormat'
+                            ],
+                            shouldNotGroupWhenFull: true
+                        },
+                        alignment: { options: ['left', 'center', 'right', 'justify'] },
+                        simpleUpload: { uploadUrl: '/admin/upload-image' },
+                        image: {
+                            toolbar: ['imageStyle:inline', 'imageStyle:block', 'imageStyle:side', '|', 'toggleImageCaption', 'imageTextAlternative', '|', 'resizeImage']
+                        },
+                        table: { contentToolbar: ['tableColumn', 'tableRow', 'mergeTableCells'] },
+                        language: 'fr'
+                    }).catch(function (err) { console.error(err); });
+                });
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', function () { setTimeout(initCKEditors, 300); });
+            } else {
+                setTimeout(initCKEditors, 300);
+            }
+        })();
+        </script>
+        HTML;
+
     public function __construct(
         private readonly PaymentRepository $payments,
         private readonly EnrollmentRepository $enrollments,
@@ -157,7 +205,9 @@ class DashboardController extends AbstractDashboardController
 
     public function configureAssets(): Assets
     {
-        return Assets::new()->addHtmlContentToHead(self::BRAND_HEAD);
+        return Assets::new()
+            ->addHtmlContentToHead(self::BRAND_HEAD)
+            ->addHtmlContentToBody(self::CKEDITOR_BODY);
     }
 
     public function configureMenuItems(): iterable

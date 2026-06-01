@@ -13,7 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\MoneyField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\TextEditorField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 final class FormationCrudController extends AbstractCrudController
@@ -37,7 +37,7 @@ final class FormationCrudController extends AbstractCrudController
         yield TextField::new('title', 'Titre');
         yield SlugField::new('slug')->setTargetFieldName('title');
         yield TextField::new('subtitle', 'Sous-titre')->hideOnIndex();
-        yield TextEditorField::new('description')->hideOnIndex();
+        yield TextareaField::new('description')->setFormTypeOption('attr', ['class' => 'ckeditor'])->hideOnIndex();
         yield MoneyField::new('priceCents', 'Prix')->setCurrency('EUR')->setStoredAsCents(true);
         yield ImageField::new('coverImage', 'Image de couverture')
             ->setUploadDir('public/uploads/formations')
