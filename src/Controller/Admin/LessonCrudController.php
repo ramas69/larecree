@@ -36,22 +36,36 @@ final class LessonCrudController extends AbstractCrudController
 
     public function configureFields(string $pageName): iterable
     {
+        // Vue liste
+        yield IdField::new('id')->onlyOnIndex();
+        yield AssociationField::new('module')->onlyOnIndex();
+        yield IntegerField::new('displayOrder', '#')->onlyOnIndex();
+        yield TextField::new('title', 'Titre')->onlyOnIndex();
+
+        // Formulaire : 2 colonnes
+        yield FormField::addColumn(8);
         yield FormField::addFieldset('Leçon')->setIcon('fa fa-play-circle');
-        yield IdField::new('id')->hideOnForm();
-        yield AssociationField::new('module');
-        yield TextField::new('title', 'Titre');
-        yield SlugField::new('slug')->setTargetFieldName('title');
-        yield TextField::new('vimeoVideoId', 'ID Vimeo')
-            ->setHelp('Héberge la vidéo sur Vimeo, puis colle ici l\'identifiant numérique (ex : 123456789). Pas d\'upload de fichier vidéo ici.')
-            ->hideOnIndex();
-        yield IntegerField::new('durationSeconds', 'Durée (secondes)')
-            ->setHelp('Durée de la vidéo en secondes (ex : 540 = 9 min).');
+        yield AssociationField::new('module')->onlyOnForms();
+        yield TextField::new('title', 'Titre')->onlyOnForms();
+        yield SlugField::new('slug')->setTargetFieldName('title')->onlyOnForms()
+            ->setHelp('Généré depuis le titre. Sert d\'URL.');
         yield TextareaField::new('description')
             ->setFormTypeOption('attr', ['class' => 'ckeditor'])
             ->setHelp('Éditeur riche : titres, couleurs, alignement, images, listes. Termine par l\'exercice « À toi de jouer ».')
-            ->hideOnIndex();
-        yield IntegerField::new('displayOrder', 'Ordre');
+            ->onlyOnForms();
 
+        yield FormField::addColumn(4);
+        yield FormField::addFieldset('Vidéo & réglages')->setIcon('fa fa-sliders');
+        yield TextField::new('vimeoVideoId', 'ID Vimeo')
+            ->setHelp('Héberge la vidéo sur Vimeo, colle l\'identifiant (ex : 123456789).')
+            ->onlyOnForms();
+        yield IntegerField::new('durationSeconds', 'Durée (secondes)')
+            ->setHelp('Ex : 540 = 9 min.')
+            ->onlyOnForms();
+        yield IntegerField::new('displayOrder', 'Ordre d\'affichage')->onlyOnForms()
+            ->setHelp('1 = première leçon du module.');
+
+        yield FormField::addColumn(12);
         yield FormField::addFieldset('Ressources de la leçon')
             ->setIcon('fa fa-link')
             ->setHelp('Ajoute autant de ressources que tu veux : fiches PDF, liens utiles. Chacune a un titre.');
