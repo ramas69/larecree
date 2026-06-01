@@ -31,7 +31,9 @@
 
             <div class="formation-programme">
                 {% for module in formation.modules %}
-                    {% set coverPath = formation.slug == 'claude-2026' ? '/images/modules/module-%02d-ouverture.png'|format(module.displayOrder) : null %}
+                    {% set coverPath = module.coverImage
+                        ? '/uploads/modules/' ~ module.coverImage
+                        : (formation.slug == 'claude-2026' ? '/images/modules/module-%02d-ouverture.png'|format(module.displayOrder) : null) %}
                     <article class="programme-module">
                         {% if coverPath %}
                             <div class="programme-module-cover" aria-hidden="true">
