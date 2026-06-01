@@ -141,6 +141,12 @@ class DashboardController extends AbstractDashboardController
                 },
                 alignment: { options: ['left', 'center', 'right', 'justify'] },
                 simpleUpload: { uploadUrl: '/admin/upload-image' },
+                removePlugins: [
+                    'RealTimeCollaborativeEditing', 'RealTimeCollaborativeComments',
+                    'RealTimeCollaborativeRevisionHistory', 'RealTimeCollaborativeTrackChanges',
+                    'PresenceList', 'Comments', 'TrackChanges', 'TrackChangesData', 'RevisionHistory',
+                    'Pagination', 'WProofreader', 'MathType', 'CKBox', 'CKFinder', 'EasyImage', 'CloudServices'
+                ],
                 image: {
                     toolbar: ['imageStyle:inline', 'imageStyle:block', 'imageStyle:side', '|', 'toggleImageCaption', 'imageTextAlternative', '|', 'resizeImage']
                 },
@@ -161,8 +167,8 @@ class DashboardController extends AbstractDashboardController
                     Editor.create(el, CONFIG).then(function () {
                         console.log('[cke] OK', el.id);
                     }).catch(function (err) {
-                        console.error('[cke] config custom KO, fallback défaut:', err && err.message ? err.message : err);
-                        Editor.create(el).catch(function (e2) { console.error('[cke] fallback KO:', e2); });
+                        console.error('[cke] config custom KO, fallback:', err && err.message ? err.message : err);
+                        Editor.create(el, { removePlugins: CONFIG.removePlugins }).catch(function (e2) { console.error('[cke] fallback KO:', e2); });
                     });
                 });
             }
