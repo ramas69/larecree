@@ -13,7 +13,7 @@
             <span class="dash-hero-caveat">— {{ formation.subtitle ?? 'formation' }}</span>
             <h1 class="dash-hero-title" style="font-size: clamp(2rem, 4vw, 3.2rem);">{{ formation.title }}</h1>
             {% if formation.description %}
-                <p class="dash-hero-sub">{{ formation.description }}</p>
+                <p class="dash-hero-sub">{{ '<' in formation.description ? formation.description|raw : formation.description|nl2br }}</p>
             {% endif %}
             <div style="display: flex; gap: 2rem; margin-top: 0.6rem; align-items: baseline;">
                 <span><strong>{{ formation.modules|length }}</strong> modules</span>
@@ -44,7 +44,7 @@
                             <span class="programme-module-num">M{{ '%02d'|format(module.displayOrder) }}</span>
                             <div>
                                 <h3 class="programme-module-title">{{ module.title }}</h3>
-                                {% if module.description %}<p class="programme-module-sub">{{ module.description }}</p>{% endif %}
+                                {% if module.description %}<div class="programme-module-sub">{{ '<' in module.description ? module.description|raw : module.description|nl2br }}</div>{% endif %}
                             </div>
                             <span class="programme-module-count">{{ module.lessons|length }} leçons</span>
                         </header>

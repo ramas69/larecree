@@ -97,7 +97,7 @@
             <section class="lp-vellum" aria-label="Description">
                 <span class="lp-vellum-eyebrow">— À retenir</span>
                 <h2 class="lp-vellum-title">Au programme de cette leçon</h2>
-                <p>{{ lesson.description }}</p>
+                <div class="lp-vellum-body">{{ '<' in lesson.description ? lesson.description|raw : lesson.description|nl2br }}</div>
             </section>
         {% endif %}
 
