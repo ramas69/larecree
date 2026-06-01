@@ -18,6 +18,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 final class FormationCrudController extends AbstractCrudController
 {
+    use SingleSaveActionsTrait;
+
     public static function getEntityFqcn(): string
     {
         return Formation::class;

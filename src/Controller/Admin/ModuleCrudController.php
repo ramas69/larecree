@@ -17,6 +17,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 
 final class ModuleCrudController extends AbstractCrudController
 {
+    use SingleSaveActionsTrait;
+
     public static function getEntityFqcn(): string
     {
         return Module::class;
