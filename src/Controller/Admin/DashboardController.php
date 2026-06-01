@@ -150,7 +150,7 @@ class DashboardController extends AbstractDashboardController
     {
         return Dashboard::new()
             ->setTitle('<span style="font-family:Fraunces,Georgia,serif;font-weight:500;">la <em style="font-style:italic;color:#E8587A;">récrée</em> tech<span style="color:#C8395E;">.</span></span>')
-            ->setFaviconPath('favicon.ico')
+            ->setFaviconPath('/favicon.svg')
             ->setDefaultColorScheme(ColorScheme::LIGHT)
             ->disableDarkMode();
     }
