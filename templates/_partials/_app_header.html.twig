@@ -30,10 +30,10 @@
         </nav>
 
         <div class="app-header-right">
-            <div class="app-user-menu">
+            <a href="{{ path('app_account') }}" class="app-user-menu" aria-label="Mon compte">
                 <span class="app-avatar" aria-hidden="true">{{ app.user.firstName|first }}</span>
                 <span class="app-user-name">{{ app.user.firstName }}</span>
-            </div>
+            </a>
             <a href="{{ path('app_logout') }}" class="app-logout">Déconnexion</a>
         </div>
     </div>

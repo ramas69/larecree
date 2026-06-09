@@ -1,0 +1,114 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon compte — La Récrée Tech{% endblock %}
+
+{% block body %}
+<div class="app-shell">
+
+    {% include '_partials/_app_header.html.twig' with { active_nav: '' } %}
+
+    <main class="app-main">
+
+        <section class="dash-hero">
+            <span class="dash-hero-caveat">ton espace</span>
+            <h1 class="dash-hero-title">Mon <em>compte</em>.</h1>
+            <p class="dash-hero-sub">Gère tes infos, ton mot de passe et tes formations.</p>
+        </section>
+
+        {% for msg in app.flashes('success') %}
+            <div class="acc-flash is-ok">{{ msg }}</div>
+        {% endfor %}
+        {% for msg in app.flashes('error') %}
+            <div class="acc-flash is-err">{{ msg }}</div>
+        {% endfor %}
+
+        <div class="acc-grid">
+
+            {# ---- Profil ---- #}
+            <section class="acc-card">
+                <header class="acc-card-head">
+                    <span class="acc-card-eyebrow">— Mes informations</span>
+                    <h2 class="acc-card-title">Profil</h2>
+                </header>
+                <form method="post" action="{{ path('app_account_profile') }}" class="acc-form" data-turbo="false">
+                    <div class="acc-field">
+                        <label for="first_name">Prénom</label>
+                        <input type="text" id="first_name" name="first_name" value="{{ user.firstName }}" required>
+                    </div>
+                    <div class="acc-field">
+                        <label for="last_name">Nom</label>
+                        <input type="text" id="last_name" name="last_name" value="{{ user.lastName }}">
+                    </div>
+                    <div class="acc-field">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" name="email" value="{{ user.email }}" required autocomplete="email">
+                    </div>
+                    <input type="hidden" name="_token" value="{{ csrf_token('account_profile') }}">
+                    <button type="submit" class="acc-btn">Enregistrer</button>
+                </form>
+            </section>
+
+            {# ---- Mot de passe ---- #}
+            <section class="acc-card">
+                <header class="acc-card-head">
+                    <span class="acc-card-eyebrow">— Sécurité</span>
+                    <h2 class="acc-card-title">Mot de passe</h2>
+                </header>
+                <form method="post" action="{{ path('app_account_password') }}" class="acc-form" data-turbo="false">
+                    <div class="acc-field">
+                        <label for="current_password">Mot de passe actuel</label>
+                        <input type="password" id="current_password" name="current_password" required autocomplete="current-password">
+                    </div>
+                    <div class="acc-field">
+                        <label for="new_password">Nouveau mot de passe</label>
+                        <input type="password" id="new_password" name="new_password" required minlength="8" autocomplete="new-password">
+                    </div>
+                    <div class="acc-field">
+                        <label for="new_password_confirm">Confirme</label>
+                        <input type="password" id="new_password_confirm" name="new_password_confirm" required minlength="8" autocomplete="new-password">
+                    </div>
+                    <input type="hidden" name="_token" value="{{ csrf_token('account_password') }}">
+                    <button type="submit" class="acc-btn">Changer le mot de passe</button>
+                </form>
+            </section>
+
+        </div>
+
+        {# ---- Mes formations ---- #}
+        <section class="dash-section">
+            <div class="dash-section-head">
+                <h2 class="dash-section-title">Mes <em>formations</em></h2>
+                <a href="{{ path('app_catalogue') }}" class="dash-section-action">Catalogue →</a>
+            </div>
+
+            {% if enrollments|length > 0 %}
+                <div class="acc-enrollments">
+                    {% for e in enrollments %}
+                        {% set f = e.formation %}
+                        <article class="acc-enroll">
+                            <div class="acc-enroll-body">
+                                <span class="acc-enroll-eyebrow">— Formation {% if e.isVipGranted %}· VIP{% endif %}</span>
+                                <h3>{{ f.title }}</h3>
+                                {% if f.subtitle %}<p>{{ f.subtitle }}</p>{% endif %}
+                            </div>
+                            <a href="{{ path('app_formation_show', { slug: f.slug }) }}" class="acc-enroll-cta">▶ Reprendre</a>
+                        </article>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="acc-empty">Tu n'es inscrit·e à aucune formation pour le moment. <a href="{{ path('app_catalogue') }}">Voir le catalogue →</a></p>
+            {% endif %}
+        </section>
+
+        <p class="acc-logout-line">
+            <a href="{{ path('app_logout') }}" class="acc-logout">↪ Me déconnecter</a>
+        </p>
+
+    </main>
+
+    <footer class="app-footer">
+        © 2026 La Récrée Tech · app.larecreetech.com
+    </footer>
+
+</div>
+{% endblock %}
