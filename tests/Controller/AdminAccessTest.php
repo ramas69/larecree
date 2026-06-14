@@ -83,6 +83,33 @@ final class AdminAccessTest extends WebTestCase
             ->setAction(Action::EDIT)->setEntityId($lesson->getId())->generateUrl());
         self::assertResponseIsSuccessful();
         self::assertSelectorExists('input[type="checkbox"][name$="[videoRemove]"]');
+
+        // Aperçu admin : 404 sans vidéo, 200 (video/mp4) avec un fichier présent
+        $lessonId = $lesson->getId();
+        $client->request('GET', '/admin/video-preview/'.$lessonId);
+        self::assertResponseStatusCodeSame(404);
+
+        $projectDir = $container->getParameter('kernel.project_dir');
+        $dir = $projectDir.'/private/videos';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        $videoName = 'preview-test.mp4';
+        $filePath = $dir.'/'.$videoName;
+        file_put_contents($filePath, 'FAKEMP4');
+
+        $freshEm = $container->get(EntityManagerInterface::class);
+        $freshLesson = $freshEm->getRepository(\App\Entity\Lesson::class)->find($lessonId);
+        $freshLesson->setVideoFilename($videoName);
+        $freshEm->flush();
+
+        try {
+            $client->request('GET', '/admin/video-preview/'.$lessonId);
+            self::assertResponseIsSuccessful();
+            self::assertResponseHeaderSame('Content-Type', 'video/mp4');
+        } finally {
+            @unlink($filePath);
+        }
     }
 
     public function testStudentCannotAccessAdmin(): void

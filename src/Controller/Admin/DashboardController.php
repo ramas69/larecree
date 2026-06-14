@@ -198,7 +198,7 @@ class DashboardController extends AbstractDashboardController
         </script>
         HTML;
 
-    // Retour visuel + auto-remplit « Durée (secondes) » à la sélection d'une vidéo (côté navigateur).
+    // Aperçu lecteur (vidéo actuelle + fichier choisi) + auto-remplit la durée en minutes.
     private const VIDEO_DURATION_BODY = <<<'HTML'
         <script>
         (function () {
@@ -207,44 +207,70 @@ class DashboardController extends AbstractDashboardController
                 if (bytes > 1048576) { return (bytes / 1048576).toFixed(1) + ' Mo'; }
                 return Math.round(bytes / 1024) + ' Ko';
             }
-            function statusEl(fileInput) {
-                var el = fileInput.parentNode.querySelector('.video-upload-status');
-                if (!el) {
-                    el = document.createElement('p');
-                    el.className = 'video-upload-status';
-                    el.style.cssText = 'margin:.5rem 0 0;font-size:.85rem;font-weight:600;color:#C8395E;';
-                    fileInput.parentNode.appendChild(el);
+            function previewBox(fileInput) {
+                var b = document.getElementById('video-preview-box');
+                if (!b) {
+                    b = document.createElement('div');
+                    b.id = 'video-preview-box';
+                    b.style.cssText = 'margin:.8rem 0 0;padding:.8rem;border:1px solid #E6DDC9;border-radius:12px;background:#fff;';
+                    fileInput.parentNode.appendChild(b);
                 }
-                return el;
+                return b;
+            }
+            function renderPreview(fileInput, src, caption) {
+                var b = previewBox(fileInput);
+                b.innerHTML = '';
+                var cap = document.createElement('p');
+                cap.style.cssText = 'margin:0 0 .5rem;font-size:.82rem;font-weight:600;color:#C8395E;';
+                cap.textContent = caption;
+                var v = document.createElement('video');
+                v.controls = true;
+                v.preload = 'metadata';
+                v.style.cssText = 'width:100%;max-height:240px;border-radius:8px;background:#000;display:block;';
+                v.src = src;
+                b.appendChild(cap);
+                b.appendChild(v);
+            }
+            function lessonId() {
+                var m = location.search.match(/entityId=(\d+)/)
+                     || location.pathname.match(/\/(\d+)\/edit/)
+                     || location.pathname.match(/\/lesson\/(\d+)/);
+                return m ? m[1] : null;
             }
             function bind() {
                 var fileInput = document.querySelector('input[type="file"][name$="[videoUpload]"]');
-                if (!fileInput || fileInput.dataset.durationBound) { return; }
-                fileInput.dataset.durationBound = '1';
+                if (!fileInput || fileInput.dataset.previewBound) { return; }
+                fileInput.dataset.previewBound = '1';
 
+                // Aperçu de la vidéo déjà enregistrée
+                var nameField = document.querySelector('input[name$="[videoFilename]"]');
+                var id = lessonId();
+                if (nameField && nameField.value.trim() && id) {
+                    renderPreview(fileInput, '/admin/video-preview/' + id + '?t=' + Date.now(), '▶ Vidéo actuelle : ' + nameField.value.trim());
+                }
+
+                // Aperçu + durée au choix d'un fichier
                 fileInput.addEventListener('change', function () {
                     var file = fileInput.files && fileInput.files[0];
-                    var status = statusEl(fileInput);
-                    if (!file) { status.textContent = ''; return; }
+                    if (!file) { return; }
 
-                    status.textContent = '✓ ' + file.name + ' (' + human(file.size) + ') — clique « Enregistrer » pour l\'envoyer.';
+                    var url = URL.createObjectURL(file);
+                    renderPreview(fileInput, url, '✓ ' + file.name + ' (' + human(file.size) + ') — clique « Enregistrer » pour l\'envoyer.');
 
                     var durationField = document.querySelector('input[name$="[durationMinutes]"]');
-                    var url = URL.createObjectURL(file);
                     var probe = document.createElement('video');
                     probe.preload = 'metadata';
                     probe.onloadedmetadata = function () {
-                        URL.revokeObjectURL(url);
                         if (isFinite(probe.duration) && probe.duration > 0) {
                             var mins = Math.max(1, Math.round(probe.duration / 60));
                             if (durationField) {
                                 durationField.value = mins;
                                 durationField.dispatchEvent(new Event('input', { bubbles: true }));
                             }
-                            status.textContent = '✓ ' + file.name + ' (' + human(file.size) + ' · ~' + mins + ' min) — clique « Enregistrer » pour l\'envoyer.';
+                            var cap = document.querySelector('#video-preview-box p');
+                            if (cap) { cap.textContent = '✓ ' + file.name + ' (' + human(file.size) + ' · ~' + mins + ' min) — clique « Enregistrer ».'; }
                         }
                     };
-                    probe.onerror = function () { URL.revokeObjectURL(url); };
                     probe.src = url;
                 });
             }
