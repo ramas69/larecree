@@ -47,12 +47,26 @@
             <div class="lp-screen-grid">
                 <div class="lp-screen-bezel">
                     <div class="lp-player-frame">
-                        <iframe
-                            src="https://player.vimeo.com/video/{{ lesson.vimeoVideoId }}?title=0&byline=0&portrait=0"
-                            title="{{ lesson.title }}"
-                            allow="autoplay; fullscreen; picture-in-picture"
-                            allowfullscreen
-                            loading="lazy"></iframe>
+                        {% if lesson.hasSelfHostedVideo %}
+                            <video
+                                controls
+                                controlsList="nodownload"
+                                preload="metadata"
+                                playsinline
+                                title="{{ lesson.title }}"
+                                src="{{ path('app_lesson_video', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}">
+                                Ton navigateur ne peut pas lire cette vidéo.
+                            </video>
+                        {% elseif lesson.vimeoVideoId %}
+                            <iframe
+                                src="https://player.vimeo.com/video/{{ lesson.vimeoVideoId }}?title=0&byline=0&portrait=0"
+                                title="{{ lesson.title }}"
+                                allow="autoplay; fullscreen; picture-in-picture"
+                                allowfullscreen
+                                loading="lazy"></iframe>
+                        {% else %}
+                            <div class="lp-no-video">Vidéo bientôt disponible</div>
+                        {% endif %}
                     </div>
                 </div>
 

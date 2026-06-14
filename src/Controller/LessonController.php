@@ -14,9 +14,11 @@ use App\Repository\FormationRepository;
 use App\Repository\LessonProgressRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Attribute\Route;
@@ -93,6 +95,47 @@ final class LessonController extends AbstractController
             'totalCount'   => $total,
             'totalSeconds' => $totalSeconds,
         ];
+    }
+
+    /**
+     * Sert la vidéo auto-hébergée, réservée aux inscrit·es (lecture + seek via Range).
+     * Le fichier est hors du dossier public : aucun accès direct par URL.
+     */
+    #[Route('/formations/{slug}/{moduleSlug}/{lessonSlug}/video', name: 'app_lesson_video', methods: ['GET'])]
+    #[IsGranted('IS_AUTHENTICATED_FULLY')]
+    public function streamVideo(
+        string $slug,
+        string $moduleSlug,
+        string $lessonSlug,
+        FormationRepository $formations,
+        EnrollmentRepository $enrollments,
+    ): BinaryFileResponse {
+        [, , $lesson] = $this->resolveContext($slug, $moduleSlug, $lessonSlug, $formations, $enrollments);
+
+        $filename = $lesson->getVideoFilename();
+        if ($filename === null || $filename === '') {
+            throw new NotFoundHttpException('Aucune vidéo auto-hébergée pour cette leçon.');
+        }
+
+        // Garde-fou : pas de traversée de répertoire (on ne garde que le nom de base).
+        $filename = basename($filename);
+        $path = $this->getParameter('kernel.project_dir').'/private/videos/'.$filename;
+        if (!is_file($path)) {
+            throw new NotFoundHttpException('Fichier vidéo introuvable sur le serveur.');
+        }
+
+        $response = new BinaryFileResponse($path);
+        $response->headers->set('Content-Type', match (strtolower(pathinfo($filename, PATHINFO_EXTENSION))) {
+            'webm'  => 'video/webm',
+            'ogg', 'ogv' => 'video/ogg',
+            'mov'   => 'video/quicktime',
+            'm4v'   => 'video/x-m4v',
+            default => 'video/mp4',
+        });
+        $response->setContentDisposition(ResponseHeaderBag::DISPOSITION_INLINE, $filename);
+        $response->setPrivate();
+
+        return $response;
     }
 
     #[Route('/formations/{slug}/{moduleSlug}/{lessonSlug}/complete', name: 'app_lesson_complete', methods: ['POST'])]

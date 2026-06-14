@@ -30,8 +30,12 @@ class Lesson
     #[ORM\Column(length: 180)]
     private ?string $slug = null;
 
-    #[ORM\Column(length: 80)]
+    #[ORM\Column(length: 80, nullable: true)]
     private ?string $vimeoVideoId = null;
+
+    /** Nom du fichier vidéo auto-hébergé dans private/videos/ (ex : m01-l01.mp4). */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $videoFilename = null;
 
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
@@ -111,10 +115,26 @@ class Lesson
         return $this->vimeoVideoId;
     }
 
-    public function setVimeoVideoId(string $vimeoVideoId): static
+    public function setVimeoVideoId(?string $vimeoVideoId): static
     {
         $this->vimeoVideoId = $vimeoVideoId;
         return $this;
+    }
+
+    public function getVideoFilename(): ?string
+    {
+        return $this->videoFilename;
+    }
+
+    public function setVideoFilename(?string $videoFilename): static
+    {
+        $this->videoFilename = $videoFilename;
+        return $this;
+    }
+
+    public function hasSelfHostedVideo(): bool
+    {
+        return $this->videoFilename !== null && $this->videoFilename !== '';
     }
 
     public function getDescription(): ?string

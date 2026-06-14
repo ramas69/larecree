@@ -117,6 +117,72 @@ final class StudentJourneyTest extends WebTestCase
         self::assertStringContainsString('player.vimeo.com/video/999932', (string) $client->getResponse()->getContent());
     }
 
+    public function testLessonVideoReturns404WhenNoSelfHostedFile(): void
+    {
+        $client = $this->bootWithFixtures();
+        $this->loginAsRama($client);
+
+        // M03L2 a un ID Vimeo mais pas de vidéo locale → 404 sur la route vidéo
+        $client->request('GET', '/formations/claude-2026/cerveau-externe/m3-l2/video');
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testLessonVideoComingSoonReturns404(): void
+    {
+        $client = $this->bootWithFixtures();
+        $this->loginAsVip($client);
+
+        $client->request('GET', '/formations/manus-2026/decouvrir-manus/m1-l1/video');
+
+        self::assertResponseStatusCodeSame(404);
+    }
+
+    public function testLessonVideoStreamsForEnrolled(): void
+    {
+        $client = $this->bootWithFixtures();
+        $this->loginAsRama($client);
+
+        $container = static::getContainer();
+        $em = $container->get(EntityManagerInterface::class);
+        $projectDir = $container->getParameter('kernel.project_dir');
+
+        // Trouver M03L2 et lui attacher une vidéo locale + écrire le fichier
+        $lesson = null;
+        $formation = $em->getRepository(Formation::class)->findOneBy(['slug' => 'claude-2026']);
+        foreach ($formation->getModules() as $m) {
+            if ($m->getSlug() === 'cerveau-externe') {
+                foreach ($m->getLessons() as $l) {
+                    if ($l->getSlug() === 'm3-l2') {
+                        $lesson = $l;
+                        break 2;
+                    }
+                }
+            }
+        }
+        self::assertNotNull($lesson);
+
+        $videoName = 'test-stream.mp4';
+        $lesson->setVideoFilename($videoName);
+        $em->flush();
+
+        $dir = $projectDir.'/private/videos';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        $filePath = $dir.'/'.$videoName;
+        file_put_contents($filePath, 'FAKEMP4BYTES');
+
+        try {
+            $client->request('GET', '/formations/claude-2026/cerveau-externe/m3-l2/video');
+
+            self::assertResponseIsSuccessful();
+            self::assertResponseHeaderSame('Content-Type', 'video/mp4');
+        } finally {
+            @unlink($filePath);
+        }
+    }
+
     public function testMarkCompletedCreatesProgressAndRedirects(): void
     {
         $client = $this->bootWithFixtures();

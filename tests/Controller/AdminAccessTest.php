@@ -71,6 +71,9 @@ final class AdminAccessTest extends WebTestCase
         self::assertNotNull($module);
         $client->request('GET', $urlGen->setController(LessonCrudController::class)->setAction(Action::NEW)->generateUrl());
         self::assertResponseIsSuccessful();
+        // Le champ d'upload vidéo (non mappé) doit bien se rendre dans le formulaire
+        self::assertSelectorExists('input[type="file"][name$="[videoUpload]"]');
+        self::assertSelectorExists('input[name$="[videoFilename]"]');
     }
 
     public function testStudentCannotAccessAdmin(): void

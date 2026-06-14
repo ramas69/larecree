@@ -198,6 +198,43 @@ class DashboardController extends AbstractDashboardController
         </script>
         HTML;
 
+    // Auto-remplit « Durée (secondes) » à partir de la vidéo uploadée (lecture côté navigateur).
+    private const VIDEO_DURATION_BODY = <<<'HTML'
+        <script>
+        (function () {
+            function bind() {
+                var fileInput = document.querySelector('input[type="file"][name$="[videoUpload]"]');
+                if (!fileInput || fileInput.dataset.durationBound) { return; }
+                fileInput.dataset.durationBound = '1';
+
+                fileInput.addEventListener('change', function () {
+                    var file = fileInput.files && fileInput.files[0];
+                    if (!file) { return; }
+
+                    var durationField = document.querySelector('input[name$="[durationSeconds]"]');
+                    if (!durationField) { return; }
+
+                    var url = URL.createObjectURL(file);
+                    var probe = document.createElement('video');
+                    probe.preload = 'metadata';
+                    probe.onloadedmetadata = function () {
+                        URL.revokeObjectURL(url);
+                        if (isFinite(probe.duration) && probe.duration > 0) {
+                            durationField.value = Math.round(probe.duration);
+                            durationField.dispatchEvent(new Event('input', { bubbles: true }));
+                        }
+                    };
+                    probe.onerror = function () { URL.revokeObjectURL(url); };
+                    probe.src = url;
+                });
+            }
+            bind();
+            document.addEventListener('turbo:load', bind);
+            document.addEventListener('turbo:render', bind);
+        })();
+        </script>
+        HTML;
+
     public function __construct(
         private readonly PaymentRepository $payments,
         private readonly EnrollmentRepository $enrollments,
@@ -243,7 +280,8 @@ class DashboardController extends AbstractDashboardController
     {
         return Assets::new()
             ->addHtmlContentToHead(self::BRAND_HEAD)
-            ->addHtmlContentToBody(self::CKEDITOR_BODY);
+            ->addHtmlContentToBody(self::CKEDITOR_BODY)
+            ->addHtmlContentToBody(self::VIDEO_DURATION_BODY);
     }
 
     public function configureMenuItems(): iterable

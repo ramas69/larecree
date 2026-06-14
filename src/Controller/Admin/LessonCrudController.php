@@ -7,19 +7,37 @@ namespace App\Controller\Admin;
 use App\Entity\Lesson;
 use App\Form\ResourceFormType;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 final class LessonCrudController extends AbstractCrudController
 {
     use SingleSaveActionsTrait;
+
+    public function __construct(
+        #[Autowire('%kernel.project_dir%')]
+        private readonly string $projectDir,
+    ) {
+    }
 
     public static function getEntityFqcn(): string
     {
@@ -55,10 +73,27 @@ final class LessonCrudController extends AbstractCrudController
             ->onlyOnForms();
 
         yield FormField::addColumn(4);
-        yield FormField::addFieldset('Vidéo & réglages')->setIcon('fa fa-sliders');
-        yield TextField::new('vimeoVideoId', 'ID Vimeo')
-            ->setHelp('Héberge la vidéo sur Vimeo, colle l\'identifiant (ex : 123456789).')
+        yield FormField::addFieldset('Vidéo')->setIcon('fa fa-film')
+            ->setHelp('Vidéo auto-hébergée (recommandé) OU ID Vimeo. Si une vidéo locale est présente, elle est prioritaire.');
+        yield Field::new('videoUpload', 'Uploader une vidéo')
+            ->setFormType(FileType::class)
+            ->setFormTypeOptions([
+                'mapped'   => false,
+                'required' => false,
+                'attr'     => ['accept' => 'video/mp4,video/webm,video/quicktime'],
+            ])
+            ->setHelp('MP4 conseillé. Limité par la taille max PHP du serveur — pour un gros fichier, dépose-le par FTP dans private/videos/ et colle son nom ci-dessous.')
             ->onlyOnForms();
+        yield TextField::new('videoFilename', 'Fichier vidéo (déposé par FTP)')
+            ->setRequired(false)
+            ->setHelp('Nom du fichier dans private/videos/ (ex : m01-l01.mp4). Rempli automatiquement après un upload.')
+            ->onlyOnForms();
+        yield TextField::new('vimeoVideoId', 'ID Vimeo (fallback)')
+            ->setRequired(false)
+            ->setHelp('Optionnel. Utilisé seulement si aucune vidéo locale n\'est définie.')
+            ->onlyOnForms();
+
+        yield FormField::addFieldset('Réglages')->setIcon('fa fa-sliders');
         yield IntegerField::new('durationSeconds', 'Durée (secondes)')
             ->setHelp('Ex : 540 = 9 min.')
             ->onlyOnForms();
@@ -76,5 +111,58 @@ final class LessonCrudController extends AbstractCrudController
             ->allowDelete()
             ->renderExpanded()
             ->onlyOnForms();
+    }
+
+    public function createNewFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
+    {
+        return $this->attachVideoUpload(parent::createNewFormBuilder($entityDto, $formOptions, $context));
+    }
+
+    public function createEditFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
+    {
+        return $this->attachVideoUpload(parent::createEditFormBuilder($entityDto, $formOptions, $context));
+    }
+
+    /**
+     * Déplace le fichier uploadé vers private/videos/ et renseigne videoFilename.
+     */
+    private function attachVideoUpload(FormBuilderInterface $builder): FormBuilderInterface
+    {
+        $projectDir = $this->projectDir;
+
+        $builder->addEventListener(FormEvents::POST_SUBMIT, static function (FormEvent $event) use ($projectDir): void {
+            $form = $event->getForm();
+            if (!$form->has('videoUpload')) {
+                return;
+            }
+            $upload = $form->get('videoUpload')->getData();
+            if (!$upload instanceof UploadedFile) {
+                return;
+            }
+
+            $lesson = $event->getData();
+            if (!$lesson instanceof Lesson) {
+                return;
+            }
+
+            $destDir = $projectDir.'/private/videos';
+            if (!is_dir($destDir)) {
+                @mkdir($destDir, 0775, true);
+            }
+
+            $ext  = $upload->guessExtension() ?: 'mp4';
+            $base = $lesson->getSlug() ?: 'video';
+            $name = $base.'-'.uniqid().'.'.$ext;
+
+            try {
+                $upload->move($destDir, $name);
+                $lesson->setVideoFilename($name);
+            } catch (FileException $e) {
+                // Échec d'écriture (disque/permissions) → erreur de formulaire, pas un 500.
+                $form->get('videoUpload')->addError(new FormError('Échec de l\'upload : '.$e->getMessage()));
+            }
+        }, 10);
+
+        return $builder;
     }
 }
