@@ -1505,6 +1505,33 @@ h1, h2, h3, h4 {
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+.lp-video-loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: rgba(0, 0, 0, 0.55);
+  color: rgba(252, 250, 245, 0.85);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+.lp-video-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(252, 250, 245, 0.25);
+  border-top-color: #E8587A;
+  border-radius: 50%;
+  animation: lp-spin 0.8s linear infinite;
+}
+@keyframes lp-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .lp-video-spinner { animation: none; }
+}
 
 /* RESOURCES SIDEBAR — pretty version */
 .lp-resources-side {

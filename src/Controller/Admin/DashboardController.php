@@ -198,10 +198,25 @@ class DashboardController extends AbstractDashboardController
         </script>
         HTML;
 
-    // Auto-remplit « Durée (secondes) » à partir de la vidéo uploadée (lecture côté navigateur).
+    // Retour visuel + auto-remplit « Durée (secondes) » à la sélection d'une vidéo (côté navigateur).
     private const VIDEO_DURATION_BODY = <<<'HTML'
         <script>
         (function () {
+            function human(bytes) {
+                if (bytes > 1073741824) { return (bytes / 1073741824).toFixed(2) + ' Go'; }
+                if (bytes > 1048576) { return (bytes / 1048576).toFixed(1) + ' Mo'; }
+                return Math.round(bytes / 1024) + ' Ko';
+            }
+            function statusEl(fileInput) {
+                var el = fileInput.parentNode.querySelector('.video-upload-status');
+                if (!el) {
+                    el = document.createElement('p');
+                    el.className = 'video-upload-status';
+                    el.style.cssText = 'margin:.5rem 0 0;font-size:.85rem;font-weight:600;color:#C8395E;';
+                    fileInput.parentNode.appendChild(el);
+                }
+                return el;
+            }
             function bind() {
                 var fileInput = document.querySelector('input[type="file"][name$="[videoUpload]"]');
                 if (!fileInput || fileInput.dataset.durationBound) { return; }
@@ -209,19 +224,24 @@ class DashboardController extends AbstractDashboardController
 
                 fileInput.addEventListener('change', function () {
                     var file = fileInput.files && fileInput.files[0];
-                    if (!file) { return; }
+                    var status = statusEl(fileInput);
+                    if (!file) { status.textContent = ''; return; }
 
-                    var durationField = document.querySelector('input[name$="[durationSeconds]"]');
-                    if (!durationField) { return; }
+                    status.textContent = '✓ ' + file.name + ' (' + human(file.size) + ') — clique « Enregistrer » pour l\'envoyer.';
 
+                    var durationField = document.querySelector('input[name$="[durationMinutes]"]');
                     var url = URL.createObjectURL(file);
                     var probe = document.createElement('video');
                     probe.preload = 'metadata';
                     probe.onloadedmetadata = function () {
                         URL.revokeObjectURL(url);
                         if (isFinite(probe.duration) && probe.duration > 0) {
-                            durationField.value = Math.round(probe.duration);
-                            durationField.dispatchEvent(new Event('input', { bubbles: true }));
+                            var mins = Math.max(1, Math.round(probe.duration / 60));
+                            if (durationField) {
+                                durationField.value = mins;
+                                durationField.dispatchEvent(new Event('input', { bubbles: true }));
+                            }
+                            status.textContent = '✓ ' + file.name + ' (' + human(file.size) + ' · ~' + mins + ' min) — clique « Enregistrer » pour l\'envoyer.';
                         }
                     };
                     probe.onerror = function () { URL.revokeObjectURL(url); };

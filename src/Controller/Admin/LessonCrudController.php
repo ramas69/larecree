@@ -21,6 +21,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormError;
@@ -86,16 +87,23 @@ final class LessonCrudController extends AbstractCrudController
             ->onlyOnForms();
         yield TextField::new('videoFilename', 'Fichier vidéo (déposé par FTP)')
             ->setRequired(false)
-            ->setHelp('Nom du fichier dans private/videos/ (ex : m01-l01.mp4). Rempli automatiquement après un upload.')
+            ->setHelp('Nom du fichier dans private/videos/ (ex : m01-l01.mp4). Rempli automatiquement après un upload. Vide ce champ pour retirer la vidéo.')
             ->onlyOnForms();
+        if ($pageName === Crud::PAGE_EDIT) {
+            yield Field::new('videoRemove', '🗑 Retirer la vidéo actuelle')
+                ->setFormType(CheckboxType::class)
+                ->setFormTypeOptions(['mapped' => false, 'required' => false])
+                ->setHelp('Coche pour supprimer la vidéo locale (le fichier est effacé). Pour remplacer : upload simplement une nouvelle vidéo.')
+                ->onlyOnForms();
+        }
         yield TextField::new('vimeoVideoId', 'ID Vimeo (fallback)')
             ->setRequired(false)
             ->setHelp('Optionnel. Utilisé seulement si aucune vidéo locale n\'est définie.')
             ->onlyOnForms();
 
         yield FormField::addFieldset('Réglages')->setIcon('fa fa-sliders');
-        yield IntegerField::new('durationSeconds', 'Durée (secondes)')
-            ->setHelp('Ex : 540 = 9 min.')
+        yield IntegerField::new('durationMinutes', 'Durée (minutes)')
+            ->setHelp('En minutes (ex : 9). Rempli automatiquement après un upload.')
             ->onlyOnForms();
         yield IntegerField::new('displayOrder', 'Ordre d\'affichage')->onlyOnForms()
             ->setHelp('1 = première leçon du module.');
@@ -132,34 +140,47 @@ final class LessonCrudController extends AbstractCrudController
 
         $builder->addEventListener(FormEvents::POST_SUBMIT, static function (FormEvent $event) use ($projectDir): void {
             $form = $event->getForm();
-            if (!$form->has('videoUpload')) {
-                return;
-            }
-            $upload = $form->get('videoUpload')->getData();
-            if (!$upload instanceof UploadedFile) {
-                return;
-            }
-
             $lesson = $event->getData();
             if (!$lesson instanceof Lesson) {
                 return;
             }
 
             $destDir = $projectDir.'/private/videos';
-            if (!is_dir($destDir)) {
-                @mkdir($destDir, 0775, true);
+            $deleteFile = static function (?string $name) use ($destDir): void {
+                if ($name === null || $name === '') {
+                    return;
+                }
+                $path = $destDir.'/'.basename($name);
+                if (is_file($path)) {
+                    @unlink($path);
+                }
+            };
+
+            // 1) Retirer la vidéo actuelle (case cochée).
+            if ($form->has('videoRemove') && $form->get('videoRemove')->getData() === true) {
+                $deleteFile($lesson->getVideoFilename());
+                $lesson->setVideoFilename(null);
             }
 
-            $ext  = $upload->guessExtension() ?: 'mp4';
-            $base = $lesson->getSlug() ?: 'video';
-            $name = $base.'-'.uniqid().'.'.$ext;
+            // 2) Nouvel upload → remplace (et efface l'ancien fichier).
+            $upload = $form->has('videoUpload') ? $form->get('videoUpload')->getData() : null;
+            if ($upload instanceof UploadedFile) {
+                if (!is_dir($destDir)) {
+                    @mkdir($destDir, 0775, true);
+                }
 
-            try {
-                $upload->move($destDir, $name);
-                $lesson->setVideoFilename($name);
-            } catch (FileException $e) {
-                // Échec d'écriture (disque/permissions) → erreur de formulaire, pas un 500.
-                $form->get('videoUpload')->addError(new FormError('Échec de l\'upload : '.$e->getMessage()));
+                $ext  = $upload->guessExtension() ?: 'mp4';
+                $base = $lesson->getSlug() ?: 'video';
+                $name = $base.'-'.uniqid().'.'.$ext;
+
+                try {
+                    $deleteFile($lesson->getVideoFilename());
+                    $upload->move($destDir, $name);
+                    $lesson->setVideoFilename($name);
+                } catch (FileException $e) {
+                    // Échec d'écriture (disque/permissions) → erreur de formulaire, pas un 500.
+                    $form->get('videoUpload')->addError(new FormError('Échec de l\'upload : '.$e->getMessage()));
+                }
             }
         }, 10);
 

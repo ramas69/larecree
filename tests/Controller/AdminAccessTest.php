@@ -74,6 +74,15 @@ final class AdminAccessTest extends WebTestCase
         // Le champ d'upload vidéo (non mappé) doit bien se rendre dans le formulaire
         self::assertSelectorExists('input[type="file"][name$="[videoUpload]"]');
         self::assertSelectorExists('input[name$="[videoFilename]"]');
+        self::assertSelectorExists('input[name$="[durationMinutes]"]');
+
+        // EDIT : le champ « retirer la vidéo » (checkbox, edit only) doit se rendre
+        $lesson = $em->getRepository(\App\Entity\Lesson::class)->findOneBy([]);
+        self::assertNotNull($lesson);
+        $client->request('GET', $urlGen->setController(LessonCrudController::class)
+            ->setAction(Action::EDIT)->setEntityId($lesson->getId())->generateUrl());
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('input[type="checkbox"][name$="[videoRemove]"]');
     }
 
     public function testStudentCannotAccessAdmin(): void

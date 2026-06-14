@@ -159,6 +159,18 @@ class Lesson
         return $this;
     }
 
+    /** Durée en minutes (pour l'admin) — convertit depuis/vers les secondes stockées. */
+    public function getDurationMinutes(): int
+    {
+        return (int) round($this->durationSeconds / 60);
+    }
+
+    public function setDurationMinutes(?int $minutes): static
+    {
+        $this->durationSeconds = max(0, (int) $minutes) * 60;
+        return $this;
+    }
+
     public function getDurationFormatted(): string
     {
         $minutes = intdiv($this->durationSeconds, 60);
