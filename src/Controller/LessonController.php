@@ -154,7 +154,7 @@ final class LessonController extends AbstractController
             throw new AccessDeniedHttpException('CSRF token invalide.');
         }
 
-        [, , $lesson, $enrollment] = $this->resolveContext($slug, $moduleSlug, $lessonSlug, $formations, $enrollments);
+        [$formation, , $lesson, $enrollment] = $this->resolveContext($slug, $moduleSlug, $lessonSlug, $formations, $enrollments);
 
         $progress = $progresses->findOneByEnrollmentAndLesson($enrollment, $lesson);
         if ($progress === null) {
@@ -165,13 +165,21 @@ final class LessonController extends AbstractController
         $progress->markCompleted();
         $em->flush();
 
-        $this->addFlash('success', 'Leçon « '.$lesson->getTitle().' » marquée comme terminée.');
+        // Enchaîne sur la leçon suivante (ou la formation si c'était la dernière).
+        [, $next] = $this->resolveSiblings($formation, $lesson);
+        if ($next !== null && $next->getModule() !== null) {
+            $this->addFlash('success', 'Leçon terminée. Place à la suivante 🎬');
 
-        return $this->redirectToRoute('app_lesson_show', [
-            'slug'       => $slug,
-            'moduleSlug' => $moduleSlug,
-            'lessonSlug' => $lessonSlug,
-        ]);
+            return $this->redirectToRoute('app_lesson_show', [
+                'slug'       => $slug,
+                'moduleSlug' => $next->getModule()->getSlug(),
+                'lessonSlug' => $next->getSlug(),
+            ]);
+        }
+
+        $this->addFlash('success', 'Bravo, tu as terminé la formation ! 🎉');
+
+        return $this->redirectToRoute('app_formation_show', ['slug' => $slug]);
     }
 
     /**

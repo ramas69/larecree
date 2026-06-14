@@ -242,17 +242,32 @@
 <script>
 (function () {
     var video = document.querySelector('[data-lp-video]');
+    if (!video) { return; }
+
+    // Indicateur de chargement
     var loader = document.querySelector('[data-lp-loader]');
-    if (!video || !loader) { return; }
-    function hide() { loader.style.display = 'none'; }
-    function show() { loader.style.display = 'flex'; }
-    if (video.readyState >= 3) { hide(); }
-    video.addEventListener('canplay', hide);
-    video.addEventListener('playing', hide);
-    video.addEventListener('waiting', show);
-    video.addEventListener('error', function () {
-        loader.querySelector('span:last-child').textContent = 'Vidéo indisponible. Réessaie ou recharge la page.';
-    });
+    if (loader) {
+        var hide = function () { loader.style.display = 'none'; };
+        var show = function () { loader.style.display = 'flex'; };
+        if (video.readyState >= 3) { hide(); }
+        video.addEventListener('canplay', hide);
+        video.addEventListener('playing', hide);
+        video.addEventListener('waiting', show);
+        video.addEventListener('error', function () {
+            loader.querySelector('span:last-child').textContent = 'Vidéo indisponible. Réessaie ou recharge la page.';
+        });
+    }
+
+    // Vidéo regardée jusqu'au bout → marque terminé + enchaîne la leçon suivante
+    var completeForm = document.querySelector('form.lp-dock-complete');
+    if (completeForm) {
+        var sent = false;
+        video.addEventListener('ended', function () {
+            if (sent) { return; }
+            sent = true;
+            completeForm.submit();
+        });
+    }
 })();
 </script>
 {% endblock %}

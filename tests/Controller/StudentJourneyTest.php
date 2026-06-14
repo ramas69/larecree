@@ -200,7 +200,8 @@ final class StudentJourneyTest extends WebTestCase
         $client->request('POST', '/formations/claude-2026/produire-livrables/m4-l1/complete', [
             '_token' => $token,
         ]);
-        self::assertResponseRedirects();
+        // Doit enchaîner sur la leçon suivante du module
+        self::assertResponseRedirects('/formations/claude-2026/produire-livrables/m4-l2');
 
         // Vérif progress créé + completedAt non-null
         $em->clear();
