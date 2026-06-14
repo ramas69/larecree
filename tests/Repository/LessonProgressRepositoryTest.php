@@ -144,7 +144,7 @@ final class LessonProgressRepositoryTest extends KernelTestCase
         $formation->addModule($module);
         $this->em->persist($module);
 
-        $lesson = (new Lesson())->setTitle('L-'.$slug)->setSlug($slug)->setVimeoVideoId('v-'.$slug)->setDisplayOrder($order);
+        $lesson = (new Lesson())->setTitle('L-'.$slug)->setSlug($slug)->setDisplayOrder($order);
         $module->addLesson($lesson);
         $this->em->persist($lesson);
         $this->em->flush();

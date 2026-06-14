@@ -30,9 +30,6 @@ class Lesson
     #[ORM\Column(length: 180)]
     private ?string $slug = null;
 
-    #[ORM\Column(length: 80, nullable: true)]
-    private ?string $vimeoVideoId = null;
-
     /** Nom du fichier vidéo auto-hébergé dans private/videos/ (ex : m01-l01.mp4). */
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $videoFilename = null;
@@ -107,17 +104,6 @@ class Lesson
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
-        return $this;
-    }
-
-    public function getVimeoVideoId(): ?string
-    {
-        return $this->vimeoVideoId;
-    }
-
-    public function setVimeoVideoId(?string $vimeoVideoId): static
-    {
-        $this->vimeoVideoId = $vimeoVideoId;
         return $this;
     }
 

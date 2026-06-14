@@ -40,9 +40,6 @@ class Formation
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $coverImage = null;
 
-    #[ORM\Column(length: 80, nullable: true)]
-    private ?string $vimeoFolderId = null;
-
     #[ORM\Column(options: ['default' => false])]
     private bool $published = false;
 
@@ -169,16 +166,6 @@ class Formation
         return $this;
     }
 
-    public function getVimeoFolderId(): ?string
-    {
-        return $this->vimeoFolderId;
-    }
-
-    public function setVimeoFolderId(?string $vimeoFolderId): static
-    {
-        $this->vimeoFolderId = $vimeoFolderId;
-        return $this;
-    }
 
     public function isPublished(): bool
     {

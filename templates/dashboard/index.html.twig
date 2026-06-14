@@ -57,8 +57,6 @@
                     {% if lesson.hasSelfHostedVideo %}
                         <video class="dash-continue-video" preload="metadata" controls playsinline
                                src="{{ path('app_lesson_video', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}#t=0.1"></video>
-                    {% elseif lesson.vimeoVideoId %}
-                        <iframe class="dash-continue-video" src="https://player.vimeo.com/video/{{ lesson.vimeoVideoId }}?title=0&byline=0&portrait=0" title="{{ lesson.title }}" allow="fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
                     {% else %}
                         <div class="dash-continue-thumb-play" aria-hidden="true">▶</div>
                     {% endif %}
@@ -98,8 +96,6 @@
                         {% if firstLesson.hasSelfHostedVideo %}
                             <video class="dash-continue-video" preload="metadata" controls playsinline
                                    src="{{ path('app_lesson_video', { slug: firstFormation.slug, moduleSlug: firstModule.slug, lessonSlug: firstLesson.slug }) }}#t=0.1"></video>
-                        {% elseif firstLesson.vimeoVideoId %}
-                            <iframe class="dash-continue-video" src="https://player.vimeo.com/video/{{ firstLesson.vimeoVideoId }}?title=0&byline=0&portrait=0" title="{{ firstLesson.title }}" allow="fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
                         {% else %}
                             <div class="dash-continue-thumb-play" aria-hidden="true">▶</div>
                         {% endif %}

@@ -17,7 +17,6 @@ final class ClaudeProgram
     public const FORMATION_SUBTITLE = 'De « j\'effleure Claude » à « je pilote Claude »';
     public const FORMATION_DESCRIPTION = '10 modules · 64 leçons · ~8h30 de vidéo · accès à vie. Apprentissage par cas d\'usage métier réel : chaque module résout un problème concret et se termine par un livrable.';
     public const FORMATION_PRICE_CENTS = 39700;
-    public const VIMEO_PREFIX = '9999';
 
     /**
      * @return list<array{

@@ -36,7 +36,7 @@ final class ResourceRepositoryTest extends KernelTestCase
     {
         $formation = (new Formation())->setSlug('claude')->setTitle('Claude');
         $module    = (new Module())->setTitle('Démarrer')->setSlug('demarrer');
-        $lesson    = (new Lesson())->setTitle('Intro')->setSlug('intro')->setVimeoVideoId('111');
+        $lesson    = (new Lesson())->setTitle('Intro')->setSlug('intro');
 
         $formation->addModule($module);
         $module->addLesson($lesson);
@@ -64,7 +64,7 @@ final class ResourceRepositoryTest extends KernelTestCase
     {
         $formation = (new Formation())->setSlug('empty')->setTitle('Empty');
         $module    = (new Module())->setTitle('Empty Module')->setSlug('empty');
-        $lesson    = (new Lesson())->setTitle('Empty Lesson')->setSlug('empty')->setVimeoVideoId('999');
+        $lesson    = (new Lesson())->setTitle('Empty Lesson')->setSlug('empty');
 
         $formation->addModule($module);
         $module->addLesson($lesson);

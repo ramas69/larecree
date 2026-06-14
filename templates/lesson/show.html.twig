@@ -63,13 +63,6 @@
                                 <span class="lp-video-spinner" aria-hidden="true"></span>
                                 <span>Chargement de la vidéo…</span>
                             </div>
-                        {% elseif lesson.vimeoVideoId %}
-                            <iframe
-                                src="https://player.vimeo.com/video/{{ lesson.vimeoVideoId }}?title=0&byline=0&portrait=0"
-                                title="{{ lesson.title }}"
-                                allow="autoplay; fullscreen; picture-in-picture"
-                                allowfullscreen
-                                loading="lazy"></iframe>
                         {% else %}
                             <div class="lp-no-video">Vidéo bientôt disponible</div>
                         {% endif %}

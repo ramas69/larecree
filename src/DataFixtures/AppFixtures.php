@@ -94,7 +94,6 @@ final class AppFixtures extends Fixture
                 $lesson = (new Lesson())
                     ->setSlug('m'.$moduleNumber.'-l'.$lessonNumber)
                     ->setTitle($title)
-                    ->setVimeoVideoId(ClaudeProgram::VIMEO_PREFIX.$moduleNumber.$lessonNumber)
                     ->setDescription($description)
                     ->setDurationSeconds($durationSeconds)
                     ->setDisplayOrder($lessonNumber);
@@ -130,7 +129,7 @@ final class AppFixtures extends Fixture
             ['Finale : ton bras droit',  'bras-droit',            'Ton workflow où Manus devient un membre de ton équipe.'],
         ];
 
-        $this->seedModules($manager, $manus, $modulesSpec, lessonsPerModule: 3, vimeoPrefix: '7777');
+        $this->seedModules($manager, $manus, $modulesSpec, lessonsPerModule: 3);
 
         return $manus;
     }
@@ -139,7 +138,7 @@ final class AppFixtures extends Fixture
      * @param list<array{0: string, 1: string, 2?: string}> $modulesSpec
      * @return array<int, array<int, Lesson>> indexed by module index, value = list of lessons
      */
-    private function seedModules(ObjectManager $manager, Formation $formation, array $modulesSpec, int $lessonsPerModule, string $vimeoPrefix): array
+    private function seedModules(ObjectManager $manager, Formation $formation, array $modulesSpec, int $lessonsPerModule): array
     {
         $lessonsByModule = [];
         foreach ($modulesSpec as $i => $spec) {
@@ -158,7 +157,6 @@ final class AppFixtures extends Fixture
                 $lesson = (new Lesson())
                     ->setSlug('m'.($i + 1).'-l'.$li)
                     ->setTitle('Leçon '.$li.' — '.$module->getTitle())
-                    ->setVimeoVideoId($vimeoPrefix.($i + 1).$li)
                     ->setDescription('Contenu pédagogique de la leçon '.$li.'.')
                     ->setDurationSeconds(60 * (8 + $li * 2))
                     ->setDisplayOrder($li);

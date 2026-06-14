@@ -28,7 +28,7 @@ final class LessonTest extends TestCase
         $lesson = (new Lesson())
             ->setTitle('Bienvenue')
             ->setSlug('bienvenue')
-            ->setVimeoVideoId('999111222')
+            
             ->setDisplayOrder(1);
 
         $module->addLesson($lesson);
@@ -40,7 +40,7 @@ final class LessonTest extends TestCase
     public function testRemoveLessonDetachesIt(): void
     {
         $module = new Module();
-        $lesson = (new Lesson())->setTitle('A')->setSlug('a')->setVimeoVideoId('111');
+        $lesson = (new Lesson())->setTitle('A')->setSlug('a');
         $module->addLesson($lesson);
 
         $module->removeLesson($lesson);

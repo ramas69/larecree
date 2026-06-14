@@ -74,6 +74,5 @@ final class FormationCrudController extends AbstractCrudController
         yield BooleanField::new('comingSoon', 'Bientôt disponible')->onlyOnForms()
             ->setHelp('Badge « Bientôt » + accès leçons bloqué.');
         yield IntegerField::new('displayOrder', 'Ordre d\'affichage')->onlyOnForms();
-        yield TextField::new('vimeoFolderId', 'Dossier Vimeo (optionnel)')->onlyOnForms();
     }
 }

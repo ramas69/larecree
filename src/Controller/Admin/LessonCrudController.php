@@ -75,7 +75,7 @@ final class LessonCrudController extends AbstractCrudController
 
         yield FormField::addColumn(4);
         yield FormField::addFieldset('Vidéo')->setIcon('fa fa-film')
-            ->setHelp('Vidéo auto-hébergée (recommandé) OU ID Vimeo. Si une vidéo locale est présente, elle est prioritaire.');
+            ->setHelp('Vidéo auto-hébergée : upload ci-dessous, ou dépose un gros fichier par FTP dans private/videos/ et colle son nom.');
         yield Field::new('videoUpload', 'Uploader une vidéo')
             ->setFormType(FileType::class)
             ->setFormTypeOptions([
@@ -96,11 +96,6 @@ final class LessonCrudController extends AbstractCrudController
                 ->setHelp('Coche pour supprimer la vidéo locale (le fichier est effacé). Pour remplacer : upload simplement une nouvelle vidéo.')
                 ->onlyOnForms();
         }
-        yield TextField::new('vimeoVideoId', 'ID Vimeo (fallback)')
-            ->setRequired(false)
-            ->setHelp('Optionnel. Utilisé seulement si aucune vidéo locale n\'est définie.')
-            ->onlyOnForms();
-
         yield FormField::addFieldset('Réglages')->setIcon('fa fa-sliders');
         yield IntegerField::new('durationMinutes', 'Durée (minutes)')
             ->setHelp('En minutes (ex : 9). Rempli automatiquement après un upload.')

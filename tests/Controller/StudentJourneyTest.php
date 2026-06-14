@@ -104,7 +104,7 @@ final class StudentJourneyTest extends WebTestCase
         self::assertResponseStatusCodeSame(404);
     }
 
-    public function testLessonShowRendersVimeoPlayer(): void
+    public function testLessonShowRendersPlaceholderWhenNoVideo(): void
     {
         $client = $this->bootWithFixtures();
         $this->loginAsRama($client);
@@ -112,9 +112,9 @@ final class StudentJourneyTest extends WebTestCase
         $client->request('GET', '/formations/claude-2026/cerveau-externe/m3-l2');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorExists('.lp-player-frame iframe');
-        // Vimeo id seedé pour M03L2 (Claude prefix 9999, module 3, leçon 2 → 999932)
-        self::assertStringContainsString('player.vimeo.com/video/999932', (string) $client->getResponse()->getContent());
+        // Aucune vidéo locale seedée → placeholder, et plus aucun Vimeo
+        self::assertSelectorExists('.lp-no-video');
+        self::assertStringNotContainsString('vimeo.com', (string) $client->getResponse()->getContent());
     }
 
     public function testLessonVideoReturns404WhenNoSelfHostedFile(): void
@@ -122,7 +122,7 @@ final class StudentJourneyTest extends WebTestCase
         $client = $this->bootWithFixtures();
         $this->loginAsRama($client);
 
-        // M03L2 a un ID Vimeo mais pas de vidéo locale → 404 sur la route vidéo
+        // M03L2 n'a pas de vidéo locale → 404 sur la route vidéo
         $client->request('GET', '/formations/claude-2026/cerveau-externe/m3-l2/video');
 
         self::assertResponseStatusCodeSame(404);

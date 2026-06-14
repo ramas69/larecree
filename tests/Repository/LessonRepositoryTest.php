@@ -36,9 +36,9 @@ final class LessonRepositoryTest extends KernelTestCase
         $module = (new Module())->setTitle('Démarrer')->setSlug('demarrer')->setDisplayOrder(1);
         $formation->addModule($module);
 
-        $second = (new Lesson())->setTitle('Second')->setSlug('second')->setVimeoVideoId('222')->setDisplayOrder(2);
-        $first  = (new Lesson())->setTitle('First') ->setSlug('first') ->setVimeoVideoId('111')->setDisplayOrder(1);
-        $third  = (new Lesson())->setTitle('Third') ->setSlug('third') ->setVimeoVideoId('333')->setDisplayOrder(3);
+        $second = (new Lesson())->setTitle('Second')->setSlug('second')->setDisplayOrder(2);
+        $first  = (new Lesson())->setTitle('First') ->setSlug('first') ->setDisplayOrder(1);
+        $third  = (new Lesson())->setTitle('Third') ->setSlug('third') ->setDisplayOrder(3);
 
         $module->addLesson($second);
         $module->addLesson($first);
