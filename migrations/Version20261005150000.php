@@ -9,13 +9,15 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Re-seed Formation Claude 2026 → programme V3 fil rouge (5 étapes · 30 vidéos · ~5 h 20).
+ * Re-seed Formation Claude 2026-27 → programme V3 fil rouge (5 étapes · 30 vidéos · ~5h).
  *
  * Remplace le V2 (10 modules · 64 leçons) par le V3 défini dans ClaudeProgram.
  *
- * ⚠️ Supprime les modules existants de claude-2026 → cascade FK efface lessons,
- * resources, lesson_progress liés. OK au 5 oct. 2026 : aucune vidéo ni progression
- * réelle en prod. Les vidéos seront uploadées leçon par leçon dans l'admin.
+ * Ne touche ni aux users, ni aux inscriptions (liées à la formation, pas aux
+ * modules), ni aux paiements. La progression V2 n'est JAMAIS supprimée : avant
+ * la purge des anciens modules, chaque lesson_progress est détaché de sa leçon
+ * (lesson_id = NULL → orphelin, conservé en base, ignoré par l'app).
+ * Les ressources attachées aux leçons V2 partent avec elles (cascade FK).
  *
  * Idempotence : skip si les 5 étapes V3 (par slug) sont déjà toutes présentes.
  */
@@ -23,7 +25,7 @@ final class Version20261005150000 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Re-seed Claude 2026 program V3 — 5 steps, 30 lessons (data only).';
+        return 'Re-seed Claude 2026-27 program V3 — 5 steps, 30 lessons, progress kept as orphans (data only).';
     }
 
     public function up(Schema $schema): void
@@ -44,11 +46,19 @@ final class Version20261005150000 extends AbstractMigration
         $this->skipIf($existing === count($slugs), 'Claude 2026 already at V3.');
 
         $this->connection->update('formation', [
+            'title'       => ClaudeProgram::FORMATION_TITLE,
             'subtitle'    => ClaudeProgram::FORMATION_SUBTITLE,
             'description' => ClaudeProgram::FORMATION_DESCRIPTION,
         ], ['id' => $formationId]);
 
-        // Purge des anciens modules (cascade lessons/resources/lesson_progress via FK).
+        // Progression V2 : détachée (orpheline), jamais supprimée.
+        $this->connection->executeStatement(
+            'UPDATE lesson_progress SET lesson_id = NULL
+             WHERE lesson_id IN (SELECT l.id FROM lesson l JOIN module m ON m.id = l.module_id WHERE m.formation_id = :fid)',
+            ['fid' => $formationId],
+        );
+
+        // Purge des anciens modules (cascade lessons/resources via FK).
         $this->connection->executeStatement(
             'DELETE FROM module WHERE formation_id = :fid',
             ['fid' => $formationId],

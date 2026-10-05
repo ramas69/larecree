@@ -2,20 +2,24 @@
 
 declare(strict_types=1);
 
-namespace App\Data;
-
 /**
- * Programme Formation Claude 2026 — V3 fil rouge (5 étapes, 30 vidéos, ~5 h 20).
+ * Programme Formation Claude 2026-27 — V3 (fil rouge, 5 étapes, 30 vidéos, ~5h).
  *
  * Source unique consommée par AppFixtures (dev) ET la migration data-seed (prod).
  * Garder synchronisé : si tu changes ici, génère une nouvelle migration de re-seed.
+ *
+ * NOTE V3 : les 10 modules V2 sont dissous dans 5 étapes fil rouge. Chaque
+ * vidéo = 1 action de l'élève + un livrable. Léa (coach) sert de fil de démo.
  */
+
+namespace App\Data;
+
 final class ClaudeProgram
 {
     public const FORMATION_SLUG = 'claude-2026';
-    public const FORMATION_TITLE = 'Formation Claude 2026';
+    public const FORMATION_TITLE = 'Formation Claude 2026-27';
     public const FORMATION_SUBTITLE = 'De « j\'effleure Claude » à « je pilote Claude »';
-    public const FORMATION_DESCRIPTION = '5 étapes fil rouge · 30 vidéos · ~5 h 20 · accès à vie. Un seul projet : ton business. Chaque étape se termine par quelque chose qui existe — et qui tourne.';
+    public const FORMATION_DESCRIPTION = 'Fil rouge : 5 étapes · 30 vidéos · ~5h de vidéo · accès à vie. Un seul projet : ton business. Chaque étape se termine par un livrable réel — ton offre, tes skills, tes connecteurs, ton agent, ta page en ligne.';
     public const FORMATION_PRICE_CENTS = 39700;
 
     /**
@@ -30,68 +34,68 @@ final class ClaudeProgram
     {
         return [
             [
-                'title' => 'Cowork : Claude te libère la main dès aujourd\'hui',
+                'title' => 'Étape 1 · Cowork — Claude te libère la main dès aujourd\'hui',
                 'slug'  => 'etape-1-cowork',
-                'description' => 'Tu pars de ton business — celui que tu lances ou celui que tu optimises. Livrable : ta présentation d\'offre rédigée dans ton ton, Claude réglé pour ton business, tes fichiers chargés dans ton projet de contexte. Ta première victoire, dans les 48 h.',
+                'description' => 'La première victoire, dans les 48 h. Tu sors avec : ta présentation d\'offre rédigée dans ton ton, Claude réglé pour TON business, tes fichiers chargés — et ton projet de contexte monté.',
                 'lessons' => [
-                    ['Bienvenue : le fil rouge et Léa', 360, "Comment fonctionne la formation : un seul projet, ton business, et une étape = un livrable. Léa, coach, fait le parcours en démo avec toi. Le Discord, les ressources.\n\n▶ À toi : présente-toi sur le Discord + dis ce que ton business doit sortir à la fin."],
-                    ['Arrêter de voir Claude comme Google', 480, "L'erreur n°1 des débutants. Chatbot vs assistant : le changement de posture. Démo : même demande, version « Google » vs « assistant ».\n\n▶ À toi : repère ta façon actuelle de parler à l'IA."],
-                    ['Le game changer 2026 : c\'est quoi Cowork', 600, "La grande nouveauté pour les non-devs : Claude qui travaille sur tes fichiers et tes dossiers. Ce que ça change pour ton business. Inclus dans Pro ET Max.\n\n▶ À toi : vérifie que ton ordi est compatible."],
-                    ['Installer et configurer Cowork', 660, "Compte, abonnement (ce qu'il te faut vraiment), installation pas à pas, première connexion.\n\n▶ À toi : installe Cowork et repère les 3 zones clés."],
-                    ['Apprends à Claude qui tu es : la Memory', 660, "Claude qui se souvient de ton contexte : ton métier, tes clients, ton ton. Démo : Léa configure une mémoire de pro.\n\n▶ À toi : remplis ta mémoire avec ton vrai contexte business."],
-                    ['Ton projet de contexte : charger tes fichiers', 720, "Un Project pour ton business : instructions, documents, exemples. Quels fichiers y mettre (et lesquels jamais).\n\n▶ À toi : crée ton projet de contexte et charge tes fichiers clés."],
-                    ['La recette d\'un texte qui te ressemble : RCFE', 780, "Rôle, Contexte, Format, Exemples. Pourquoi « écris-moi un texte » ne marche jamais. Démo : un texte plat → un texte qui sonne comme toi.\n\n▶ À toi : réécris un de tes textes avec RCFE."],
-                    ['On assemble : ta présentation d\'offre rédigée', 720, "Léa rédige son offre de A à Z avec son Claude réglé. Itérer, corriger, finaliser. Ta première victoire.\n\n▶ À toi : rédige ta présentation d'offre et partage ton win."],
+                    ['Crée ton compte Claude', 480, "Quel plan choisir (Pro suffit), premiers réglages de langue et de style. Visite rapide de l'interface.\n\n▶ À toi : configure ton compte, repère les 3 zones clés."],
+                    ['Règle Claude pour TON business', 480, "La Memory et le style par défaut : Claude se souvient de qui tu es, de ton métier, de ton ton. Ne plus jamais réexpliquer.\n\n▶ À toi : remplis ta mémoire avec ton vrai contexte — comme Léa, coach, qui fixe son vouvoiement et son ton chaleureux."],
+                    ['La fenêtre chat vs le projet', 600, "Quand utiliser une conversation simple, quand créer un Project. La différence qui fait gagner des heures.\n\n▶ À toi : identifie 3 Projects utiles pour ton business."],
+                    ['Ta première vraie tâche', 600, "Choisir UNE tâche réelle de ton business et la formuler comme à un stagiaire : le trio rôle / contexte / format (la méthode RCFE en action). Démo Léa : son texte de présentation aux nouveaux prospects.\n\n▶ À toi : rédige ta présentation d'offre avec le prompt du cours."],
+                    ['Le va-et-vient', 600, "Corriger sans repartir de zéro : « moins long », « garde le ton », « reprends le point 2 ». Une correction = un chiffre ou une zone pointée.\n\n▶ À toi : améliore ton texte en 3 itérations, jusqu'à ce qu'il te ressemble."],
+                    ['Ton projet de contexte', 720, "Charger TES fichiers dans un Project : ta fiche de tarifs, tes emails types, ton offre. C'est ça, du contexte : ce que Claude voit à chaque fois. (On ne prompte plus : on construit du contexte.)\n\n▶ À toi : monte ton projet de contexte — ton actif le plus durable."],
+                    ['Les erreurs qui coûtent', 480, "Recopier sans relire, donner des données sensibles, attendre la perfection du premier essai. Les 12 erreurs que je vois chez tous les débutants — et le réflexe anti-chaque.\n\n▶ À toi : note tes 3 réflexes de vérification."],
+                    ['On ne prompte plus : on construit du contexte', 720, "La leçon 2026 : le prompt n'est qu'une ligne, le vrai actif est le contexte (projet, skills, mémoire). Cas d'école en direct : un prompt « tout-en-un » d'affiche de marque, analysé et réparé en 2 prompts.\n\n▶ À toi : livre ta présentation d'offre finale — c'est ton livrable d'étape."],
                 ],
             ],
             [
-                'title' => 'Skills : écrire une fois, pour toujours',
+                'title' => 'Étape 2 · Skills — écrire une fois, pour toujours',
                 'slug'  => 'etape-2-skills',
-                'description' => 'Ce que tu refais chaque semaine, Claude le sait déjà. Livrable : tes 2-3 skills qui tournent.',
+                'description' => 'Ce que tu refais chaque semaine, Claude le sait déjà. Tu sors avec : tes 2-3 skills qui tournent sur ton vrai travail.',
                 'lessons' => [
-                    ['C\'est quoi un Skill', 540, "Les skills expliqués simplement : comment un skill transforme Claude en spécialiste de TES tâches.\n\n▶ À toi : liste 3 tâches que tu refais chaque semaine."],
-                    ['Créer ton skill avec le Skill Creator', 780, "Démo : Léa crée son skill de relance client de A à Z avec le Skill Creator intégré.\n\n▶ À toi : crée ton premier skill."],
-                    ['Les Plugins métier', 480, "C'est quoi un plugin (un bundle de skills). Les plugins dispo (marketing, finance, ops…) et comment choisir.\n\n▶ À toi : installe un plugin pertinent pour ton activité."],
-                    ['Ton métier, ton exemple', 660, "Les mêmes gestes, adaptés à ton cas : freelance, consultant, artisan, e-commerçant. Les skills qui comptent pour chacun.\n\n▶ À toi : choisis l'exemple le plus proche de ton business."],
-                    ['On assemble : tes 2-3 skills qui tournent', 600, "Tester, ajuster, ranger ta boîte à outils.\n\n▶ À toi : fais tourner tes 2-3 skills sur une vraie semaine."],
+                    ['Repère ce qui se répète', 480, "Balayer ta semaine : les 3 tâches hebdo que tu refais tout le temps. Le critère de choix : « je pourrais le coller dans Claude sans réexpliquer ».\n\n▶ À toi : liste tes 3 candidates."],
+                    ['Ta première skill', 720, "Construire de A à Z la skill « relance prospect » de Léa : rôle, contexte à DEMANDER (ne jamais deviner), règles non négociables, format littéral, cas limites.\n\n▶ À toi : transpose la skill sur TON service."],
+                    ['La structure qui marche', 600, "Anatomie d'un SKILL.md : nom, description qui déclenche, corps concis (<500 lignes), règles avant le format. Pourquoi les interdits font plus que les souhaits.\n\n▶ À toi : passe ta skill au crayon rouge."],
+                    ['Durcir une skill', 720, "Bornes chiffrées, cas limites (« si plus de 3 mois de silence… »), boucle de vérification, boucle de validation humaine. Un prompt sans SI est une démo.\n\n▶ À toi : ajoute les 2 SI de survie à ta skill."],
+                    ['Ta boîte à skills', 480, "Organiser, nommer, tester avec 3-5 formulations différentes. Quand fusionner, quand couper. Ta boîte devient ta bibliothèque « prompts qui marchent ».\n\n▶ À toi : 2-3 skills validées et testées — c'est ton livrable d'étape."],
                 ],
             ],
             [
-                'title' => 'Connecteurs : Claude branché à tes outils',
+                'title' => 'Étape 3 · Connecteurs — Claude branché à tes outils',
                 'slug'  => 'etape-3-connecteurs',
-                'description' => 'Plus un seul copier-coller. Livrable : Claude connecté à ton calendrier, tes mails, tes fichiers (ce que les techniciens appellent MCP) — et tes données clients restent les tiennes.',
+                'description' => 'Plus un seul copier-coller. Tu sors avec : Claude connecté à ton calendrier, tes mails, tes fichiers — et tes données clients restent les tiennes.',
                 'lessons' => [
-                    ['C\'est quoi un Connecteur', 540, "Brancher Claude à tes outils : ce que ça change, ce que ça permet. Sécurité et permissions.\n\n▶ À toi : liste les outils de ton business à brancher."],
-                    ['Ce qu\'on ne branche JAMAIS', 660, "Données clients sensibles, accès trop larges, vérification des faits. La séquence de confiance avant de connecter quoi que ce soit.\n\n▶ À toi : écris ta liste « jamais » et ta liste « oui »."],
-                    ['Connecter ton agenda et tes mails', 720, "Démo : Léa connecte Google Agenda puis Gmail. Lire, préparer, proposer — sans rien envoyer seul.\n\n▶ À toi : connecte ton agenda et tes mails."],
-                    ['Connecter tes fichiers : Drive, Notion et autres', 600, "Démo : Drive et Notion, combiner plusieurs connecteurs.\n\n▶ À toi : connecte l'outil où vivent tes fichiers."],
-                    ['Ta première automatisation sur tes fichiers', 720, "Laisser Claude lire et ranger tes fichiers. Démo : organiser un dossier, traiter des documents.\n\n▶ À toi : fais ta première automatisation."],
-                    ['Piloter depuis ton mobile (Dispatch)', 420, "Lancer des tâches depuis ton téléphone, entre deux rendez-vous.\n\n▶ À toi : teste Dispatch sur ton téléphone."],
-                    ['On assemble : Claude branché à ton business', 600, "Récap : agenda, mails, fichiers. Plus un seul copier-coller.\n\n▶ À toi : fais tourner une journée type avec tes connecteurs."],
+                    ['C\'est quoi un connecteur', 300, "L'image de la prise universelle entre Claude et tes outils (ce que les techniciens appellent MCP — tu n'en auras jamais besoin). Le modèle c'est le cerveau, les connecteurs sont les mains, tes skills sont les gestes.\n\n▶ À toi : liste les 2 outils que Claude devrait voir."],
+                    ['Branche ton calendrier, pas à pas', 720, "Démo écran complet : répertoire, connexion, autorisations. Règle d'or : commencer en « approbation requise » pour tout ce qui écrit.\n\n▶ À toi : branche ton calendrier."],
+                    ['Branche ta boîte mail', 720, "Lecture seule d'abord. Ce que ça change : Claude voit les prospects sans réponse, prépare — n'envoie jamais seul.\n\n▶ À toi : branche ta boîte en lecture seule."],
+                    ['Branche tes fichiers', 600, "Drive / documents : ta fiche de tarifs, ton offre, tes messages types deviennent visibles de Claude. Ce qui est stable va dans le contexte (étape 1), ce qui change chaque jour va dans un connecteur.\n\n▶ À toi : branche ton stockage."],
+                    ['Ce qu\'on ne branche JAMAIS', 480, "Données de paiement, identité, santé, données clients sensibles sans accord. Le réflexe 4E (Effective, Efficient, Ethical, Safe) version production. Ta règle simple à retenir.\n\n▶ À toi : écris ta règle de confidentialité personnelle."],
+                    ['Le flux branché', 720, "La démo du module : lire → préparer → proposer → attendre validation. Léa : Claude repère la cliente qui a sauté 2 séances et prépare le rappel doux. Zéro copier-coller.\n\n▶ À toi : fais tourner ton premier flux complet."],
+                    ['Quand ça casse', 480, "Déconnexion, permissions perdues, trop de connecteurs actifs (au-delà de 10 : mode « à la demande »). Les réflexes de déblocage.\n\n▶ À toi : teste un scénario de panne — c'est ton livrable d'étape."],
                 ],
             ],
             [
-                'title' => 'Agents : la tâche qui ne passe plus par toi',
+                'title' => 'Étape 4 · Agents — la tâche qui ne passe plus par toi',
                 'slug'  => 'etape-4-agents',
-                'description' => 'Rappels, relances : la tâche tourne sans toi. Livrable : ton premier agent en service — avec validation humaine avant chaque envoi. Toujours.',
+                'description' => 'Ton premier agent en service. Tu sors avec : rappels et relances qui partent seuls — validés par toi avant chaque envoi. Toujours.',
                 'lessons' => [
-                    ['Claude qui bosse seul : c\'est quoi un agent', 600, "Les tâches récurrentes automatisées : ce qu'un agent fait, ce qu'il ne doit jamais faire seul.\n\n▶ À toi : choisis LA tâche que ton premier agent va prendre."],
-                    ['Le piège du « tout à l\'IA »', 540, "Quand déléguer, quand garder la main. Pourquoi la validation humaine avant chaque envoi n'est pas négociable.\n\n▶ À toi : définis ton point de validation."],
-                    ['Créer ton premier agent', 900, "Démo : Léa crée son agent de rappels de rendez-vous de A à Z — programmer, déclencher, valider.\n\n▶ À toi : crée ton agent."],
-                    ['Relances et rappels : les cas d\'usage', 720, "Relances de devis, rappels de rendez-vous, suivi client. Adapter à ton métier.\n\n▶ À toi : ajoute un deuxième cas à ton agent."],
-                    ['On assemble : ton agent en service', 600, "Le tester une semaine, ajuster, le laisser tourner.\n\n▶ À toi : mets ton agent en service et partage ton win."],
+                    ['Agent ≠ chat', 360, "Le chat attend, l'agent agit selon un horaire. L'échelle d'autonomie : plus l'action est réversible, plus Claude peut agir seul ; plus elle est visible, plus il te demande.\n\n▶ À toi : choisis TA tâche — répétitive, bénigne, vérifiable."],
+                    ['Choisis TA tâche', 480, "Le critère des 3 conditions. Léa : les rappels de séance. Les mauvaises candidates : ce qui demande un jugement qui change, ce qui envoie à ta place, ce qui n'a jamais été fait à la main.\n\n▶ À toi : valide ta tâche contre les 3 conditions."],
+                    ['Construis ton agent', 840, "Pas à pas : l'horaire (« chaque soir à 18 h »), la préparation (jamais l'envoi), la mise en file de validation, le TON depuis ton projet, les bornes (max 3 phrases), les 2 SI de survie (jour vide, cas ambigu).\n\n▶ À toi : construis le tien sur ta vraie tâche."],
+                    ['Fais-le tourner', 600, "Premières exécutions : regarder, corriger, durcir. Le prompt autonome (personne ne sera là pour répondre) : règles par défaut, signalement des manques, « ce qui demande mon attention » en 3 lignes.\n\n▶ À toi : 3 exécutions contrôlées — c'est ton livrable d'étape."],
+                    ['Le vrai coût en production', 600, "Chaque étape consomme des tokens : /usage, la part des skills et des connecteurs, quand l'IA coûte plus cher que 3 minutes à la main. Ce que les vendeurs ne montrent pas.\n\n▶ À toi : mesure le coût réel de ton agent sur une semaine."],
                 ],
             ],
             [
-                'title' => 'Claude Design : ta page en ligne, aujourd\'hui',
+                'title' => 'Étape 5 · Claude Design — ta page en ligne, aujourd\'hui',
                 'slug'  => 'etape-5-claude-design',
-                'description' => 'Le dernier jour, ton business est en ligne. Livrable : ta page business en ligne, lien partageable, prête à mettre dans ta bio Instagram.',
+                'description' => 'Le grand final. Tu sors avec : ta page business en ligne, lien partageable, prête à mettre dans ta bio Instagram.',
                 'lessons' => [
-                    ['Créer en discutant : c\'est quoi Claude Design', 600, "La nouveauté 2026 pour créer visuellement sans être designer. Ce qu'on peut faire.\n\n▶ À toi : explore l'interface."],
-                    ['Ton identité : couleurs, typos, style', 660, "Faire analyser ton brand existant (ou en créer un). Récupérer couleurs, typos, ton.\n\n▶ À toi : pose ton identité visuelle."],
-                    ['Construire ta page business', 900, "Démo : Léa construit sa page — offre, preuve, prise de rendez-vous. Itérer en discutant.\n\n▶ À toi : construis ta page."],
-                    ['Mettre ta page en ligne', 720, "Les options simples de mise en ligne, sans technique lourde. Ta page à une vraie adresse.\n\n▶ À toi : mets ta page en ligne."],
-                    ['On assemble : ton business en ligne', 660, "Le lien dans ta bio, la routine de veille, la suite. Ton business est en ligne et tourne en pilote automatique.\n\n▶ À toi : partage ton lien sur le Discord."],
+                    ['Le brouillon qui parle', 600, "Partir de SES mots : ce que tu vends, à qui, la promesse (le contenu est ton affaire, le design est l'affaire de Claude). Démo Léa : sa vitrine « coaching ».\n\n▶ À toi : rédige ton brief de page."],
+                    ['Génère ta première version', 600, "Claude Design : deck, landing, mockups. La contrainte qui fait « pro » : une seule couleur d'accent, un seul CTA au-dessus de la ligne de flottaison.\n\n▶ À toi : génère la tienne."],
+                    ['Les 3 corrections qui font pro', 720, "Hiérarchie, contraste, un seul bouton. Les interdits AVANT la génération : carrousel, compteur de places, phrases marketing génériques.\n\n▶ À toi : applique les 3 corrections."],
+                    ['Le texte qui convertit', 600, "Titres (le résultat, pas le sujet), preuve sociale, section prix. Ce que tu as appris en étape 1 (RCFE) s'applique à chaque mot de ta page.\n\n▶ À toi : finalise tes textes."],
+                    ['Mets-la en ligne, pas à pas', 720, "Hébergement simple + domaine + vérifier sur mobile. Léa : sa page est en ligne, le lien va dans sa bio Instagram.\n\n▶ À toi : TA page en ligne, lien partageable — c'est ton livrable final. 🎉"],
                 ],
             ],
         ];
