@@ -109,7 +109,7 @@ final class StudentJourneyTest extends WebTestCase
         $client = $this->bootWithFixtures();
         $this->loginAsRama($client);
 
-        $client->request('GET', '/formations/claude-2026/cerveau-externe/m3-l2');
+        $client->request('GET', '/formations/claude-2026/etape-3-connecteurs/m3-l2');
 
         self::assertResponseIsSuccessful();
         // Aucune vidéo locale seedée → placeholder, et plus aucun Vimeo
@@ -123,7 +123,7 @@ final class StudentJourneyTest extends WebTestCase
         $this->loginAsRama($client);
 
         // M03L2 n'a pas de vidéo locale → 404 sur la route vidéo
-        $client->request('GET', '/formations/claude-2026/cerveau-externe/m3-l2/video');
+        $client->request('GET', '/formations/claude-2026/etape-3-connecteurs/m3-l2/video');
 
         self::assertResponseStatusCodeSame(404);
     }
@@ -151,7 +151,7 @@ final class StudentJourneyTest extends WebTestCase
         $lesson = null;
         $formation = $em->getRepository(Formation::class)->findOneBy(['slug' => 'claude-2026']);
         foreach ($formation->getModules() as $m) {
-            if ($m->getSlug() === 'cerveau-externe') {
+            if ($m->getSlug() === 'etape-3-connecteurs') {
                 foreach ($m->getLessons() as $l) {
                     if ($l->getSlug() === 'm3-l2') {
                         $lesson = $l;
@@ -174,7 +174,7 @@ final class StudentJourneyTest extends WebTestCase
         file_put_contents($filePath, 'FAKEMP4BYTES');
 
         try {
-            $client->request('GET', '/formations/claude-2026/cerveau-externe/m3-l2/video');
+            $client->request('GET', '/formations/claude-2026/etape-3-connecteurs/m3-l2/video');
 
             self::assertResponseIsSuccessful();
             self::assertResponseHeaderSame('Content-Type', 'video/mp4');
@@ -193,15 +193,15 @@ final class StudentJourneyTest extends WebTestCase
         $formation = $em->getRepository(Formation::class)->findOneBy(['slug' => 'claude-2026']);
         self::assertNotNull($formation);
 
-        $client->request('GET', '/formations/claude-2026/produire-livrables/m4-l1');
+        $client->request('GET', '/formations/claude-2026/etape-4-agents/m4-l1');
         $token = $client->getCrawler()->filter('input[name="_token"]')->attr('value');
         self::assertNotEmpty($token);
 
-        $client->request('POST', '/formations/claude-2026/produire-livrables/m4-l1/complete', [
+        $client->request('POST', '/formations/claude-2026/etape-4-agents/m4-l1/complete', [
             '_token' => $token,
         ]);
         // Doit enchaîner sur la leçon suivante du module
-        self::assertResponseRedirects('/formations/claude-2026/produire-livrables/m4-l2');
+        self::assertResponseRedirects('/formations/claude-2026/etape-4-agents/m4-l2');
 
         // Vérif progress créé + completedAt non-null
         $em->clear();
@@ -213,7 +213,7 @@ final class StudentJourneyTest extends WebTestCase
 
         $lesson = null;
         foreach ($enrollment->getFormation()->getModules() as $m) {
-            if ($m->getSlug() === 'produire-livrables') {
+            if ($m->getSlug() === 'etape-4-agents') {
                 foreach ($m->getLessons() as $l) {
                     if ($l->getSlug() === 'm4-l1') {
                         $lesson = $l;

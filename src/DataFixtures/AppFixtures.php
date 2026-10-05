@@ -71,7 +71,7 @@ final class AppFixtures extends Fixture
     }
 
     /**
-     * Programme Formation Claude 2026 — V2 (10 modules, 64 leçons) depuis ClaudeProgram.
+     * Programme Formation Claude 2026 — V3 fil rouge (5 étapes, 30 vidéos) depuis ClaudeProgram.
      *
      * @return array<int, array<int, Lesson>>
      */
