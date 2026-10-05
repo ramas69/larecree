@@ -8,8 +8,10 @@
 # Sortie : ~/backups/larecree-YYYYMMDD-HHMMSS.sql.gz
 # Rotation : garde 7 derniers fichiers, supprime les plus vieux.
 #
-# Variables à adapter en haut (les hardcoder ici plutôt que dans .env pour
-# éviter d'avoir à parser dotenv depuis bash).
+# Identifiants MySQL dans ~/.larecree.my.cnf (chmod 600, hors repo) :
+#   [client]
+#   user=sora3439_ramaAdmin
+#   password=...
 
 set -euo pipefail
 
@@ -17,8 +19,7 @@ set -euo pipefail
 DB_HOST="127.0.0.1"
 DB_PORT="3306"
 DB_NAME="sora3439_app_larecree"
-DB_USER="sora3439_ramaAdmin"
-DB_PASS="Agencehabitat26@"  # ← reflète .env.local prod (PAS d'URL-encode ici, c'est mysql CLI)
+DB_CNF="$HOME/.larecree.my.cnf"
 BACKUP_DIR="$HOME/backups"
 RETENTION_DAYS=7
 # ================================
@@ -33,10 +34,9 @@ echo "[$(date +'%H:%M:%S')] ▶ Dump $DB_NAME → $DUMP_FILE"
 # mariadb-dump = nouveau nom de mysqldump sur o2switch
 DUMP_CMD=$(command -v mariadb-dump 2>/dev/null || command -v mysqldump)
 "$DUMP_CMD" \
+    --defaults-extra-file="$DB_CNF" \
     --host="$DB_HOST" \
     --port="$DB_PORT" \
-    --user="$DB_USER" \
-    --password="$DB_PASS" \
     --single-transaction \
     --quick \
     --routines \
