@@ -11,7 +11,8 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Mime\Email;
 
-final class CandidatureControllerTest extends WebTestCase
+/** Les formulaires de larecreetech.com : la candidature à la cohorte et le quiz. */
+final class SiteControllerTest extends WebTestCase
 {
     private const FORMULAIRE = [
         'prenom' => 'Awa', 'nom' => 'Diop', 'email' => 'awa@example.com', 'telephone' => '', 'situation' => 'freelance', 'link' => '',
@@ -31,9 +32,36 @@ final class CandidatureControllerTest extends WebTestCase
         return $client;
     }
 
-    private function nombre(): int
+    private function nombre(string $table = 'candidature'): int
     {
-        return (int) static::getContainer()->get(Connection::class)->fetchOne('SELECT COUNT(*) FROM candidature');
+        return (int) static::getContainer()->get(Connection::class)->fetchOne("SELECT COUNT(*) FROM $table");
+    }
+
+    public function testQuizGardeUneFoisParAdresse(): void
+    {
+        $client = $this->client();
+        $quiz = ['email' => 'Lea@Example.com', 'profil' => 'Le Pilote', 'consentement' => '1', '_gotcha' => ''];
+        $client->request('POST', '/quiz', $quiz, [], ['HTTP_ORIGIN' => 'https://larecreetech.com']);
+
+        self::assertResponseStatusCodeSame(201);
+        self::assertResponseHeaderSame('Access-Control-Allow-Origin', 'https://larecreetech.com');
+        self::assertEmailCount(1);
+        self::assertSame('🌸 Quiz — Le Pilote', self::getMailerMessage()->getSubject());
+
+        // elle refait le quiz (autre profil, même adresse) : elle a son plan, mais rien de nouveau n'est gardé ni envoyé
+        $client->request('POST', '/quiz', ['email' => 'lea@example.com', 'profil' => 'Le Prudent'] + $quiz);
+        self::assertResponseStatusCodeSame(201);
+        self::assertEmailCount(0);
+        self::assertSame(['lea@example.com', 'Le Pilote'], array_values(static::getContainer()->get(Connection::class)->fetchAssociative('SELECT email, profil FROM contact_quiz')));
+    }
+
+    public function testQuizSansAccordRefuse(): void
+    {
+        $client = $this->client();
+        $client->request('POST', '/quiz', ['email' => 'lea@example.com', 'profil' => 'Le Pilote']);
+
+        self::assertResponseStatusCodeSame(422);
+        self::assertSame(0, $this->nombre('contact_quiz'));
     }
 
     public function testCandidatureGardeeEtEnvoyeeAHello(): void
