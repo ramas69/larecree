@@ -26,10 +26,13 @@ final class StripeWebhookHandler
     {
         $event = Webhook::constructEvent($payload, $sigHeader, $this->stripeWebhookSecret);
 
-        if ($event->type === 'checkout.session.completed') {
+        // Paiement différé (Klarna possible) : completed arrive en 'unpaid', l'encaissement vient avec async_payment_succeeded.
+        if (in_array($event->type, ['checkout.session.completed', 'checkout.session.async_payment_succeeded'], true)) {
             /** @var Session $session */
             $session = $event->data->object;
-            $this->checkoutService->handleSessionCompleted($session);
+            if ($session->payment_status === 'paid') {
+                $this->checkoutService->handleSessionCompleted($session);
+            }
         }
 
         return $event;
