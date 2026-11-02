@@ -16,16 +16,12 @@
         {% endif %}
     </section>
 
-    {# La leçon à reprendre, ou la toute première #}
+    {# La leçon commencée à reprendre, sinon la prochaine leçon du programme #}
     {% set reprise = null %}
     {% if snapshot.currentProgress %}
         {% set reprise = { lesson: snapshot.currentProgress.lesson, progress: snapshot.currentProgress } %}
-    {% elseif snapshot.enrollmentSnapshots|length > 0 %}
-        {% set premiereFormation = snapshot.enrollmentSnapshots[0].enrollment.formation %}
-        {% set premierModule = premiereFormation.modules|first %}
-        {% if premierModule and premierModule.lessons|first %}
-            {% set reprise = { lesson: premierModule.lessons|first, progress: null } %}
-        {% endif %}
+    {% elseif snapshot.nextLesson %}
+        {% set reprise = { lesson: snapshot.nextLesson, progress: null } %}
     {% endif %}
 
     {% if reprise %}
@@ -47,7 +43,7 @@
             </div>
 
             <div class="cb-reprendre-texte">
-                <p class="cb-surtitre">{{ reprise.progress ? 'Reprendre' : 'Ta première leçon' }}</p>
+                <p class="cb-surtitre">{{ reprise.progress ? 'Reprendre' : 'Ta prochaine leçon' }}</p>
                 <h2 id="titre-reprendre">{{ lesson.title }}</h2>
                 <p class="cb-ou">{{ formation.title }} · Cours {{ module.displayOrder }} · Leçon {{ lesson.displayOrder }}</p>
 
@@ -60,7 +56,7 @@
                     <p class="cb-meta"><strong>{{ reprise.progress.percentWatched }} %</strong> vus{% if reste > 0 %} · encore {{ m.duree(reste) }}{% endif %} · le {{ reprise.progress.lastWatchedAt|date('d/m/Y') }}</p>
                     <a href="{{ url }}" class="ct-bouton cb-bouton">Reprendre la leçon</a>
                 {% else %}
-                    <a href="{{ url }}" class="ct-bouton cb-bouton">Commencer la formation</a>
+                    <a href="{{ url }}" class="ct-bouton cb-bouton">Commencer la leçon</a>
                 {% endif %}
             </div>
         </section>

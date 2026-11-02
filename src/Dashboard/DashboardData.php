@@ -10,13 +10,11 @@ use App\Entity\LessonProgress;
 use App\Entity\Module;
 use App\Entity\User;
 use App\Repository\EnrollmentRepository;
-use App\Repository\LessonProgressRepository;
 
 final class DashboardData
 {
     public function __construct(
         private readonly EnrollmentRepository $enrollments,
-        private readonly LessonProgressRepository $progresses,
     ) {
     }
 
@@ -25,16 +23,12 @@ final class DashboardData
         $userEnrollments = $this->enrollments->findByUser($user);
 
         $totalSeconds = 0;
-        $progressSum = 0;
-        $progressDen = 0;
         $currentCandidate = null;
 
         $enrollmentSnapshots = [];
         foreach ($userEnrollments as $enrollment) {
             foreach ($enrollment->getProgresses() as $progress) {
                 $totalSeconds += $progress->getWatchedSeconds();
-                $progressSum += $progress->getPercentWatched();
-                $progressDen++;
                 if (!$progress->isCompleted()
                     && ($currentCandidate === null || $progress->getLastWatchedAt() > $currentCandidate->getLastWatchedAt())) {
                     $currentCandidate = $progress;
@@ -47,27 +41,30 @@ final class DashboardData
             );
         }
 
-        $avgProgress = $progressDen > 0 ? (int) round($progressSum / $progressDen) : 0;
-
         return new DashboardSnapshot(
-            enrollmentsInProgressCount: count($userEnrollments),
             totalWatchedHours: $this->formatHours($totalSeconds),
-            averageProgressPercent: $avgProgress,
-            certificatesCount: 0,
-            currentProgress: $currentCandidate ?? $this->fallbackCurrent($userEnrollments),
+            currentProgress: $currentCandidate,
             enrollmentSnapshots: $enrollmentSnapshots,
+            nextLesson: $currentCandidate === null ? $this->nextLesson($userEnrollments) : null,
         );
     }
 
     /**
+     * Avant : la dernière leçon vue, même terminée (« Reprendre » une leçon vue à 100 %).
+     * Maintenant : la première leçon pas encore terminée, dans l'ordre du programme.
+     *
      * @param Enrollment[] $userEnrollments
      */
-    private function fallbackCurrent(array $userEnrollments): ?LessonProgress
+    private function nextLesson(array $userEnrollments): ?Lesson
     {
         foreach ($userEnrollments as $enrollment) {
-            $rows = $this->progresses->findByEnrollment($enrollment);
-            if ($rows !== []) {
-                return $rows[0];
+            [$completed] = $this->indexLessonProgress($enrollment);
+            foreach ($enrollment->getFormation()?->getModules() ?? [] as $module) {
+                foreach ($module->getLessons() as $lesson) {
+                    if (!isset($completed[$lesson->getId()])) {
+                        return $lesson;
+                    }
+                }
             }
         }
 

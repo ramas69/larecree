@@ -1,3 +1,7 @@
+/* Le design « école » de l'app (connexion, espace élève), celui du site larecreetech.com.
+   Couleurs : vert forêt, moutarde (boutons et surligneur, jamais en texte), sauge et sable. */
+body { margin: 0; -webkit-font-smoothing: antialiased; }
+
 /* Les pages de connexion et de mot de passe : le design « école » du site larecreetech.com.
    Couleurs : vert forêt, moutarde (action et surligneur, jamais en texte), sauge et sable. */
 .cartable {
@@ -312,6 +316,22 @@
 .cb-reglement { margin: 0; padding: 22px 28px 22px 52px; border: 1px solid var(--trait); border-left: 4px solid var(--moutarde); border-radius: 14px; background: var(--blanc); display: grid; gap: 10px; }
 .cb-reglement li { padding-left: 6px; }
 .cb-reglement li::marker { font-family: var(--serif); font-style: italic; color: var(--vert); }
+
+/* le texte riche écrit dans l'admin (descriptions de formation, de cours et de leçon) */
+.cb-feuille-texte > :first-child, .cb-formation-desc > :first-child, .cb-cours-desc > :first-child { margin-top: 0; }
+.cb-feuille-texte > :last-child, .cb-formation-desc > :last-child, .cb-cours-desc > :last-child { margin-bottom: 0; }
+:is(.cb-feuille-texte, .cb-formation-desc, .cb-cours-desc) :is(ul, ol) { margin: 8px 0 12px 20px; padding: 0; }
+:is(.cb-feuille-texte, .cb-formation-desc, .cb-cours-desc) li { margin-bottom: 4px; }
+:is(.cb-feuille-texte, .cb-formation-desc, .cb-cours-desc) strong { font-weight: 500; color: var(--vert); }
+:is(.cb-feuille-texte, .cb-formation-desc, .cb-cours-desc) a { color: var(--vert); text-decoration: underline; text-decoration-color: var(--moutarde); text-decoration-thickness: 2px; }
+:is(.cb-feuille-texte, .cb-formation-desc, .cb-cours-desc) :is(h1, h2, h3) { margin: 16px 0 8px; font-family: var(--serif); font-weight: 500; font-size: 20px; color: var(--vert); }
+:is(.cb-feuille-texte, .cb-formation-desc, .cb-cours-desc) img { display: block; max-width: 100%; height: auto; border-radius: 10px; }
+:is(.cb-feuille-texte, .cb-formation-desc, .cb-cours-desc) figure { margin: 16px 0; }
+:is(.cb-feuille-texte, .cb-formation-desc, .cb-cours-desc) figcaption { margin-top: 6px; font-size: 14px; text-align: center; }
+:is(.cb-feuille-texte, .cb-formation-desc, .cb-cours-desc) blockquote { margin: 16px 0; padding-left: 16px; border-left: 3px solid var(--moutarde); font-family: var(--serif); font-style: italic; }
+:is(.cb-feuille-texte, .cb-formation-desc, .cb-cours-desc) table { width: 100%; margin: 16px 0; border-collapse: collapse; display: block; overflow-x: auto; }
+:is(.cb-feuille-texte, .cb-formation-desc, .cb-cours-desc) :is(td, th) { padding: 8px 10px; border: 1px solid var(--trait); }
+:is(.cb-feuille-texte, .cb-formation-desc, .cb-cours-desc) th { background: var(--casse); font-weight: 500; }
 
 @media (max-width: 860px) {
   .cb-barre-dedans { flex-wrap: wrap; gap: 12px; }
