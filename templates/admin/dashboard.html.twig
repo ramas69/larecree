@@ -97,7 +97,7 @@
         }
         .kpi-card {
             background: #fff;
-            border: 1px solid rgba(20, 17, 13, 0.10);
+            border: 1px solid #E3E0D8;
             border-radius: 14px;
             padding: 20px 22px;
             display: flex;
@@ -107,29 +107,31 @@
         .kpi-card--primary {
             background: #1F3025;
             border-color: #1F3025;
-            color: #FCFAF5;
+            color: #F3F1EA;
         }
         .kpi-label {
             font-size: 11px;
             font-weight: 600;
             letter-spacing: 0.12em;
             text-transform: uppercase;
-            color: #C8395E;
+            color: #1F3025;
         }
-        .kpi-card--primary .kpi-label { color: #E8587A; }
+        .kpi-card--primary .kpi-label { color: rgba(243, 241, 234, 0.75); }
         .kpi-value {
-            font-size: 30px;
-            font-weight: 700;
+            font-family: 'Newsreader', Georgia, serif;
+            font-size: 34px;
+            font-weight: 400;
             line-height: 1.1;
-            color: #14110D;
+            color: #1F3025;
         }
-        .kpi-card--primary .kpi-value { color: #FCFAF5; }
-        .kpi-hint { font-size: 12px; color: #4A453E; }
-        .kpi-card--primary .kpi-hint { color: rgba(252, 250, 245, 0.7); }
+        .kpi-card--primary { border-bottom: 4px solid #E3AB1F; }
+        .kpi-card--primary .kpi-value { color: #FFFFFF; }
+        .kpi-hint { font-size: 12px; color: #3F4A42; }
+        .kpi-card--primary .kpi-hint { color: rgba(243, 241, 234, 0.75); }
 
         .kpi-table-wrap { margin-bottom: 24px; }
-        .kpi-table-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
-        .kpi-empty { color: #4A453E; }
-        .kpi-note { font-size: 12px; color: #4A453E; font-style: italic; }
+        .kpi-table-title { font-family: 'Newsreader', Georgia, serif; font-style: italic; font-size: 22px; font-weight: 400; color: #1F3025; margin-bottom: 12px; }
+        .kpi-empty { color: #3F4A42; }
+        .kpi-note { font-size: 12px; color: #3F4A42; font-style: italic; }
     </style>
 {% endblock %}

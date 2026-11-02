@@ -22,108 +22,119 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class DashboardController extends AbstractDashboardController
 {
     /**
-     * Polices Google + override des variables de thème EasyAdmin façon DA La Récrée Tech.
+     * Polices Google + variables de thème EasyAdmin dans le design « école » du site
+     * (vert forêt, moutarde pour les boutons et le surligneur, jamais en texte).
      */
     private const BRAND_HEAD = <<<'HTML'
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=Manrope:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Lexend:wght@300;400;500;600&display=swap" rel="stylesheet">
         <script src="https://cdn.ckeditor.com/ckeditor5/41.4.2/super-build/ckeditor.js"></script>
         <style>
             /* Variables thème EA — mêmes sélecteurs que le core, chargées après donc prioritaires */
             :root,
             [data-bs-theme=light] {
-                --bs-primary: #C8395E;
-                --bs-primary-rgb: 200, 57, 94;
-                --bs-link-color: #C8395E;
-                --bs-link-color-rgb: 200, 57, 94;
-                --bs-link-hover-color: #A82248;
-                --highlight-color: #C8395E;
-                --highlight-bg: rgba(200, 57, 94, 0.12);
-                --button-primary-bg: #C8395E;
-                --button-primary-border-color: #C8395E;
-                --button-primary-color: #FCFAF5;
-                --button-primary-hover-bg: #A82248;
-                --button-primary-hover-border-color: #A82248;
-                --button-primary-active-bg: #A82248;
-                --button-primary-active-border-color: #A82248;
-                --text-color: #14110D;
-                --body-bg: #FCFAF5;
-                --content-bg: #FCFAF5;
-                --bs-body-bg: #FCFAF5;
+                --bs-primary: #1F3025;
+                --bs-primary-rgb: 31, 48, 37;
+                --bs-link-color: #1F3025;
+                --bs-link-color-rgb: 31, 48, 37;
+                --bs-link-hover-color: #2E4637;
+                --highlight-color: #1F3025;
+                --highlight-bg: rgba(227, 171, 31, 0.25);
+                --button-primary-bg: #E3AB1F;
+                --button-primary-border-color: #E3AB1F;
+                --button-primary-color: #1F3025;
+                --button-primary-hover-bg: #D19C17;
+                --button-primary-hover-border-color: #D19C17;
+                --button-primary-active-bg: #D19C17;
+                --button-primary-active-border-color: #D19C17;
+                --text-color: #3F4A42;
+                --body-bg: #F7F6F3;
+                --content-bg: #F7F6F3;
+                --bs-body-bg: #F7F6F3;
                 --sidebar-bg: #1F3025;
                 --sidebar-border-color: #1F3025;
-                --sidebar-logo-color: #FCFAF5;
-                --sidebar-menu-color: rgba(252, 250, 245, 0.78);
-                --sidebar-menu-icon-color: rgba(252, 250, 245, 0.55);
-                --sidebar-menu-header-color: #E8587A;
-                --sidebar-menu-active-item-bg: rgba(200, 57, 94, 0.25);
-                --sidebar-menu-active-item-color: #FCFAF5;
-                --bs-body-font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+                --sidebar-logo-color: #FFFFFF;
+                --sidebar-menu-color: rgba(243, 241, 234, 0.8);
+                --sidebar-menu-icon-color: rgba(243, 241, 234, 0.55);
+                --sidebar-menu-header-color: rgba(243, 241, 234, 0.55);
+                --sidebar-menu-active-item-bg: rgba(227, 171, 31, 0.22);
+                --sidebar-menu-active-item-color: #FFFFFF;
+                --bs-body-font-family: 'Lexend', system-ui, -apple-system, sans-serif;
             }
 
             /* Base */
-            body.ea { background: #FCFAF5; font-family: 'Manrope', system-ui, sans-serif; }
-            .content { background: #FCFAF5; }
+            body.ea { background: #F7F6F3; font-family: 'Lexend', system-ui, sans-serif; font-weight: 300; color: #3F4A42; }
+            body.ea strong, body.ea b, body.ea th, body.ea label { font-weight: 500; }
+            .content { background: #F7F6F3; }
 
-            /* Sidebar tableau noir */
-            .sidebar { background: #1F3025 !important; border-color: rgba(252, 250, 245, 0.08) !important; }
+            /* Barre de côté : le tableau vert */
+            .sidebar { background: #1F3025 !important; border-color: rgba(243, 241, 234, 0.08) !important; }
             .sidebar .logo, .sidebar .logo a, .sidebar .logo span {
-                color: #FCFAF5 !important;
-                font-family: 'Fraunces', Georgia, serif !important;
+                color: #FFFFFF !important;
+                font-family: 'Newsreader', Georgia, serif !important;
             }
-            .menu .menu-item .menu-item-contents { color: rgba(252, 250, 245, 0.78) !important; }
-            .menu .menu-item .menu-icon { color: rgba(252, 250, 245, 0.5) !important; }
+            .menu .menu-item .menu-item-contents { color: rgba(243, 241, 234, 0.8) !important; }
+            .menu .menu-item .menu-icon { color: rgba(243, 241, 234, 0.5) !important; }
             .menu .menu-header {
-                color: #E8587A !important;
-                font-family: 'DM Mono', monospace;
-                letter-spacing: 0.12em;
+                color: rgba(243, 241, 234, 0.55) !important;
+                font-weight: 500;
+                letter-spacing: 0.14em;
                 text-transform: uppercase;
             }
-            .menu .menu-item:hover .menu-item-contents { color: #FCFAF5 !important; }
-            .menu .menu-item:hover .menu-icon { color: rgba(252, 250, 245, 0.85) !important; }
+            .menu .menu-item:hover .menu-item-contents { color: #FFFFFF !important; }
+            .menu .menu-item:hover .menu-icon { color: rgba(243, 241, 234, 0.85) !important; }
             .menu .menu-item.active .menu-item-contents {
-                background: rgba(200, 57, 94, 0.28) !important;
-                color: #FCFAF5 !important;
+                background: rgba(227, 171, 31, 0.22) !important;
+                color: #FFFFFF !important;
                 border-radius: 8px;
+                box-shadow: inset 3px 0 0 #E3AB1F;
             }
-            .menu .menu-item.active .menu-icon { color: #E8587A !important; }
+            .menu .menu-item.active .menu-icon { color: #FFFFFF !important; }
 
-            /* Titres en Fraunces */
+            /* Titres en Newsreader italique, comme le site */
             .content-header-title,
             .content-header-title *,
             h1.title {
-                font-family: 'Fraunces', Georgia, serif !important;
-                font-weight: 500 !important;
-                letter-spacing: -0.02em;
-                color: #14110D;
+                font-family: 'Newsreader', Georgia, serif !important;
+                font-style: italic;
+                font-weight: 400 !important;
+                color: #1F3025;
             }
 
-            /* Boutons + liens rose framboise */
+            /* Boutons moutarde, liens verts soulignés de moutarde */
             .btn-primary {
-                background: #C8395E !important;
-                border-color: #C8395E !important;
-                color: #FCFAF5 !important;
+                background: #E3AB1F !important;
+                border-color: #E3AB1F !important;
+                color: #1F3025 !important;
+                font-weight: 500;
             }
             .btn-primary:hover, .btn-primary:focus {
-                background: #A82248 !important;
-                border-color: #A82248 !important;
+                background: #D19C17 !important;
+                border-color: #D19C17 !important;
+                color: #1F3025 !important;
             }
-            a { color: #C8395E; }
-            a:hover { color: #A82248; }
-            .badge.badge-primary, .badge-primary { background: #C8395E !important; color: #FCFAF5 !important; }
+            .btn { border-radius: 10px; }
+            a { color: #1F3025; }
+            a:hover { color: #2E4637; text-decoration-color: #E3AB1F; }
+            .badge.badge-primary, .badge-primary { background: #E3AB1F !important; color: #1F3025 !important; }
+            :focus-visible { outline: 3px solid #1F3025; outline-offset: 2px; }
+            /* Tableaux : la colonne triée en vert et moutarde (EasyAdmin la met en bleu) */
+            .datagrid th.sorted { box-shadow: inset 0 -3px 0 #E3AB1F; }
+            .datagrid th.sorted a, .datagrid th.sorted .icon { color: #1F3025 !important; }
+            .datagrid th a { color: #1F3025; }
 
-            /* CKEditor — hauteur + intégration DA */
+            /* CKEditor — hauteur + intégration au design */
             .ck.ck-editor { width: 100%; }
             .ck-editor__editable, .ck.ck-content { min-height: 360px; }
             .ck.ck-editor__editable_inline { padding: 1rem 1.2rem; }
-            .ck.ck-toolbar { border-radius: 8px 8px 0 0 !important; background: #FCFAF5 !important; }
+            .ck.ck-toolbar { border-radius: 8px 8px 0 0 !important; background: #F7F6F3 !important; }
             .ck.ck-editor__main > .ck-editor__editable { border-radius: 0 0 8px 8px !important; }
-            .ck.ck-editor__editable.ck-focused { border-color: #C8395E !important; box-shadow: 0 0 0 2px rgba(200,57,94,0.15) !important; }
-            .ck.ck-button.ck-on, .ck.ck-button:active { background: rgba(200,57,94,0.12) !important; color: #C8395E !important; }
-            .ck-content h2 { font-family: 'Fraunces', Georgia, serif; }
-            .ck-content h3 { font-family: 'Fraunces', Georgia, serif; }
-            .ck-content a { color: #C8395E; }
+            .ck.ck-editor__editable.ck-focused { border-color: #1F3025 !important; box-shadow: 0 0 0 3px #DFE7DF !important; }
+            .ck.ck-button.ck-on, .ck.ck-button:active { background: rgba(227, 171, 31, 0.25) !important; color: #1F3025 !important; }
+            .ck-content h2 { font-family: 'Newsreader', Georgia, serif; }
+            .ck-content h3 { font-family: 'Newsreader', Georgia, serif; }
+            .ck-content a { color: #1F3025; text-decoration: underline; text-decoration-color: #E3AB1F; }
             /* textarea brut (avant init / fallback) plus haut */
             textarea.ckeditor { min-height: 320px; }
         </style>
@@ -221,7 +232,7 @@ class DashboardController extends AbstractDashboardController
                 var b = previewBox(fileInput);
                 b.innerHTML = '';
                 var cap = document.createElement('p');
-                cap.style.cssText = 'margin:0 0 .5rem;font-size:.82rem;font-weight:600;color:#C8395E;';
+                cap.style.cssText = 'margin:0 0 .5rem;font-size:.82rem;font-weight:500;color:#1F3025;';
                 cap.textContent = caption;
                 var v = document.createElement('video');
                 v.controls = true;
@@ -316,7 +327,7 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('<span style="font-family:Fraunces,Georgia,serif;font-weight:500;">la <em style="font-style:italic;color:#E8587A;">récrée</em> tech<span style="color:#C8395E;">.</span></span>')
+            ->setTitle('<span style="font-family:Newsreader,Georgia,serif;font-weight:400;">la <em style="font-style:italic;">récrée</em> tech.</span>')
             ->setFaviconPath('/favicon.svg')
             ->setDefaultColorScheme(ColorScheme::LIGHT)
             ->disableDarkMode();
