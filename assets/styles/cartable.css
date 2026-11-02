@@ -280,6 +280,19 @@
 .cb-cours-action { font-size: 14px; color: var(--vert); text-decoration: underline; text-decoration-color: var(--moutarde); text-decoration-thickness: 2px; text-underline-offset: 3px; white-space: nowrap; }
 .cb-cours-cadenas { width: 20px; height: 20px; color: #8a938c; }
 
+/* mon compte */
+.cb-compte-grille { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; align-items: start; }
+.cb-fiche { padding: 26px 28px; border: 1px solid var(--trait); border-radius: 14px; background: var(--blanc); box-shadow: 0 12px 0 -6px #e9e5dc; }
+.cb-fiche .cb-h3 { margin-bottom: 18px; }
+.cb-fiche .cb-bouton { margin-top: 6px; }
+.cb-aide { font-weight: 300; font-size: 13px; color: var(--texte); margin-left: 6px; }
+.cb-main > .ct-succes, .cb-main > .ct-alerte { margin: 0; }
+.cb-mes-formations { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.cb-mes-formations a { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 20px; border: 1px solid var(--trait); border-radius: 12px; text-decoration: none; color: var(--vert); }
+.cb-mes-formations a:hover { border-color: var(--vert); }
+.cb-mes-formations strong { font-family: var(--serif); font-weight: 500; font-size: 19px; }
+.cb-mes-formations em { display: block; font-size: 14px; color: var(--texte); }
+
 @media (max-width: 860px) {
   .cb-barre-dedans { flex-wrap: wrap; gap: 12px; }
   .cb-burger { display: inline-flex; align-items: center; gap: 8px; margin-left: auto; padding: 8px 12px; border: 1px solid var(--trait); border-radius: 8px; font-size: 15px; color: var(--vert); cursor: pointer; }

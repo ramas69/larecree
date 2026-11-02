@@ -47,7 +47,7 @@ final class AccountControllerTest extends WebTestCase
         $client->request('GET', '/mon-compte');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('.dash-hero-title', 'compte');
+        self::assertSelectorTextContains('.cb-titre', 'compte');
         self::assertSelectorExists('input[name="email"]');
     }
 
