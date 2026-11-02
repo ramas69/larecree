@@ -175,7 +175,7 @@ final class StripeCheckoutService
         $email = (new TemplatedEmail())
             ->from(new Address(self::SENDER_EMAIL, self::SENDER_NAME))
             ->to(self::ADMIN_EMAIL)
-            ->subject(sprintf('💸 Nouvelle inscription — %s (%s)', $formation->getTitle(), $user->getEmail()))
+            ->subject(sprintf('Nouvelle inscription : %s (%s)', $formation->getTitle(), $user->getEmail()))
             ->htmlTemplate('emails/admin_new_enrollment.html.twig')
             ->context([
                 'user'            => $user,
@@ -220,7 +220,7 @@ final class StripeCheckoutService
         $email = (new TemplatedEmail())
             ->from(new Address(self::SENDER_EMAIL, self::SENDER_NAME))
             ->to($user->getEmail())
-            ->subject('Bienvenue à La Récrée Tech — fixe ton mot de passe')
+            ->subject('Bienvenue dans la classe : choisis ton mot de passe')
             ->htmlTemplate('emails/welcome_after_checkout.html.twig')
             ->context([
                 'user'      => $user,

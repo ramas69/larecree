@@ -52,7 +52,7 @@ final class ResetPasswordHelper
         $email = (new TemplatedEmail())
             ->from(new Address(self::SENDER_EMAIL, self::SENDER_NAME))
             ->to($user->getEmail())
-            ->subject('Réinitialise ton mot de passe — La Récrée Tech')
+            ->subject('Ton nouveau mot de passe · La Récrée Tech')
             ->htmlTemplate('emails/reset_password.html.twig')
             ->context([
                 'user'     => $user,

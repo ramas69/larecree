@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}La Récrée Tech{% endblock %}</title>
+</head>
+{# Les e-mails de l'app, dans le design « école » du site. Styles écrits dans chaque balise : les messageries ignorent le reste. #}
+<body style="margin: 0; padding: 0; background-color: #f7f6f3; color: #1f3025; font-family: Helvetica, Arial, sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background: #f7f6f3; padding: 32px 16px;">
+        <tr>
+            <td align="center">
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width: 560px; background: #ffffff; border: 1px solid #e3e0d8; border-radius: 14px; overflow: hidden;">
+                    <tr>
+                        <td style="background: #1f3025; padding: 24px 32px; border-bottom: 4px solid #e3ab1f;">
+                            <span style="font-family: Georgia, 'Times New Roman', serif; font-size: 22px; color: #ffffff;">la <em>récrée</em> tech.</span>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 32px;">
+                            <p style="margin: 0 0 10px; font-size: 12px; font-weight: bold; letter-spacing: 0.14em; text-transform: uppercase; color: #1f3025;">{% block surtitre %}{% endblock %}</p>
+                            <h1 style="margin: 0 0 18px; font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-weight: normal; font-size: 28px; line-height: 1.2; color: #1f3025;">{% block titre %}{% endblock %}</h1>
+                            {% block contenu %}{% endblock %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="background: #f7f6f3; padding: 18px 32px; font-size: 12px; line-height: 1.5; color: #3f4a42;">
+                            {% block pied %}La récré, c'est l'école sans la peur. · hello@larecreetech.com{% endblock %}
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
