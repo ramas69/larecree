@@ -76,6 +76,6 @@ final class DashboardControllerTest extends WebTestCase
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('.cb-surtitre', 'Ta prochaine leçon');
         // La suivante dans le programme : Claude M03 L03.
-        self::assertSelectorTextContains('.cb-ou', 'Cours 3 · Leçon 3');
+        self::assertSelectorTextContains('.cb-ou', 'Étape 3 · Leçon 3');
     }
 }

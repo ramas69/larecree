@@ -15,8 +15,8 @@
     <h2 style="margin: 0 0 10px; padding-top: 22px; border-top: 1px solid #e3e0d8; font-family: Georgia, 'Times New Roman', serif; font-style: italic; font-weight: normal; font-size: 20px; color: #1f3025;">Et ensuite ?</h2>
     <ol style="margin: 0; padding-left: 20px; font-size: 15px; line-height: 1.7; color: #3f4a42;">
         <li>Connecte-toi avec ton e-mail et ton nouveau mot de passe.</li>
-        {% set premierCours = formation.modules|first %}
-        <li>Commence par le cours 1{% if premierCours %} : {{ premierCours.title }}{% endif %}.</li>
+        {% set premiereEtape = formation.modules|first %}
+        <li>Commence par l'étape 1{% if premiereEtape %} : {{ premiereEtape.nom }}{% endif %}.</li>
         <li>Rejoins la classe sur Discord : le lien est dans ton cartable.</li>
     </ol>
 {% endblock %}

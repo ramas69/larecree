@@ -45,7 +45,7 @@
             <div class="cb-reprendre-texte">
                 <p class="cb-surtitre">{{ reprise.progress ? 'Reprendre' : 'Ta prochaine leçon' }}</p>
                 <h2 id="titre-reprendre">{{ lesson.title }}</h2>
-                <p class="cb-ou">{{ formation.title }} · Cours {{ module.displayOrder }} · Leçon {{ lesson.displayOrder }}</p>
+                <p class="cb-ou">{{ formation.title }} · Étape {{ module.displayOrder }} · Leçon {{ lesson.displayOrder }}</p>
 
                 {% if reprise.progress %}
                     {% set vu = reprise.progress.watchedSeconds %}
@@ -75,7 +75,7 @@
                 <article class="cb-edt">
                     <header class="cb-edt-tete">
                         <h3>{{ formation.title }}{% if es.enrollment.isVipGranted %} <span class="cb-badge">VIP</span>{% endif %}</h3>
-                        <p><strong>{{ pm.overallPercent }} %</strong> · {{ pm.doneModulesCount }} cours terminé{{ pm.doneModulesCount > 1 ? 's' }} sur {{ pm.totalModulesCount }}</p>
+                        <p><strong>{{ pm.overallPercent }} %</strong> · {{ pm.doneModulesCount }} étape{{ pm.doneModulesCount > 1 ? 's' }} terminée{{ pm.doneModulesCount > 1 ? 's' }} sur {{ pm.totalModulesCount }}</p>
                     </header>
 
                     <ol class="cb-marelle">
@@ -93,7 +93,7 @@
                     </ol>
 
                     <footer class="cb-edt-pied">
-                        {% if pm.lastCompletedTitle %}<span>Dernier cours terminé : <strong>{{ pm.lastCompletedTitle }}</strong></span>{% endif %}
+                        {% if pm.lastCompletedTitle %}<span>Dernière étape terminée : <strong>{{ pm.lastCompletedTitle }}</strong></span>{% endif %}
                         <a href="{{ path('app_formation_show', { slug: formation.slug }) }}" class="cb-lien">Voir le programme →</a>
                     </footer>
                 </article>
@@ -102,7 +102,7 @@
     {% else %}
         <section class="cb-vide">
             <h2 class="cb-h2">Ton cartable est <em>vide</em> pour l'instant.</h2>
-            <p>Choisis ta formation : ses cours et ses leçons arriveront ici.</p>
+            <p>Choisis ta formation : ses étapes et ses leçons arriveront ici.</p>
             <a href="{{ path('app_catalogue') }}" class="ct-bouton cb-bouton">Voir les formations</a>
         </section>
     {% endif %}

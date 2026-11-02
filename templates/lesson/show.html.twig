@@ -15,11 +15,11 @@
     <span aria-hidden="true">›</span>
     <a href="{{ path('app_formation_show', { slug: formation.slug }) }}">{{ formation.title }}</a>
     <span aria-hidden="true">›</span>
-    <span>Cours {{ module.displayOrder }}</span>
+    <span>Étape {{ module.displayOrder }} · {{ module.nom }}</span>
 </nav>
 
 <header class="cb-lecon-tete">
-    <p class="cb-num">Cours {{ module.displayOrder }} · Leçon {{ lesson.displayOrder }} · {{ m.duree(lesson.durationSeconds) }}</p>
+    <p class="cb-num">Étape {{ module.displayOrder }} · Leçon {{ lesson.displayOrder }} · {{ m.duree(lesson.durationSeconds) }}</p>
     <h1 class="cb-titre cb-titre-lecon">{{ lesson.title }}</h1>
 </header>
 
@@ -93,9 +93,9 @@
 
     <aside class="cb-lecon-cote">
         <section class="cb-plan" aria-labelledby="titre-plan">
-            <p class="cb-plan-sur">Cours {{ module.displayOrder }}</p>
-            <h2 class="cb-h3" id="titre-plan">{{ module.title }}</h2>
-            <div class="cb-progres cb-progres-clair" role="progressbar" aria-label="Avancée dans le cours" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ moduleStats.percent }}">
+            <p class="cb-plan-sur">Étape {{ module.displayOrder }}</p>
+            <h2 class="cb-h3" id="titre-plan">{{ module.nom }}</h2>
+            <div class="cb-progres cb-progres-clair" role="progressbar" aria-label="Avancée dans l'étape" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ moduleStats.percent }}">
                 <span style="width: {{ moduleStats.percent }}%"></span>
             </div>
             <p class="cb-plan-compte">{{ moduleStats.doneCount }} leçon{{ moduleStats.doneCount > 1 ? 's' }} terminée{{ moduleStats.doneCount > 1 ? 's' }} sur {{ moduleStats.totalCount }}</p>

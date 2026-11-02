@@ -95,7 +95,7 @@ final class DashboardData
 
             if ($state === 'done' || $state === 'finale-done') {
                 $doneModules++;
-                $lastDoneTitle = $module->getTitle();
+                $lastDoneTitle = $module->getNom();
             } elseif ($state === 'current') {
                 $foundCurrent = true;
             }
@@ -103,7 +103,7 @@ final class DashboardData
             $items[] = new ProgressMapItem(
                 index: $i + 1,
                 label: 'M'.str_pad((string) ($i + 1), 2, '0', STR_PAD_LEFT),
-                title: $module->getTitle(),
+                title: $module->getNom(),
                 state: $state,
                 percent: $modulePercent,
             );

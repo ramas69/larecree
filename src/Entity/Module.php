@@ -85,6 +85,30 @@ class Module
         return $this;
     }
 
+    /**
+     * Le nom court de l'étape : « Étape 1 · Cowork — Claude te libère la main » → « Cowork ».
+     * Le numéro est retiré, les pages le montrent déjà une fois.
+     */
+    public function getNom(): string
+    {
+        return $this->decouperTitre()[0];
+    }
+
+    /** Ce qui suit le tiret : « Claude te libère la main », ou null. */
+    public function getPromesse(): ?string
+    {
+        return $this->decouperTitre()[1];
+    }
+
+    /** @return array{0: string, 1: ?string} */
+    private function decouperTitre(): array
+    {
+        $titre = (string) preg_replace('/^\s*(?:étape|cours|module)\s*\d+\s*[·:.–—-]\s*/iu', '', (string) $this->title);
+        $morceaux = preg_split('/\s+[—–]\s+/u', $titre, 2) ?: [$titre];
+
+        return [trim($morceaux[0]), isset($morceaux[1]) ? trim($morceaux[1]) : null];
+    }
+
     public function getSlug(): ?string
     {
         return $this->slug;

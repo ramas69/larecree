@@ -90,12 +90,12 @@ final class Programme
 
             $statut = $liste !== [] && $faitesEtape === count($liste) ? 'fait'
                 : ($reprise !== null && $reprise->getModule() === $module ? 'encours' : 'avenir');
-            [$nom, $promesse] = self::titre($module);
+            $promesse = $module->getPromesse() !== null ? self::phrase($module->getPromesse()) : null;
             [$intro, $repars, $texte] = self::description($module);
 
             $etapes[] = new Etape(
                 numero: count($etapes) + 1,
-                nom: $nom,
+                nom: $module->getNom(),
                 promesse: trim(($promesse ?? '').' '.($intro ?? '')) ?: null,
                 repars: $repars,
                 texte: $texte,
@@ -127,20 +127,6 @@ final class Programme
             reprisePourcent: $reprise !== null ? ($suivi($reprise)?->getPercentWatched() ?? 0) : 0,
             ouverte: $ouverte,
         );
-    }
-
-    /**
-     * « Étape 1 · Cowork — Claude te libère la main » → ['Cowork', 'Claude te libère la main.']
-     * Le numéro est retiré : la page le montre déjà une fois.
-     *
-     * @return array{0: string, 1: ?string}
-     */
-    private static function titre(Module $module): array
-    {
-        $titre = (string) preg_replace('/^\s*(?:étape|cours|module)\s*\d+\s*[·:.–—-]\s*/iu', '', (string) $module->getTitle());
-        $morceaux = preg_split('/\s+[—–]\s+/u', $titre, 2) ?: [$titre];
-
-        return [trim($morceaux[0]), isset($morceaux[1]) ? self::phrase($morceaux[1]) : null];
     }
 
     /**
