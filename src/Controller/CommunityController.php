@@ -31,6 +31,7 @@ final class CommunityController extends AbstractController
     private function channels(): array
     {
         return [
+            ['name' => '#presentations', 'desc' => 'Pour dire bonjour à la classe, le jour où tu arrives.'],
             ['name' => '#wins', 'desc' => 'Un devoir rendu, une chose qui marche ? Tu la poses ici. On fête aussi les petites.'],
             ['name' => '#questions', 'desc' => 'Tu bloques sur une commande, un réglage, une idée ? Demande : quelqu\'un de la classe est passé par là.'],
             ['name' => '#vos-projets', 'desc' => 'Montre ce que tu construis. Feedback honnête, jamais gratuit.'],
