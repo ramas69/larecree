@@ -1,0 +1,28 @@
+<header class="cb-barre">
+    <input type="checkbox" id="cb-menu" class="cb-menu-case" aria-label="Ouvrir ou fermer le menu">
+    <div class="cb-barre-dedans">
+        <a href="{{ path('app_dashboard') }}" class="ct-marque" aria-label="Mon cartable, l'accueil">
+            {% include '_partials/_logo.html.twig' %}
+            <span>la <em>récrée</em> tech.</span>
+        </a>
+
+        <label for="cb-menu" class="cb-burger" aria-hidden="true"><span></span>Menu</label>
+
+        <div class="cb-tiroir">
+            <nav class="cb-nav" aria-label="Navigation">
+                <a href="{{ path('app_dashboard') }}" {% if active_nav == 'dashboard' %}aria-current="page"{% endif %}>Mon cartable</a>
+                <a href="{{ path('app_catalogue') }}" {% if active_nav == 'catalogue' %}aria-current="page"{% endif %}>Les formations</a>
+                <a href="{{ path('app_community') }}" {% if active_nav == 'community' %}aria-current="page"{% endif %}>La classe</a>
+                {% if app.user.isAdmin %}<a href="{{ path('admin') }}">Admin</a>{% endif %}
+            </nav>
+
+            <div class="cb-moi">
+                <a href="{{ path('app_account') }}" class="cb-compte" {% if active_nav == 'account' %}aria-current="page"{% endif %}>
+                    <span class="cb-avatar" aria-hidden="true">{{ app.user.firstName|first }}</span>
+                    {{ app.user.firstName }}
+                </a>
+                <a href="{{ path('app_logout') }}" class="cb-sortie">Déconnexion</a>
+            </div>
+        </div>
+    </div>
+</header>

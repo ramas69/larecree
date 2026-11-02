@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{# Les pages de l'espace élève, dans le design « école » du site (refonte de novembre 2026). #}
+
+{% block theme_color %}#1F3025{% endblock %}
+
+{% block polices %}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Lexend:wght@300;400;500&family=Caveat:wght@500;600&display=swap">
+{% endblock %}
+
+{% block stylesheets %}
+    <link rel="stylesheet" href="{{ asset('styles/cartable.css') }}">
+{% endblock %}
+
+{% block body %}
+<div class="cartable">
+    {% include '_partials/_barre.html.twig' %}
+
+    <main class="cb-main">
+        {% block contenu %}{% endblock %}
+    </main>
+
+    <footer class="ct-pied">
+        <span>La récré, c'est l'école sans la peur.</span>
+        <span>hello@larecreetech.com</span>
+    </footer>
+</div>
+{% endblock %}

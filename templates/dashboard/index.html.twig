@@ -1,197 +1,115 @@
-{% extends 'base.html.twig' %}
+{% extends '_mon_cartable.html.twig' %}
 
-{% block title %}Dashboard — La Récrée Tech{% endblock %}
+{% macro duree(secondes) %}{{ secondes // 60 }} min{% if secondes % 60 %} {{ secondes % 60 }} s{% endif %}{% endmacro %}
+{% import _self as m %}
 
-{% block body %}
-<div class="app-shell">
+{% set active_nav = 'dashboard' %}
 
-    {% include '_partials/_app_header.html.twig' with { active_nav: 'dashboard' } %}
+{% block title %}Mon cartable · La Récrée Tech{% endblock %}
 
-    <main class="app-main">
+{% block contenu %}
 
-        <section class="dash-hero">
-            <span class="dash-hero-caveat">salut {{ app.user.firstName }}</span>
-            <h1 class="dash-hero-title">Bon <em>retour</em>.</h1>
-            <p class="dash-hero-sub">Reprends ton parcours là où tu l'as laissé, ou explore une nouvelle formation.</p>
-        </section>
+    <section class="cb-tete">
+        <p class="cb-num">Mon cartable</p>
+        <h1 class="cb-titre">Bon <em>retour</em>, {{ app.user.firstName }}.</h1>
+        {% if snapshot.enrollmentSnapshots|length > 0 %}
+            <p class="cb-note">ta leçon t'attend là où tu l'as laissée</p>
+        {% endif %}
+    </section>
 
-        <section class="dash-stats">
-            <div class="dash-stat">
-                <span class="dash-stat-label">— Formations</span>
-                <div class="dash-stat-value">{{ snapshot.enrollmentsInProgressCount }}</div>
-                <span class="dash-stat-hint">en cours</span>
-            </div>
-            <div class="dash-stat">
-                <span class="dash-stat-label">— Heures vidéo</span>
-                <div class="dash-stat-value">{{ snapshot.totalWatchedHours }}</div>
-                <span class="dash-stat-hint">accumulées</span>
-            </div>
-            <div class="dash-stat">
-                <span class="dash-stat-label">— Progression</span>
-                <div class="dash-stat-value">{{ snapshot.averageProgressPercent }}%</div>
-                <span class="dash-stat-hint">moyenne</span>
-            </div>
-            <div class="dash-stat">
-                <span class="dash-stat-label">— Certificats</span>
-                <div class="dash-stat-value">{{ snapshot.certificatesCount }}</div>
-                <span class="dash-stat-hint">obtenus</span>
-            </div>
-        </section>
+    {# La leçon à reprendre, ou la toute première #}
+    {% set reprise = null %}
+    {% if snapshot.currentProgress %}
+        {% set reprise = { lesson: snapshot.currentProgress.lesson, progress: snapshot.currentProgress } %}
+    {% elseif snapshot.enrollmentSnapshots|length > 0 %}
+        {% set premiereFormation = snapshot.enrollmentSnapshots[0].enrollment.formation %}
+        {% set premierModule = premiereFormation.modules|first %}
+        {% if premierModule and premierModule.lessons|first %}
+            {% set reprise = { lesson: premierModule.lessons|first, progress: null } %}
+        {% endif %}
+    {% endif %}
 
-        {% if snapshot.currentProgress %}
-        {% set cur = snapshot.currentProgress %}
-        {% set lesson = cur.lesson %}
+    {% if reprise %}
+        {% set lesson = reprise.lesson %}
         {% set module = lesson.module %}
         {% set formation = module.formation %}
-        {% set total = lesson.durationSeconds %}
-        {% set watched = cur.watchedSeconds %}
-        {% set remaining = (total - watched) > 0 ? (total - watched) : 0 %}
-        <section class="dash-section">
-            <div class="dash-section-head">
-                <h2 class="dash-section-title">Reprendre <em>où tu en étais</em></h2>
-                <a href="#" class="dash-section-action">Voir tout →</a>
+        {% set url = path('app_lesson_show', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) %}
+        <section class="cb-reprendre" aria-labelledby="titre-reprendre">
+            <div class="cb-video">
+                {% if lesson.hasSelfHostedVideo %}
+                    <video preload="metadata" controls playsinline
+                           src="{{ path('app_lesson_video', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}#t=0.1"></video>
+                {% else %}
+                    <a href="{{ url }}" class="cb-lecture" aria-label="Ouvrir la leçon">
+                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
+                    </a>
+                {% endif %}
+                <span class="cb-duree">{{ m.duree(lesson.durationSeconds) }}</span>
             </div>
 
-            <div class="dash-continue">
-                <div class="dash-continue-thumb">
-                    {% if lesson.hasSelfHostedVideo %}
-                        <video class="dash-continue-video" preload="metadata" controls playsinline
-                               src="{{ path('app_lesson_video', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}#t=0.1"></video>
-                    {% else %}
-                        <div class="dash-continue-thumb-play" aria-hidden="true">▶</div>
-                    {% endif %}
-                    <span class="dash-continue-thumb-time">{{ lesson.durationFormatted }}</span>
-                </div>
-                <div class="dash-continue-body">
-                    <span class="dash-continue-eyebrow">★ {{ formation.title }} · M{{ '%02d'|format(module.displayOrder) }} · Leçon {{ lesson.displayOrder }}</span>
-                    <h3>{{ lesson.title }}</h3>
-                    <p class="dash-continue-meta">Tu en es à {{ (watched // 60) }} min {{ (watched % 60) }} s sur {{ lesson.durationFormatted }} · {{ (remaining // 60) }} min restantes</p>
+            <div class="cb-reprendre-texte">
+                <p class="cb-surtitre">{{ reprise.progress ? 'Reprendre' : 'Ta première leçon' }}</p>
+                <h2 id="titre-reprendre">{{ lesson.title }}</h2>
+                <p class="cb-ou">{{ formation.title }} · Cours {{ module.displayOrder }} · Leçon {{ lesson.displayOrder }}</p>
 
-                    <div class="dash-progress-bar">
-                        <div class="dash-progress-bar-fill" style="width: {{ cur.percentWatched }}%;"></div>
+                {% if reprise.progress %}
+                    {% set vu = reprise.progress.watchedSeconds %}
+                    {% set reste = lesson.durationSeconds - vu %}
+                    <div class="cb-progres" role="progressbar" aria-label="Avancée dans la leçon" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ reprise.progress.percentWatched }}">
+                        <span style="width: {{ reprise.progress.percentWatched }}%"></span>
                     </div>
-                    <div class="dash-progress-meta">
-                        <span><strong>{{ cur.percentWatched }} %</strong> de la leçon</span>
-                        <span>Vue {{ cur.lastWatchedAt|date('d/m/Y') }}</span>
-                    </div>
-
-                    <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}" class="dash-continue-cta">▶ Reprendre la leçon</a>
-                </div>
+                    <p class="cb-meta"><strong>{{ reprise.progress.percentWatched }} %</strong> vus{% if reste > 0 %} · encore {{ m.duree(reste) }}{% endif %} · le {{ reprise.progress.lastWatchedAt|date('d/m/Y') }}</p>
+                    <a href="{{ url }}" class="ct-bouton cb-bouton">Reprendre la leçon</a>
+                {% else %}
+                    <a href="{{ url }}" class="ct-bouton cb-bouton">Commencer la formation</a>
+                {% endif %}
             </div>
         </section>
-        {% elseif snapshot.enrollmentSnapshots|length > 0 %}
-            {% set firstEnrollment = snapshot.enrollmentSnapshots[0].enrollment %}
-            {% set firstFormation = firstEnrollment.formation %}
-            {% set firstModule = firstFormation.modules|first %}
-            {% set firstLesson = firstModule ? firstModule.lessons|first : null %}
-            {% if firstLesson %}
-            <section class="dash-section">
-                <div class="dash-section-head">
-                    <h2 class="dash-section-title">Bienvenue, <em>commence</em> par ici</h2>
-                    <a href="{{ path('app_formation_show', { slug: firstFormation.slug }) }}" class="dash-section-action">Voir le programme →</a>
-                </div>
+    {% endif %}
 
-                <div class="dash-continue">
-                    <div class="dash-continue-thumb">
-                        {% if firstLesson.hasSelfHostedVideo %}
-                            <video class="dash-continue-video" preload="metadata" controls playsinline
-                                   src="{{ path('app_lesson_video', { slug: firstFormation.slug, moduleSlug: firstModule.slug, lessonSlug: firstLesson.slug }) }}#t=0.1"></video>
-                        {% else %}
-                            <div class="dash-continue-thumb-play" aria-hidden="true">▶</div>
-                        {% endif %}
-                        <span class="dash-continue-thumb-time">{{ firstLesson.durationFormatted }}</span>
-                    </div>
-                    <div class="dash-continue-body">
-                        <span class="dash-continue-eyebrow">★ {{ firstFormation.title }} · M{{ '%02d'|format(firstModule.displayOrder) }} · Leçon {{ firstLesson.displayOrder }}</span>
-                        <h3>{{ firstLesson.title }}</h3>
-                        <p class="dash-continue-meta">Ta toute première leçon — {{ firstLesson.durationFormatted }}. Allez, on y va.</p>
-
-                        <div class="dash-progress-bar">
-                            <div class="dash-progress-bar-fill" style="width: 0%;"></div>
-                        </div>
-                        <div class="dash-progress-meta">
-                            <span><strong>0 %</strong> de la formation</span>
-                            <span>{{ snapshot.enrollmentSnapshots[0].progressMap.totalCount ?? snapshot.enrollmentSnapshots[0].progressMap.totalModulesCount }} modules au programme</span>
-                        </div>
-
-                        <a href="{{ path('app_lesson_show', { slug: firstFormation.slug, moduleSlug: firstModule.slug, lessonSlug: firstLesson.slug }) }}" class="dash-continue-cta">▶ Commencer la formation</a>
-                    </div>
-                </div>
-            </section>
-            {% endif %}
-        {% endif %}
-
-        {% if snapshot.enrollmentSnapshots|length > 0 %}
-        <section class="dash-section">
-            <div class="dash-section-head">
-                <h2 class="dash-section-title">
-                    {% if snapshot.enrollmentSnapshots|length > 1 %}Tes <em>parcours</em>{% else %}Ton <em>parcours</em>{% endif %}
-                </h2>
-                <a href="{{ path('app_catalogue') }}" class="dash-section-action">Catalogue →</a>
+    {% if snapshot.enrollmentSnapshots|length > 0 %}
+        <section class="cb-section" aria-labelledby="titre-edt">
+            <div class="cb-section-tete">
+                <h2 class="cb-h2" id="titre-edt">Ton <em>emploi du temps</em></h2>
+                {% if snapshot.totalWatchedHours != '0 min' %}<p class="cb-discret">Vidéo regardée jusqu'ici : {{ snapshot.totalWatchedHours }}</p>{% endif %}
             </div>
 
             {% for es in snapshot.enrollmentSnapshots %}
-            {% set pm = es.progressMap %}
-            {% set formation = es.enrollment.formation %}
-            <div class="dash-progress-map" aria-label="Carte de progression {{ formation.title }}" {% if not loop.first %}style="margin-top: 1.5rem;"{% endif %}>
-                <div class="dash-progress-map-title">
-                    <span>— <strong>{{ formation.title }}</strong> {% if es.enrollment.isVipGranted %}<em style="color: var(--rose);">· VIP</em>{% endif %}</span>
-                    <span><em>Progression : {{ pm.overallPercent }} %</em> · {{ pm.doneModulesCount }} modules validés sur {{ pm.totalModulesCount }}</span>
-                </div>
+                {% set pm = es.progressMap %}
+                {% set formation = es.enrollment.formation %}
+                <article class="cb-edt">
+                    <header class="cb-edt-tete">
+                        <h3>{{ formation.title }}{% if es.enrollment.isVipGranted %} <span class="cb-badge">VIP</span>{% endif %}</h3>
+                        <p><strong>{{ pm.overallPercent }} %</strong> · {{ pm.doneModulesCount }} cours terminé{{ pm.doneModulesCount > 1 ? 's' }} sur {{ pm.totalModulesCount }}</p>
+                    </header>
 
-                <div class="map-track">
-                    {% for item in pm.items %}
-                        <div class="map-node">
-                            {% if item.state == 'done' %}
-                                <span class="map-marker is-done" title="Module {{ item.label }} validé">✓</span>
-                            {% elseif item.state == 'finale-done' %}
-                                <span class="map-marker is-finale" title="Module {{ item.label }} — Finale validée">★</span>
-                            {% elseif item.state == 'current' %}
-                                <span class="map-marker is-current" title="Module {{ item.label }} en cours">{{ '%02d'|format(item.index) }}</span>
-                            {% elseif item.state == 'finale' %}
-                                <span class="map-marker is-finale" title="Module {{ item.label }} — Finale">★</span>
-                            {% else %}
-                                <span class="map-marker">{{ '%02d'|format(item.index) }}</span>
-                            {% endif %}
-                            <span class="map-label">{{ item.label }}</span>
-                            {% if item.state == 'current' %}<span class="map-pct">{{ item.percent }}%</span>{% endif %}
-                        </div>
-                        {% if not loop.last %}
-                            <div class="map-connector {{ item.state in ['done', 'finale-done'] ? 'is-done' : '' }}"></div>
-                        {% endif %}
-                    {% endfor %}
-                </div>
+                    <ol class="cb-marelle">
+                        {% for item in pm.items %}
+                            {% set fait = item.state in ['done', 'finale-done'] %}
+                            <li class="cb-case{{ fait ? ' est-fait' }}{{ item.state == 'current' ? ' est-en-cours' }}">
+                                <span class="cb-case-num">
+                                    {% if fait %}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="visuellement-cache">Terminé : </span>{% endif %}
+                                    {% if not fait %}{{ item.index }}{% endif %}
+                                </span>
+                                <span class="cb-case-titre">{{ item.title }}</span>
+                                {% if item.state == 'current' %}<span class="cb-case-pct">en cours · {{ item.percent }} %</span>{% endif %}
+                            </li>
+                        {% endfor %}
+                    </ol>
 
-                <div class="dash-progress-map-foot">
-                    <span>Dernier module validé : <strong>{{ pm.lastCompletedTitle ?? '—' }}</strong></span>
-                    <a href="{{ path('app_formation_show', { slug: formation.slug }) }}">→ Voir détail formation</a>
-                </div>
-            </div>
+                    <footer class="cb-edt-pied">
+                        {% if pm.lastCompletedTitle %}<span>Dernier cours terminé : <strong>{{ pm.lastCompletedTitle }}</strong></span>{% endif %}
+                        <a href="{{ path('app_formation_show', { slug: formation.slug }) }}" class="cb-lien">Voir le programme →</a>
+                    </footer>
+                </article>
             {% endfor %}
         </section>
-        {% endif %}
-
-        <section class="dash-section">
-            <div class="dash-section-head">
-                <h2 class="dash-section-title">Activité <em>récente</em></h2>
-            </div>
-
-            <div class="dash-activity">
-                <div class="dash-activity-item">
-                    <span class="dash-activity-dot" aria-hidden="true"></span>
-                    <div class="dash-activity-body">
-                        <strong>Compte créé</strong>
-                        <span>{{ app.user.createdAt|date('d/m/Y · H:i') }}</span>
-                    </div>
-                </div>
-            </div>
+    {% else %}
+        <section class="cb-vide">
+            <h2 class="cb-h2">Ton cartable est <em>vide</em> pour l'instant.</h2>
+            <p>Choisis ta formation : ses cours et ses leçons arriveront ici.</p>
+            <a href="{{ path('app_catalogue') }}" class="ct-bouton cb-bouton">Voir les formations</a>
         </section>
+    {% endif %}
 
-    </main>
-
-    <footer class="app-footer">
-        © 2026 La Récrée Tech · app.larecreetech.com
-    </footer>
-
-</div>
 {% endblock %}

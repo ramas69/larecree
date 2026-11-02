@@ -4,8 +4,11 @@
 
 {% block theme_color %}#1F3025{% endblock %}
 
-{% block stylesheets %}
+{% block polices %}
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400;1,6..72,500&family=Lexend:wght@300;400;500&family=Caveat:wght@500;600&display=swap">
+{% endblock %}
+
+{% block stylesheets %}
     <link rel="stylesheet" href="{{ asset('styles/cartable.css') }}">
 {% endblock %}
 
@@ -14,7 +17,7 @@
 
     <header class="ct-entete">
         <a href="https://larecreetech.com" class="ct-marque" aria-label="La Récrée Tech, le site">
-            <svg viewBox="0 0 280 280" aria-hidden="true"><g transform="translate(20 20)"><path d="M120 0A100 100 0 0 1 207 50L190 60A80 80 0 0 0 120 20Z" fill="currentColor"/><path d="M207 50A100 100 0 0 1 207 150L190 140A80 80 0 0 0 190 60Z" fill="currentColor"/><path d="M207 150A100 100 0 0 1 120 200L120 180A80 80 0 0 0 190 140Z" fill="currentColor"/><path d="M120 200A100 100 0 0 1 33 150L50 140A80 80 0 0 0 120 180Z" fill="currentColor"/><path d="M33 150A100 100 0 0 1 33 50L50 60A80 80 0 0 0 50 140Z" fill="none" stroke="currentColor" stroke-width="6" opacity=".45"/><path d="M33 50A100 100 0 0 1 120 0L120 20A80 80 0 0 0 50 60Z" fill="none" stroke="currentColor" stroke-width="6" opacity=".45"/><text x="120" y="138" font-family="Newsreader, Georgia, serif" font-size="92" font-style="italic" fill="currentColor" text-anchor="middle">r</text></g></svg>
+            {% include '_partials/_logo.html.twig' %}
             <span>la <em>récrée</em> tech.</span>
         </a>
         {% block retour %}<a href="https://larecreetech.com" class="ct-retour">← Retour au site</a>{% endblock %}
