@@ -1,0 +1,85 @@
+/* Les pages de connexion et de mot de passe : le design « école » du site larecreetech.com.
+   Couleurs : vert forêt, moutarde (action et surligneur, jamais en texte), sauge et sable. */
+.cartable {
+  --blanc: #ffffff; --casse: #f7f6f3; --vert: #1f3025; --vert-doux: #2e4637; --texte: #3f4a42; --trait: #e3e0d8;
+  --creme: #f3f1ea; --moutarde: #e3ab1f; --sauge: #dfe7df; --sable: #efe6d3;
+  --serif: 'Newsreader', Georgia, serif; --sans: 'Lexend', system-ui, sans-serif; --main: 'Caveat', cursive;
+  min-height: 100vh; display: flex; flex-direction: column; background: var(--blanc); color: var(--texte);
+  font-family: var(--sans); font-weight: 300; font-size: 17px; line-height: 1.6;
+}
+.cartable *, .cartable *::before, .cartable *::after { box-sizing: border-box; }
+.cartable a { color: var(--vert); }
+.cartable :focus-visible { outline: 3px solid var(--vert); outline-offset: 3px; border-radius: 4px; }
+
+.ct-entete { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 18px max(24px, env(safe-area-inset-left)); border-bottom: 1px solid var(--trait); }
+.ct-marque { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--vert); font-family: var(--serif); font-size: 22px; }
+.ct-marque svg { width: 34px; height: 34px; }
+.ct-marque em { font-style: italic; }
+.ct-retour { font-size: 15px; font-weight: 400; text-decoration: none; }
+.ct-retour:hover { text-decoration: underline; text-decoration-color: var(--moutarde); text-decoration-thickness: 2px; }
+
+.ct-main { flex: 1; display: grid; grid-template-columns: 1fr 1fr; }
+
+/* à gauche, le tableau vert */
+.ct-tableau {
+  position: relative; display: flex; flex-direction: column; justify-content: center; gap: 10px; padding: 56px clamp(32px, 6vw, 88px);
+  background-color: var(--vert); color: var(--creme);
+  background-image: linear-gradient(rgba(243, 241, 234, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(243, 241, 234, .06) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+.ct-num { margin: 0; display: flex; align-items: center; gap: 14px; font-size: 13px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; }
+.ct-num::after { content: ""; width: 48px; height: 2px; border-radius: 1px; background: var(--moutarde); }
+.ct-grand { margin: 6px 0 0; font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(40px, 4.6vw, 60px); line-height: 1.05; color: var(--blanc); max-width: 12ch; }
+.ct-grand em { background: linear-gradient(transparent 58%, var(--moutarde) 58%, var(--moutarde) 92%, transparent 92%); padding: 0 .06em; color: var(--blanc); }
+.ct-note { margin: 4px 0 0; font-family: var(--main); font-weight: 600; font-size: 28px; transform: rotate(-2deg); transform-origin: left; }
+.ct-dessin { width: 220px; max-width: 60%; margin-top: 28px; }
+
+/* à droite, la feuille */
+.ct-feuille {
+  display: flex; align-items: center; justify-content: center; padding: 56px max(24px, env(safe-area-inset-right)) 56px 24px;
+  background-image: linear-gradient(rgba(31, 48, 37, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(31, 48, 37, .055) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+.ct-carte { width: 100%; max-width: 440px; background: var(--blanc); border: 1px solid var(--trait); border-radius: 14px; padding: 36px 36px 32px; box-shadow: 0 14px 0 -6px #e9e5dc; }
+.ct-eyebrow { margin: 0 0 12px; display: flex; align-items: center; gap: 12px; font-size: 12px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase; color: var(--vert); }
+.ct-eyebrow::before { content: ""; width: 9px; height: 9px; border-radius: 2px; background: var(--moutarde); }
+.ct-titre { margin: 0; font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 38px; line-height: 1.1; color: var(--vert); text-wrap: balance; }
+.ct-titre em { background: linear-gradient(transparent 60%, var(--moutarde) 60%, var(--moutarde) 92%, transparent 92%); padding: 0 .05em; }
+.ct-sous { margin: 10px 0 24px; font-size: 16px; }
+.ct-sous strong { font-weight: 500; color: var(--vert); }
+
+.ct-champ { display: grid; gap: 6px; margin-bottom: 16px; }
+.ct-champ label { font-size: 15px; font-weight: 500; color: var(--vert); }
+.ct-champ input { width: 100%; min-height: 48px; padding: 10px 14px; border: 1.5px solid #c9cdc4; border-radius: 10px; background: var(--blanc); font: 400 16px var(--sans); color: var(--vert); }
+.ct-champ input::placeholder { color: #8a938c; }
+.ct-champ input:focus { outline: none; border-color: var(--vert); box-shadow: 0 0 0 3px var(--sauge); }
+
+.ct-ligne { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; margin: 4px 0 22px; font-size: 15px; }
+.ct-case { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+.ct-case input { width: 18px; height: 18px; accent-color: var(--vert); }
+
+.ct-bouton {
+  display: flex; width: 100%; align-items: center; justify-content: center; min-height: 52px; padding: 12px 20px; border: 0; border-radius: 10px;
+  background: var(--moutarde); color: var(--vert) !important; font: 500 17px var(--sans); text-decoration: none; cursor: pointer; transition: filter .2s, transform .2s;
+}
+.ct-bouton:hover { filter: brightness(.94); }
+.ct-bouton:active { transform: translateY(1px); }
+
+.ct-alerte, .ct-succes { margin: 0 0 18px; padding: 12px 14px; border-radius: 10px; font-size: 15px; color: var(--vert); }
+.ct-alerte { background: var(--casse); border-left: 4px solid var(--vert); font-weight: 400; }
+.ct-succes { background: var(--sauge); border-left: 4px solid var(--moutarde); }
+
+.ct-ligne a, .ct-lien-bas a { font-weight: 400; text-decoration: underline; text-decoration-color: var(--moutarde); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+.ct-lien-bas { margin: 22px 0 0; padding-top: 18px; border-top: 1px solid var(--trait); font-size: 15px; text-align: center; }
+
+.ct-pied { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; padding: 18px max(24px, env(safe-area-inset-left)); background: var(--casse); font-size: 14px; }
+
+@media (max-width: 860px) {
+  .ct-main { grid-template-columns: 1fr; }
+  .ct-tableau { padding: 32px 24px; }
+  .ct-dessin { display: none; }
+  .ct-grand { font-size: 36px; }
+  .ct-feuille { padding: 32px 16px 48px; }
+  .ct-carte { padding: 28px 22px 24px; }
+}
+@media (prefers-reduced-motion: reduce) { .ct-bouton { transition: none; } }
