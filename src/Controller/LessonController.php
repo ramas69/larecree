@@ -168,7 +168,7 @@ final class LessonController extends AbstractController
         // Enchaîne sur la leçon suivante (ou la formation si c'était la dernière).
         [, $next] = $this->resolveSiblings($formation, $lesson);
         if ($next !== null && $next->getModule() !== null) {
-            $this->addFlash('success', 'Leçon terminée. Place à la suivante 🎬');
+            $this->addFlash('success', 'Leçon terminée. Place à la suivante.');
 
             return $this->redirectToRoute('app_lesson_show', [
                 'slug'       => $slug,
@@ -177,7 +177,7 @@ final class LessonController extends AbstractController
             ]);
         }
 
-        $this->addFlash('success', 'Bravo, tu as terminé la formation ! 🎉');
+        $this->addFlash('success', 'Formation terminée. Bravo !');
 
         return $this->redirectToRoute('app_formation_show', ['slug' => $slug]);
     }

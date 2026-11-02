@@ -1,235 +1,156 @@
-{% extends 'base.html.twig' %}
+{% extends '_mon_cartable.html.twig' %}
 
-{% block title %}{{ lesson.title }} — {{ formation.title }}{% endblock %}
+{% macro duree(secondes) %}{{ secondes // 60 }} min{% if secondes % 60 %} {{ secondes % 60 }} s{% endif %}{% endmacro %}
+{% import _self as m %}
 
-{% block body %}
+{% set active_nav = 'dashboard' %}
+
+{% block title %}{{ lesson.title }} · {{ formation.title }}{% endblock %}
+
+{% block contenu %}
 {% set isDone = progress and progress.isCompleted %}
-{% set watched = progress ? progress.watchedSeconds : 0 %}
-{% set total = lesson.durationSeconds %}
 {% set pct = progress ? progress.percentWatched : 0 %}
 
-<div class="app-shell lp-shell">
+<nav class="cb-fil" aria-label="Fil d'Ariane">
+    <a href="{{ path('app_dashboard') }}">Mon cartable</a>
+    <span aria-hidden="true">›</span>
+    <a href="{{ path('app_formation_show', { slug: formation.slug }) }}">{{ formation.title }}</a>
+    <span aria-hidden="true">›</span>
+    <span>Cours {{ module.displayOrder }}</span>
+</nav>
 
-    {% include '_partials/_app_header.html.twig' with { active_nav: 'catalogue' } %}
+<header class="cb-lecon-tete">
+    <p class="cb-num">Cours {{ module.displayOrder }} · Leçon {{ lesson.displayOrder }} · {{ m.duree(lesson.durationSeconds) }}</p>
+    <h1 class="cb-titre cb-titre-lecon">{{ lesson.title }}</h1>
+</header>
 
-    <main class="lp-cinema">
+{% for message in app.flashes('success') %}
+    <div class="ct-succes" role="status">{{ message }}</div>
+{% endfor %}
 
-        {# ============ TOP STRIP ============ #}
-        <div class="lp-strip">
-            <nav class="lp-strip-crumbs" aria-label="Fil d'Ariane">
-                <a href="{{ path('app_catalogue') }}">◄ Catalogue</a>
-                <span aria-hidden="true">·</span>
-                <a href="{{ path('app_formation_show', { slug: formation.slug }) }}">{{ formation.title }}</a>
-                <span aria-hidden="true">·</span>
-                <span>M{{ '%02d'|format(module.displayOrder) }} · {{ module.title }}</span>
-            </nav>
+<div class="cb-lecon">
+    <div class="cb-lecon-principal">
 
-            <div class="lp-strip-meta">
-                <span class="lp-strip-chrono">{{ '%02d'|format(total // 60) }}:{{ '%02d'|format(total % 60) }}</span>
-                <span class="lp-strip-caveat">leçon {{ lesson.displayOrder }}</span>
-            </div>
+        <div class="cb-ecran">
+            {% if lesson.hasSelfHostedVideo %}
+                <video data-lp-video controls controlsList="nodownload" preload="metadata" playsinline
+                       title="{{ lesson.title }}"
+                       src="{{ path('app_lesson_video', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}">
+                    Ton navigateur ne peut pas lire cette vidéo.
+                </video>
+                <div class="cb-chargement" data-lp-loader>
+                    <span class="cb-roue" aria-hidden="true"></span>
+                    <span>Chargement de la vidéo…</span>
+                </div>
+            {% else %}
+                <p class="cb-sans-video">la vidéo arrive bientôt</p>
+            {% endif %}
         </div>
 
-        {# ============ HEADLINE ============ #}
-        <header class="lp-headline">
-            <span class="lp-headline-mark">★</span>
-            <div class="lp-headline-body">
-                <span class="lp-headline-eyebrow">Leçon {{ '%02d'|format(lesson.displayOrder) }} · M{{ '%02d'|format(module.displayOrder) }} {{ module.title }}</span>
-                <h1 class="lp-headline-title">{{ lesson.title }}</h1>
-            </div>
-        </header>
+        <div class="cb-etat">
+            {% if isDone %}
+                <p class="cb-etat-texte"><span class="cb-pastille est-fait">Terminée</span> le {{ progress.completedAt|date('d/m/Y') }}</p>
+            {% elseif pct > 0 %}
+                <p class="cb-etat-texte"><span class="cb-pastille est-en-cours">En cours</span> {{ pct }} % vus · le {{ progress.lastWatchedAt|date('d/m/Y') }}</p>
+            {% else %}
+                <p class="cb-etat-texte"><span class="cb-pastille">À voir</span> {{ m.duree(lesson.durationSeconds) }}</p>
+            {% endif %}
 
-        {# ============ CINEMASCOPE PLAYER + RESOURCES (2 col) ============ #}
-        <section class="lp-screen" aria-label="Lecteur vidéo">
-            <div class="lp-curtain lp-curtain-left" aria-hidden="true"></div>
-            <div class="lp-curtain lp-curtain-right" aria-hidden="true"></div>
+            {% if not isDone %}
+                <form method="post" action="{{ path('app_lesson_complete', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}" class="cb-terminer">
+                    <input type="hidden" name="_token" value="{{ csrf_token('lesson_complete_' ~ lesson.slug) }}">
+                    <button type="submit" class="ct-bouton cb-bouton">J'ai terminé cette leçon</button>
+                </form>
+            {% endif %}
+        </div>
 
-            <div class="lp-screen-grid">
-                <div class="lp-screen-bezel">
-                    <div class="lp-player-frame">
-                        {% if lesson.hasSelfHostedVideo %}
-                            <video
-                                class="lp-video"
-                                data-lp-video
-                                controls
-                                controlsList="nodownload"
-                                preload="metadata"
-                                playsinline
-                                title="{{ lesson.title }}"
-                                src="{{ path('app_lesson_video', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}">
-                                Ton navigateur ne peut pas lire cette vidéo.
-                            </video>
-                            <div class="lp-video-loader" data-lp-loader>
-                                <span class="lp-video-spinner" aria-hidden="true"></span>
-                                <span>Chargement de la vidéo…</span>
-                            </div>
-                        {% else %}
-                            <div class="lp-no-video">Vidéo bientôt disponible</div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                {% if lesson.resources|length > 0 %}
-                    <aside class="lp-resources-side" aria-label="Ressources">
-                        <header class="lp-resources-side-head">
-                            <span class="lp-resources-side-eyebrow">— Ressources</span>
-                            <h2 class="lp-resources-side-title">À télécharger · liens</h2>
-                        </header>
-                        <ul class="lp-resources-side-list">
-                            {% for r in lesson.resources %}
-                                {% set isFile = r.type.value == 'file' %}
-                                {% set href = isFile ? r.filePath : r.url %}
-                                <li class="lp-resource-side {{ isFile ? 'is-file' : 'is-link' }}">
-                                    {% if href %}
-                                        <a href="{{ href }}" {{ isFile ? '' : 'target="_blank" rel="noopener"' }}>
-                                            <span class="lp-resource-side-icon" aria-hidden="true">{{ isFile ? '📄' : '🔗' }}</span>
-                                            <span class="lp-resource-side-body">
-                                                <span class="lp-resource-side-kind">{{ isFile ? 'PDF' : 'Lien' }}</span>
-                                                <strong>{{ r.title }}</strong>
-                                                <em>{{ isFile ? 'Télécharger →' : 'Ouvrir →' }}</em>
-                                            </span>
-                                        </a>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    </aside>
-                {% endif %}
-            </div>
-        </section>
-
-        {% for message in app.flashes('success') %}
-            <div class="lp-flash">
-                <span class="lp-flash-icon" aria-hidden="true">✓</span>
-                {{ message }}
-            </div>
-        {% endfor %}
-
-        {# ============ DESCRIPTION CARD (papier vélin) ============ #}
         {% if lesson.description %}
-            <section class="lp-vellum" aria-label="Description">
-                <span class="lp-vellum-eyebrow">— À retenir</span>
-                <h2 class="lp-vellum-title">Au programme de cette leçon</h2>
-                <div class="lp-vellum-body">{{ '<' in lesson.description ? lesson.description|raw : lesson.description|nl2br }}</div>
+            <section class="cb-feuille" aria-labelledby="titre-programme">
+                <h2 class="cb-h3" id="titre-programme">Au programme de cette leçon</h2>
+                <div class="cb-feuille-texte">{{ '<' in lesson.description ? lesson.description|raw : lesson.description|nl2br }}</div>
             </section>
         {% endif %}
 
-        {# ============ NAV PREV/NEXT en bas ============ #}
-        <nav class="lp-bigjump" aria-label="Navigation leçons">
+        <nav class="cb-suite" aria-label="Leçon précédente et suivante">
             {% if prevLesson %}
-                <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: prevLesson.module.slug, lessonSlug: prevLesson.slug }) }}" class="lp-bigjump-link">
-                    <span class="lp-bigjump-arrow">◄</span>
-                    <span>
-                        <small>Leçon précédente</small>
-                        <strong>{{ prevLesson.title }}</strong>
-                    </span>
+                <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: prevLesson.module.slug, lessonSlug: prevLesson.slug }) }}" class="cb-suite-lien">
+                    <small>← Leçon précédente</small>
+                    <strong>{{ prevLesson.title }}</strong>
                 </a>
             {% else %}
-                <span class="lp-bigjump-link is-disabled">
-                    <span class="lp-bigjump-arrow">◄</span>
-                    <span>
-                        <small>Précédente</small>
-                        <strong>Début de la formation</strong>
-                    </span>
-                </span>
+                <span class="cb-suite-lien est-inactif"><small>← Leçon précédente</small><strong>Début de la formation</strong></span>
             {% endif %}
 
             {% if nextLesson %}
-                <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: nextLesson.module.slug, lessonSlug: nextLesson.slug }) }}" class="lp-bigjump-link lp-bigjump-next">
-                    <span>
-                        <small>Leçon suivante</small>
-                        <strong>{{ nextLesson.title }}</strong>
-                    </span>
-                    <span class="lp-bigjump-arrow">►</span>
+                <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: nextLesson.module.slug, lessonSlug: nextLesson.slug }) }}" class="cb-suite-lien cb-suite-apres">
+                    <small>Leçon suivante →</small>
+                    <strong>{{ nextLesson.title }}</strong>
                 </a>
             {% else %}
-                <span class="lp-bigjump-link lp-bigjump-next is-disabled">
-                    <span>
-                        <small>Suivante</small>
-                        <strong>Fin de la formation 🎉</strong>
-                    </span>
-                    <span class="lp-bigjump-arrow">►</span>
-                </span>
+                <span class="cb-suite-lien cb-suite-apres est-inactif"><small>Leçon suivante →</small><strong>Fin de la formation</strong></span>
             {% endif %}
         </nav>
+    </div>
 
-    </main>
-
-    {# ============ DOCK STICKY EN BAS ============ #}
-    {# Drawer toggle (hidden checkbox) #}
-    <input type="checkbox" id="lp-drawer-toggle" class="lp-drawer-input">
-
-    <section class="lp-dock" aria-label="Barre d'action leçon">
-        <div class="lp-dock-inner">
-            <div class="lp-dock-status">
-                {% if isDone %}
-                    <span class="lp-dock-pill is-done">● Terminée</span>
-                    <span class="lp-dock-meta">le {{ progress.completedAt|date('d/m/Y') }}</span>
-                {% elseif pct > 0 %}
-                    <span class="lp-dock-pill is-progress">▶ En cours</span>
-                    <span class="lp-dock-meta">{{ pct }}% · vue {{ progress.lastWatchedAt|date('d/m/Y') }}</span>
-                {% else %}
-                    <span class="lp-dock-pill">○ À voir</span>
-                    <span class="lp-dock-meta">{{ lesson.durationFormatted }}</span>
-                {% endif %}
+    <aside class="cb-lecon-cote">
+        <section class="cb-plan" aria-labelledby="titre-plan">
+            <p class="cb-plan-sur">Cours {{ module.displayOrder }}</p>
+            <h2 class="cb-h3" id="titre-plan">{{ module.title }}</h2>
+            <div class="cb-progres cb-progres-clair" role="progressbar" aria-label="Avancée dans le cours" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ moduleStats.percent }}">
+                <span style="width: {{ moduleStats.percent }}%"></span>
             </div>
+            <p class="cb-plan-compte">{{ moduleStats.doneCount }} leçon{{ moduleStats.doneCount > 1 ? 's' }} terminée{{ moduleStats.doneCount > 1 ? 's' }} sur {{ moduleStats.totalCount }}</p>
 
-            {% if not isDone %}
-                <form method="post" action="{{ path('app_lesson_complete', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}" class="lp-dock-complete">
-                    <input type="hidden" name="_token" value="{{ csrf_token('lesson_complete_' ~ lesson.slug) }}">
-                    <button type="submit">
-                        <span aria-hidden="true">✓</span> Marquer comme terminée
-                    </button>
-                </form>
-            {% endif %}
+            <ol class="cb-plan-liste">
+                {% for l in allLessonsInModule %}
+                    {% set ici = l == lesson %}
+                    {% set lp = progressByLessonId[l.id] ?? null %}
+                    {% set lFait = lp and lp.isCompleted %}
+                    {% set lCommence = lp and lp.percentWatched > 0 and not lFait %}
+                    <li class="cb-plan-item{{ ici ? ' est-ici' }}{{ lFait ? ' est-fait' }}">
+                        <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: l.slug }) }}" {% if ici %}aria-current="page"{% endif %}>
+                            <span class="cb-plan-num">
+                                {% if lFait %}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="visuellement-cache">Terminée : </span>{% else %}{{ loop.index }}{% endif %}
+                            </span>
+                            <span class="cb-plan-texte">
+                                <strong>{{ l.title }}</strong>
+                                <em>{{ m.duree(l.durationSeconds) }}{% if lCommence %} · {{ lp.percentWatched }} % vus{% endif %}</em>
+                            </span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ol>
+        </section>
 
-            <label for="lp-drawer-toggle" class="lp-dock-drawer-trigger">
-                <span aria-hidden="true">☰</span> Plan du module
-                <em class="lp-dock-drawer-count">{{ moduleStats.doneCount }}/{{ moduleStats.totalCount }}</em>
-            </label>
-        </div>
-    </section>
-
-    {# ============ DRAWER SIDE ============ #}
-    <label for="lp-drawer-toggle" class="lp-drawer-overlay" aria-label="Fermer le plan"></label>
-
-    <aside class="lp-drawer" aria-label="Plan du module">
-        <header class="lp-drawer-head">
-            <div>
-                <span class="lp-drawer-eyebrow">— Module {{ '%02d'|format(module.displayOrder) }}</span>
-                <h3 class="lp-drawer-title">{{ module.title }}</h3>
-                <p class="lp-drawer-meta">{{ moduleStats.totalCount }} leçons · {{ moduleStats.percent }} %</p>
-            </div>
-            <label for="lp-drawer-toggle" class="lp-drawer-close" aria-label="Fermer">✕</label>
-        </header>
-
-        <progress class="lp-drawer-progress" max="100" value="{{ moduleStats.percent }}" aria-label="Progression module">{{ moduleStats.percent }} %</progress>
-
-        <ol class="lp-drawer-list">
-            {% for l in allLessonsInModule %}
-                {% set isCurrent = l == lesson %}
-                {% set lp = progressByLessonId[l.id] ?? null %}
-                {% set lDone = lp and lp.isCompleted %}
-                {% set lStarted = lp and lp.percentWatched > 0 and not lDone %}
-                <li class="lp-drawer-item {{ isCurrent ? 'is-current' : '' }} {{ lDone ? 'is-done' : '' }} {{ lStarted ? 'is-started' : '' }}">
-                    <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: l.slug }) }}">
-                        <span class="lp-drawer-mark" aria-hidden="true">{% if lDone %}✓{% elseif isCurrent %}▶{% else %}{{ loop.index }}{% endif %}</span>
-                        <span class="lp-drawer-text">
-                            <strong>{{ l.title }}</strong>
-                            <em>{{ l.durationFormatted }}{% if lStarted %} · {{ lp.percentWatched }} %{% endif %}</em>
-                        </span>
-                    </a>
-                </li>
-            {% endfor %}
-        </ol>
-
-        <a href="{{ path('app_formation_show', { slug: formation.slug }) }}" class="lp-drawer-back">↩ Voir la formation complète</a>
+        {% if lesson.resources|length > 0 %}
+            <section class="cb-ressources" aria-labelledby="titre-ressources">
+                <h2 class="cb-h3" id="titre-ressources">Dans ton cartable</h2>
+                <ul>
+                    {% for r in lesson.resources %}
+                        {% set isFile = r.type.value == 'file' %}
+                        {% set href = isFile ? r.filePath : r.url %}
+                        {% if href %}
+                            <li>
+                                <a href="{{ href }}" {{ isFile ? '' : 'target="_blank" rel="noopener"' }}>
+                                    <span class="cb-ressource-icone" aria-hidden="true">
+                                        {% if isFile %}
+                                            <svg viewBox="0 0 24 24"><path d="M7 3h7l5 5v13H7z M14 3v5h5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+                                        {% else %}
+                                            <svg viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                                        {% endif %}
+                                    </span>
+                                    <span class="cb-ressource-texte">
+                                        <strong>{{ r.title }}</strong>
+                                        <em>{{ isFile ? 'PDF à télécharger' : 'Lien, dans un nouvel onglet' }}</em>
+                                    </span>
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
     </aside>
-
-    <footer class="app-footer lp-cinema-footer">
-        © 2026 La Récrée Tech · app.larecreetech.com
-    </footer>
-
 </div>
 
 <script>
@@ -252,7 +173,7 @@
     }
 
     // Vidéo regardée jusqu'au bout → marque terminé + enchaîne la leçon suivante
-    var completeForm = document.querySelector('form.lp-dock-complete');
+    var completeForm = document.querySelector('form.cb-terminer');
     if (completeForm) {
         var sent = false;
         video.addEventListener('ended', function () {
