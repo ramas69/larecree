@@ -30,7 +30,7 @@ final class CheckoutController extends AbstractController
         return $this->redirect($session->url);
     }
 
-    #[Route('/checkout/success', name: 'app_checkout_success', methods: ['GET'])]
+    #[Route('/checkout/success', name: 'app_checkout_success', methods: ['GET'], priority: 1)]
     public function success(Request $request, PaymentRepository $payments): Response
     {
         $sessionId = (string) $request->query->get('session_id');
@@ -42,7 +42,7 @@ final class CheckoutController extends AbstractController
         ]);
     }
 
-    #[Route('/checkout/cancel', name: 'app_checkout_cancel', methods: ['GET'])]
+    #[Route('/checkout/cancel', name: 'app_checkout_cancel', methods: ['GET'], priority: 1)]
     public function cancel(): Response
     {
         return $this->render('checkout/cancel.html.twig');
