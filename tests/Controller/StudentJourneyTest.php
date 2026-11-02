@@ -52,6 +52,19 @@ final class StudentJourneyTest extends WebTestCase
         return $vip;
     }
 
+    public function testClassePageLinksToDiscord(): void
+    {
+        $client = $this->bootWithFixtures();
+        $this->loginAsRama($client);
+
+        $client->request('GET', '/communaute');
+
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('.cb-titre', 'Discord');
+        self::assertSelectorExists('a.ct-bouton[href^="https://discord.gg/"]');
+        self::assertSelectorCount(5, '.cb-reglement li');
+    }
+
     public function testCatalogueListsPublishedFormationsWithEnrolledBadge(): void
     {
         $client = $this->bootWithFixtures();
