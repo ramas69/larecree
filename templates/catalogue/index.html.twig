@@ -1,115 +1,59 @@
-{% extends 'base.html.twig' %}
+{% extends '_mon_cartable.html.twig' %}
+{% import '_partials/_macros.html.twig' as m %}
 
-{% block title %}Catalogue — La Récrée Tech{% endblock %}
+{% set active_nav = 'catalogue' %}
 
-{% block body %}
-<div class="app-shell">
+{% block title %}Les formations · La Récrée Tech{% endblock %}
 
-    {% include '_partials/_app_header.html.twig' with { active_nav: 'catalogue' } %}
+{% block contenu %}
 
-    <main class="app-main">
+    <section class="cb-tete">
+        <p class="cb-num">Les formations</p>
+        <h1 class="cb-titre">Choisis ta prochaine <em>formation</em>.</h1>
+        <p class="cb-note">une formation, un cahier</p>
+    </section>
 
-        <section class="cat-hero">
-            <div class="cat-hero-grid" aria-hidden="true"></div>
-            <div class="cat-hero-inner">
-                <span class="cat-hero-caveat">notre catalogue</span>
-                <h1 class="cat-hero-title">Choisis ta <em>prochaine</em> formation.</h1>
-                <p class="cat-hero-sub">Toutes nos formations Récrée Tech, des fondations Claude au design produit.</p>
-
-                <ul class="cat-hero-stats">
-                    <li><strong>{{ totalFormations }}</strong><span>formation{{ totalFormations > 1 ? 's' : '' }}</span></li>
-                    <li><strong>{{ totalModules }}</strong><span>modules</span></li>
-                    <li><strong>{{ totalLessons }}</strong><span>leçons</span></li>
-                    {% if enrolledCount > 0 %}
-                        <li class="is-mine"><strong>{{ enrolledCount }}</strong><span>{{ enrolledCount > 1 ? 'à toi' : 'à toi' }}</span></li>
+    <section class="cb-cahiers" aria-label="Les formations">
+        {% for card in cards %}
+            {% set f = card.formation %}
+            {% set bientot = f.isComingSoon %}
+            <article class="cb-cahier{{ bientot ? ' est-bientot' }}{{ card.enrolled ? ' est-inscrit' }}">
+                <div class="cb-cahier-couv">
+                    <span class="cb-cahier-num" aria-hidden="true">{{ '%02d'|format(loop.index) }}</span>
+                    {% if bientot %}
+                        <span class="cb-badge cb-badge-clair">Bientôt</span>
+                    {% elseif card.enrolled %}
+                        <span class="cb-badge">{{ card.vipGranted ? 'VIP' : 'Dans ton cartable' }}</span>
                     {% endif %}
-                </ul>
-            </div>
-        </section>
+                    <div class="cb-etiquette">
+                        <span>Formation</span>
+                        <h2>
+                            {% if bientot %}{{ f.title }}{% else %}<a href="{{ path('app_formation_show', { slug: f.slug }) }}">{{ f.title }}</a>{% endif %}
+                        </h2>
+                    </div>
+                </div>
 
-        <section class="cat-grid-section">
-            <div class="cat-section-head">
-                <h2 class="cat-section-title">— Les <em>formations</em></h2>
-                <span class="cat-section-hint">★ Triées par ordre de sortie</span>
-            </div>
+                <div class="cb-cahier-corps">
+                    {% if f.subtitle %}<p class="cb-cahier-sous">{{ f.subtitle }}</p>{% endif %}
+                    <p class="cb-discret">{{ card.modulesCount }} cours · {{ card.lessonsCount }} leçons · {{ card.totalDurationFormatted }}</p>
 
-            <div class="cat-grid">
-                {% for card in cards %}
-                    {% set f = card.formation %}
-                    {% set comingSoon = f.isComingSoon %}
-                    <article class="cat-card {{ card.enrolled ? 'is-enrolled' : '' }} {{ card.vipGranted ? 'is-vip' : '' }} {{ comingSoon ? 'is-coming' : '' }}">
-
-                        <div class="cat-card-cover-wrapper">
-                            <div class="cat-card-cover">
-                                <div class="cat-card-cover-fallback">
-                                    <span class="cat-card-cover-grid" aria-hidden="true"></span>
-                                    <span class="cat-card-cover-eyebrow">★ La Récré Tech · Formation</span>
-                                    <span class="cat-card-cover-num">{{ '%02d'|format(loop.index) }}</span>
-                                    <span class="cat-card-cover-title">{{ f.title }}</span>
-                                    {% if f.subtitle %}<span class="cat-card-cover-sub">{{ f.subtitle }}</span>{% endif %}
-                                </div>
-                                <div class="cat-card-cover-overlay" aria-hidden="true"></div>
-                                {% if comingSoon %}
-                                    <span class="cat-card-badge is-coming">⏳ Bientôt</span>
-                                {% elseif card.enrolled %}
-                                    <span class="cat-card-badge {{ card.vipGranted ? 'is-vip' : '' }}">{{ card.vipGranted ? '★ VIP' : '✓ Inscrit·e' }}</span>
-                                {% endif %}
-                            </div>
+                    {% if bientot %}
+                        <p class="cb-cahier-bientot">elle arrive bientôt</p>
+                    {% elseif card.enrolled %}
+                        <div class="cb-progres cb-progres-clair" role="progressbar" aria-label="Avancée dans {{ f.title }}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ card.progressPercent }}">
+                            <span style="width: {{ card.progressPercent }}%"></span>
                         </div>
+                        <p class="cb-discret"><strong>{{ card.progressPercent }} %</strong> · {{ card.completedLessonsCount }} leçon{{ card.completedLessonsCount > 1 ? 's' }} terminée{{ card.completedLessonsCount > 1 ? 's' }} sur {{ card.lessonsCount }}</p>
+                        <a href="{{ path('app_formation_show', { slug: f.slug }) }}" class="ct-bouton">Reprendre la formation</a>
+                    {% else %}
+                        <p class="cb-cahier-prix">{{ m.prix(f) }}</p>
+                        <a href="{{ path('app_formation_show', { slug: f.slug }) }}" class="ct-bouton cb-bouton-trait">Voir le programme</a>
+                    {% endif %}
+                </div>
+            </article>
+        {% else %}
+            <p>Aucune formation publiée pour l'instant.</p>
+        {% endfor %}
+    </section>
 
-                        <div class="cat-card-body">
-                            <span class="cat-card-eyebrow">
-                                — Formation · {{ card.modulesCount }} modules · {{ card.totalDurationFormatted }}
-                            </span>
-                            <h3 class="cat-card-title">
-                                {% if comingSoon %}
-                                    <span>{{ f.title }}</span>
-                                {% else %}
-                                    <a href="{{ path('app_formation_show', { slug: f.slug }) }}">{{ f.title }}</a>
-                                {% endif %}
-                            </h3>
-                            {% if f.subtitle %}<p class="cat-card-sub">{{ f.subtitle }}</p>{% endif %}
-
-                            {% if comingSoon %}
-                                <div class="cat-card-coming-row">
-                                    <span class="cat-card-coming-label">— Sortie prévue</span>
-                                    <span class="cat-card-coming-date">Bientôt</span>
-                                </div>
-                            {% elseif card.enrolled %}
-                                <div class="cat-card-progress">
-                                    <progress class="cat-card-progress-bar" max="100" value="{{ card.progressPercent }}" aria-label="Progression formation {{ f.title }}">{{ card.progressPercent }} %</progress>
-                                    <div class="cat-card-progress-meta">
-                                        <span><strong>{{ card.progressPercent }} %</strong> de la formation</span>
-                                        <span>{{ card.completedLessonsCount }} / {{ card.lessonsCount }} leçons</span>
-                                    </div>
-                                </div>
-                            {% else %}
-                                <div class="cat-card-price-row">
-                                    <span class="cat-card-price-label">Tarif</span>
-                                    <span class="cat-card-price">{{ f.priceFormatted }}</span>
-                                </div>
-                            {% endif %}
-
-                            {% if comingSoon %}
-                                <button type="button" class="cat-card-cta is-disabled" disabled>Préviens-moi à la sortie</button>
-                            {% else %}
-                                <a href="{{ path('app_formation_show', { slug: f.slug }) }}" class="cat-card-cta {{ card.enrolled ? 'is-resume' : '' }}">
-                                    {{ card.enrolled ? '▶ Reprendre la formation' : 'Découvrir le programme →' }}
-                                </a>
-                            {% endif %}
-                        </div>
-                    </article>
-                {% else %}
-                    <p>Aucune formation publiée pour le moment.</p>
-                {% endfor %}
-            </div>
-        </section>
-
-    </main>
-
-    <footer class="app-footer">
-        © 2026 La Récrée Tech · app.larecreetech.com
-    </footer>
-
-</div>
 {% endblock %}

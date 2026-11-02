@@ -1,88 +1,106 @@
-{% extends 'base.html.twig' %}
+{% extends '_mon_cartable.html.twig' %}
+{% import '_partials/_macros.html.twig' as m %}
 
-{% block title %}{{ formation.title }} — La Récrée Tech{% endblock %}
+{% set active_nav = enrollment ? 'dashboard' : 'catalogue' %}
 
-{% block body %}
-<div class="app-shell">
+{% block title %}{{ formation.title }} · La Récrée Tech{% endblock %}
 
-    {% include '_partials/_app_header.html.twig' with { active_nav: 'catalogue' } %}
+{% block contenu %}
+{% set nbLecons = 0 %}
+{% set secondes = 0 %}
+{% set nbFaites = 0 %}
+{% for module in formation.modules %}
+    {% for lesson in module.lessons %}
+        {% set nbLecons = nbLecons + 1 %}
+        {% set secondes = secondes + lesson.durationSeconds %}
+        {% if completedLessonIds[lesson.id] ?? false %}{% set nbFaites = nbFaites + 1 %}{% endif %}
+    {% endfor %}
+{% endfor %}
 
-    <main class="app-main">
+<nav class="cb-fil" aria-label="Fil d'Ariane">
+    {% if enrollment %}<a href="{{ path('app_dashboard') }}">Mon cartable</a>{% else %}<a href="{{ path('app_catalogue') }}">Les formations</a>{% endif %}
+    <span aria-hidden="true">›</span>
+    <span>{{ formation.title }}</span>
+</nav>
 
-        <section class="dash-hero" style="display: flex; flex-direction: column; gap: 0.4rem;">
-            <span class="dash-hero-caveat">— {{ formation.subtitle ?? 'formation' }}</span>
-            <h1 class="dash-hero-title" style="font-size: clamp(2rem, 4vw, 3.2rem);">{{ formation.title }}</h1>
-            {% if formation.description %}
-                <p class="dash-hero-sub">{{ '<' in formation.description ? formation.description|raw : formation.description|nl2br }}</p>
+<section class="cb-formation-tete">
+    <div class="cb-formation-texte">
+        <p class="cb-num">La formation</p>
+        <h1 class="cb-titre">{{ formation.title }}</h1>
+        {% if formation.subtitle %}<p class="cb-note">{{ formation.subtitle }}</p>{% endif %}
+        {% if formation.description %}
+            <div class="cb-formation-desc">{{ '<' in formation.description ? formation.description|raw : formation.description|nl2br }}</div>
+        {% endif %}
+    </div>
+
+    <aside class="cb-formation-carte">
+        <p class="cb-discret">{{ formation.modules|length }} cours · {{ nbLecons }} leçons · {{ secondes >= 3600 ? (secondes // 3600) ~ ' h ' ~ ('%02d'|format(secondes % 3600 // 60)) : (secondes // 60) ~ ' min' }}</p>
+        {% if enrollment %}
+            <p class="cb-formation-statut"><span class="cb-badge">{{ enrollment.isVipGranted ? 'VIP' : 'Dans ton cartable' }}</span></p>
+            {% set pct = nbLecons > 0 ? (nbFaites * 100 / nbLecons)|round : 0 %}
+            <div class="cb-progres cb-progres-clair" role="progressbar" aria-label="Avancée dans la formation" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ pct }}">
+                <span style="width: {{ pct }}%"></span>
+            </div>
+            <p class="cb-discret"><strong>{{ pct }} %</strong> · {{ nbFaites }} leçon{{ nbFaites > 1 ? 's' }} terminée{{ nbFaites > 1 ? 's' }} sur {{ nbLecons }}</p>
+        {% else %}
+            <p class="cb-cahier-prix">{{ m.prix(formation) }}</p>
+            <a href="{{ path('app_checkout_start', { slug: formation.slug }) }}" class="ct-bouton">Je prends ma place</a>
+            <a href="{{ path('app_checkout_start', { slug: formation.slug, plan: '3x' }) }}" class="cb-lien cb-lien-centre">ou en 3 fois sans frais</a>
+        {% endif %}
+    </aside>
+</section>
+
+<section class="cb-section" aria-labelledby="titre-programme">
+    <h2 class="cb-h2" id="titre-programme">Le <em>programme</em></h2>
+
+    {% for module in formation.modules %}
+        {% set faites = 0 %}
+        {% for lesson in module.lessons %}{% if completedLessonIds[lesson.id] ?? false %}{% set faites = faites + 1 %}{% endif %}{% endfor %}
+        {% set coursFait = enrollment and faites == module.lessons|length and faites > 0 %}
+        {# Un cours terminé reste fermé : on l'ouvre d'un clic. #}
+        <details class="cb-cours"{{ coursFait ? '' : ' open' }}>
+            {% if module.coverImage %}
+                <img class="cb-cours-image" src="{{ '/uploads/modules/' ~ module.coverImage }}" alt="" loading="lazy">
             {% endif %}
-            <div style="display: flex; gap: 2rem; margin-top: 0.6rem; align-items: baseline;">
-                <span><strong>{{ formation.modules|length }}</strong> modules</span>
-                <span><strong>{{ formation.priceFormatted }}</strong></span>
-                {% if enrollment %}
-                    <span style="color: var(--rose);"><strong>✓ Inscrit·e</strong>{% if enrollment.isVipGranted %} · VIP{% endif %}</span>
-                {% endif %}
-            </div>
-        </section>
-
-        <section class="dash-section">
-            <div class="dash-section-head">
-                <h2 class="dash-section-title">Le <em>programme</em></h2>
-            </div>
-
-            <div class="formation-programme">
-                {% for module in formation.modules %}
-                    {% set coverPath = module.coverImage ? '/uploads/modules/' ~ module.coverImage : null %}
-                    <article class="programme-module">
-                        {% if coverPath %}
-                            <div class="programme-module-cover" aria-hidden="true">
-                                <img src="{{ coverPath }}" alt="" loading="lazy">
-                            </div>
-                        {% endif %}
-                        <header class="programme-module-head">
-                            <span class="programme-module-num">M{{ '%02d'|format(module.displayOrder) }}</span>
-                            <div>
-                                <h3 class="programme-module-title">{{ module.title }}</h3>
-                                {% if module.description %}<div class="programme-module-sub">{{ '<' in module.description ? module.description|raw : module.description|nl2br }}</div>{% endif %}
-                            </div>
-                            <span class="programme-module-count">{{ module.lessons|length }} leçons</span>
-                        </header>
-
-                        <ol class="programme-lessons">
-                            {% for lesson in module.lessons %}
-                                {% set done = completedLessonIds[lesson.id] ?? false %}
-                                <li class="programme-lesson {{ done ? 'is-done' : '' }}">
-                                    <span class="programme-lesson-mark" aria-hidden="true">{{ done ? '✓' : loop.index }}</span>
-                                    <div class="programme-lesson-body">
-                                        <strong>{{ lesson.title }}</strong>
-                                        <span>{{ lesson.durationFormatted }}</span>
-                                    </div>
-                                    {% if enrollment %}
-                                        <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}" class="programme-lesson-cta">
-                                            {{ done ? 'Revoir' : 'Lire' }} →
-                                        </a>
-                                    {% else %}
-                                        <span class="programme-lesson-lock" aria-label="Verrouillée">🔒</span>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
-                        </ol>
-                    </article>
-                {% endfor %}
-            </div>
-
-            {% if not enrollment %}
-                <div style="margin-top: 2rem; padding: 1.5rem; border: 1px dashed var(--rose); border-radius: 12px; text-align: center;">
-                    <p style="margin: 0 0 0.8rem;"><strong>Pas encore inscrit·e à cette formation.</strong></p>
-                    <a href="#" class="dash-continue-cta">→ Pré-inscription / Stripe</a>
+            <summary class="cb-cours-tete">
+                <span class="cb-case-num{{ coursFait ? ' est-fait' }}">
+                    {% if coursFait %}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="visuellement-cache">Cours terminé : </span>{% else %}{{ module.displayOrder }}{% endif %}
+                </span>
+                <div class="cb-cours-titre">
+                    <p class="cb-plan-sur">Cours {{ module.displayOrder }}</p>
+                    <h3 class="cb-h3">{{ module.title }}</h3>
+                    {% if module.description %}<div class="cb-cours-desc">{{ '<' in module.description ? module.description|raw : module.description|nl2br }}</div>{% endif %}
                 </div>
-            {% endif %}
-        </section>
+                <span class="cb-discret cb-cours-compte">{% if enrollment %}{{ faites }}/{{ module.lessons|length }}{% else %}{{ module.lessons|length }}{% endif %} leçons <svg class="cb-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </summary>
 
-    </main>
+            <ol class="cb-cours-lecons">
+                {% for lesson in module.lessons %}
+                    {% set fait = completedLessonIds[lesson.id] ?? false %}
+                    <li class="cb-plan-item{{ fait ? ' est-fait' }}">
+                        {% if enrollment %}
+                            <a href="{{ path('app_lesson_show', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}">
+                        {% else %}
+                            <div class="cb-cours-verrou">
+                        {% endif %}
+                            <span class="cb-plan-num">
+                                {% if fait %}<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="visuellement-cache">Terminée : </span>{% else %}{{ loop.index }}{% endif %}
+                            </span>
+                            <span class="cb-plan-texte">
+                                <strong>{{ lesson.title }}</strong>
+                                <em>{{ m.duree(lesson.durationSeconds) }}</em>
+                            </span>
+                            {% if enrollment %}
+                                <span class="cb-cours-action">{{ fait ? 'Revoir' : 'Ouvrir' }} →</span>
+                            {% else %}
+                                <svg class="cb-cours-cadenas" viewBox="0 0 24 24" aria-label="Réservée aux inscriptions"><rect x="5" y="10.5" width="14" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>
+                            {% endif %}
+                        {% if enrollment %}</a>{% else %}</div>{% endif %}
+                    </li>
+                {% endfor %}
+            </ol>
+        </details>
+    {% endfor %}
+</section>
 
-    <footer class="app-footer">
-        © 2026 La Récrée Tech · app.larecreetech.com
-    </footer>
-
-</div>
 {% endblock %}

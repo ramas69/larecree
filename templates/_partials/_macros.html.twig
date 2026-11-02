@@ -1,0 +1,5 @@
+{# Petits formats partagés par les pages de l'espace élève. #}
+
+{% macro duree(secondes) %}{{ secondes // 60 }} min{% if secondes % 60 %} {{ secondes % 60 }} s{% endif %}{% endmacro %}
+
+{% macro prix(formation) %}{{ (formation.priceCents / 100)|number_format(formation.priceCents % 100 ? 2 : 0, ',', ' ') }} €{% endmacro %}

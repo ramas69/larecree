@@ -60,13 +60,12 @@ final class StudentJourneyTest extends WebTestCase
         $client->request('GET', '/formations');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('.cat-hero-title', 'prochaine');
+        self::assertSelectorTextContains('.cb-titre', 'prochaine');
         // 2 formations seedées : Claude (enrollée par Rama) + Manus (coming soon)
-        self::assertGreaterThanOrEqual(2, $client->getCrawler()->filter('.cat-card')->count());
-        self::assertGreaterThanOrEqual(1, $client->getCrawler()->filter('.cat-card.is-enrolled')->count());
-        self::assertGreaterThanOrEqual(1, $client->getCrawler()->filter('.cat-card.is-coming')->count());
-        self::assertSelectorTextContains('.cat-card-badge.is-coming', 'Bientôt');
-        self::assertSelectorExists('.cat-hero-stats');
+        self::assertGreaterThanOrEqual(2, $client->getCrawler()->filter('.cb-cahier')->count());
+        self::assertGreaterThanOrEqual(1, $client->getCrawler()->filter('.cb-cahier.est-inscrit')->count());
+        self::assertGreaterThanOrEqual(1, $client->getCrawler()->filter('.cb-cahier.est-bientot')->count());
+        self::assertSelectorTextContains('.cb-cahier.est-bientot .cb-badge', 'Bientôt');
     }
 
     public function testComingSoonFormationShowReturns404(): void
@@ -87,10 +86,10 @@ final class StudentJourneyTest extends WebTestCase
         $client->request('GET', '/formations/claude-2026');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('.lesson-title, .dash-hero-title', 'Claude');
-        self::assertSelectorExists('.programme-module');
+        self::assertSelectorTextContains('.cb-titre', 'Claude');
+        self::assertSelectorExists('.cb-cours');
         // M01+M02 toutes leçons done (8 leçons) + M03L1 done = 9 done markers
-        self::assertGreaterThanOrEqual(8, $client->getCrawler()->filter('.programme-lesson.is-done')->count());
+        self::assertGreaterThanOrEqual(8, $client->getCrawler()->filter('.cb-cours-lecons .cb-plan-item.est-fait')->count());
     }
 
     public function testLessonShowRequiresEnrollment(): void
@@ -113,7 +112,7 @@ final class StudentJourneyTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         // Aucune vidéo locale seedée → placeholder, et plus aucun Vimeo
-        self::assertSelectorExists('.lp-no-video');
+        self::assertSelectorExists('.cb-sans-video');
         self::assertStringNotContainsString('vimeo.com', (string) $client->getResponse()->getContent());
     }
 

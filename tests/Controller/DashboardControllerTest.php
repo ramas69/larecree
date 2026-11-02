@@ -36,14 +36,16 @@ final class DashboardControllerTest extends WebTestCase
         $client->request('GET', '/dashboard');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('.dash-hero-title', 'Bon');
-        self::assertSelectorTextContains('.dash-section-title', 'Reprendre');
+        self::assertSelectorTextContains('.cb-titre', 'Bon');
+        self::assertSelectorTextContains('.cb-surtitre', 'Reprendre');
         // currentProgress = la plus récente non terminée (Design M02 L01 ou Claude M03 L02)
-        self::assertSelectorExists('.dash-continue-eyebrow');
+        self::assertSelectorExists('.cb-ou');
         // Au moins une carte de parcours (Rama inscrit à Claude)
-        self::assertGreaterThanOrEqual(1, $client->getCrawler()->filter('.dash-progress-map')->count());
+        self::assertGreaterThanOrEqual(1, $client->getCrawler()->filter('.cb-edt')->count());
         // progress map
-        self::assertSelectorExists('.map-marker.is-done');
-        self::assertSelectorExists('.map-marker.is-current');
+        self::assertSelectorExists('.cb-case.est-fait');
+        self::assertSelectorExists('.cb-case.est-en-cours');
+        // Même progression que le catalogue : leçons terminées / leçons de la formation (14 sur 30 dans les fixtures).
+        self::assertSelectorTextContains('.cb-edt-tete', '47 %');
     }
 }

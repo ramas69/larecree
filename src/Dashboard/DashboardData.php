@@ -85,11 +85,15 @@ final class DashboardData
         $foundCurrent = false;
         $totalModules = count($modules);
         $lastDoneTitle = null;
+        $doneLessonsAll = 0;
+        $totalLessonsAll = 0;
 
         foreach ($modules as $i => $module) {
             /** @var Module $module */
             [$doneLessons, $totalLessons, $modulePercent] = $this->summarizeModule($module, $completedLessonIds, $watchedLessonIds);
             $isLast = $i === $totalModules - 1;
+            $doneLessonsAll += $doneLessons;
+            $totalLessonsAll += $totalLessons;
             $state = $this->resolveState($doneLessons, $totalLessons, $modulePercent, $isLast, $foundCurrent);
 
             if ($state === 'done' || $state === 'finale-done') {
@@ -108,9 +112,8 @@ final class DashboardData
             );
         }
 
-        $overall = $totalModules > 0
-            ? (int) round(array_sum(array_map(fn (ProgressMapItem $p) => $p->percent, $items)) / $totalModules)
-            : 0;
+        // Même calcul que le catalogue et la page formation : leçons terminées / leçons de la formation.
+        $overall = $totalLessonsAll > 0 ? (int) round($doneLessonsAll * 100 / $totalLessonsAll) : 0;
 
         return new ProgressMap(
             items: $items,

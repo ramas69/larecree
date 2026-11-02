@@ -1,7 +1,6 @@
 {% extends '_mon_cartable.html.twig' %}
 
-{% macro duree(secondes) %}{{ secondes // 60 }} min{% if secondes % 60 %} {{ secondes % 60 }} s{% endif %}{% endmacro %}
-{% import _self as m %}
+{% import '_partials/_macros.html.twig' as m %}
 
 {% set active_nav = 'dashboard' %}
 
@@ -92,7 +91,7 @@
                                     {% if not fait %}{{ item.index }}{% endif %}
                                 </span>
                                 <span class="cb-case-titre">{{ item.title }}</span>
-                                {% if item.state == 'current' %}<span class="cb-case-pct">en cours · {{ item.percent }} %</span>{% endif %}
+                                {% if item.state == 'current' %}<span class="cb-case-pct">en cours</span>{% endif %}
                             </li>
                         {% endfor %}
                     </ol>

@@ -39,7 +39,7 @@ final class ResetPasswordControllerTest extends WebTestCase
         $client->request('GET', self::URL_REQUEST);
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('.auth-title', 'arrive');
+        self::assertSelectorTextContains('.ct-titre', 'lien');
         self::assertSelectorExists('input[name="email"]');
     }
 
@@ -56,7 +56,7 @@ final class ResetPasswordControllerTest extends WebTestCase
         ]);
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('.auth-card', 'Si un compte existe');
+        self::assertSelectorTextContains('.ct-carte', 'Si un compte existe');
     }
 
     public function testRequestKnownEmailPersistsToken(): void
@@ -86,7 +86,7 @@ final class ResetPasswordControllerTest extends WebTestCase
         $client->request('GET', self::URL_REQUEST.'/inexistant-token-xyz');
 
         self::assertResponseStatusCodeSame(410);
-        self::assertSelectorTextContains('.auth-title', 'plus valide');
+        self::assertSelectorTextContains('.ct-titre', 'plus valide');
     }
 
     public function testConfirmValidTokenChangesPassword(): void
