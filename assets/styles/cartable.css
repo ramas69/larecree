@@ -257,28 +257,58 @@ body { margin: 0; -webkit-font-smoothing: antialiased; }
 .cb-cahier.est-bientot .cb-cahier-couv { background-color: #5d6b61; }
 .cb-discret strong { font-weight: 500; color: var(--vert); }
 
-/* la page d'une formation */
-.cb-formation-tete { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 40px; align-items: start; margin-top: -16px; }
-.cb-formation-desc { margin-top: 18px; max-width: 64ch; }
-.cb-formation-carte { display: grid; gap: 12px; padding: 24px; border: 1px solid var(--trait); border-radius: 14px; background: var(--blanc); box-shadow: 0 12px 0 -6px #e9e5dc; }
-.cb-formation-carte .cb-discret { margin: 0; }
-.cb-formation-statut { margin: 0; }
-.cb-formation-statut .cb-badge { margin: 0; }
-.cb-lien-centre { text-align: center; }
-.cb-cours { border: 1px solid var(--trait); border-radius: 14px; background: var(--blanc); overflow: hidden; }
-.cb-cours-image { display: block; width: 100%; max-height: 220px; object-fit: cover; }
-.cb-cours-tete { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 16px; align-items: start; padding: 22px 24px; background: var(--casse); border-bottom: 1px solid var(--trait); }
-.cb-case-num.est-fait { border-color: var(--moutarde); background: var(--moutarde); }
-.cb-cours-titre .cb-plan-sur { margin: 0; font-size: 20px; }
-.cb-cours-desc { margin-top: 6px; font-size: 15px; max-width: 70ch; }
-.cb-cours-compte { margin: 0; white-space: nowrap; }
-.cb-cours > summary { list-style: none; cursor: pointer; }
-.cb-cours > summary::-webkit-details-marker { display: none; }
-.cb-cours:not([open]) > summary { border-bottom: 0; }
-.cb-cours-compte { display: inline-flex; align-items: center; gap: 6px; }
-.cb-chevron { width: 18px; height: 18px; transition: transform .2s; }
-.cb-cours[open] .cb-chevron { transform: rotate(180deg); }
-.cb-cours-lecons { list-style: none; margin: 0; padding: 10px 14px 14px; display: grid; gap: 2px; }
+/* la page d'une formation (variante B « les onglets », choisie par Rama) :
+   où l'élève en est sur le tableau vert, puis une étape à la fois */
+.cb-prog-tete {
+  display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 20px 32px; align-items: center; margin-top: -16px; padding: 26px 28px; border-radius: 14px;
+  background-color: var(--vert); color: var(--creme);
+  background-image: linear-gradient(rgba(243, 241, 234, .06) 1px, transparent 1px), linear-gradient(90deg, rgba(243, 241, 234, .06) 1px, transparent 1px);
+  background-size: 30px 30px;
+}
+.cb-prog-tete-vente { grid-template-columns: minmax(0, 1fr) auto; }
+.cb-prog-tete .cb-num { color: var(--creme); }
+.cb-anneau { width: 96px; height: 96px; }
+.cb-anneau circle { fill: none; stroke-width: 8; }
+.cb-anneau-fond { stroke: rgba(243, 241, 234, .18); }
+.cb-anneau-plein { stroke: var(--moutarde); stroke-linecap: round; }
+.cb-anneau text { font: 500 21px var(--sans); fill: var(--blanc); }
+.cb-prog-texte { display: grid; gap: 6px; min-width: 0; }
+.cb-prog-titre { margin: 4px 0 0; font-family: var(--serif); font-style: italic; font-weight: 400; font-size: clamp(28px, 3.4vw, 40px); line-height: 1.1; color: var(--blanc); text-wrap: balance; }
+.cb-prog-titre em { background: linear-gradient(transparent 60%, var(--moutarde) 60%, var(--moutarde) 92%, transparent 92%); padding: 0 .05em; }
+.cb-prog-note { margin: 0; font-family: var(--main); font-weight: 600; font-size: 26px; color: var(--creme); transform: rotate(-1.5deg); transform-origin: left; }
+.cb-prog-meta { margin: 0; font-size: 15px; }
+.cb-prog-meta strong { font-weight: 500; color: var(--blanc); }
+.cb-prog-bouton { gap: 10px; max-width: 360px; text-align: left; }
+.cb-prog-bouton svg { width: 18px; height: 18px; flex: none; }
+.cb-prog-achat { display: grid; gap: 10px; justify-items: center; padding: 20px 22px; border-radius: 12px; background: var(--blanc); }
+.cb-formation-desc { margin-top: -16px; max-width: 64ch; }
+
+.cb-etapes { display: grid; gap: 16px; }
+.cb-onglets { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.cb-onglet { display: grid; gap: 8px; align-content: start; min-width: 0; padding: 14px; border: 1.5px solid var(--trait); border-radius: 12px; background: var(--blanc); text-align: left; font: inherit; color: var(--texte); cursor: pointer; }
+.cb-onglet:hover { border-color: #c9cdc4; }
+.cb-onglet[aria-selected="true"] { padding: 13.5px; border: 2px solid var(--vert); background: var(--sauge); box-shadow: 0 6px 0 -3px var(--moutarde); }
+.cb-onglet-haut { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.cb-onglet-num { flex: none; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; border: 1.5px solid #c9cdc4; font-family: var(--serif); font-style: italic; font-size: 17px; color: var(--vert); }
+.cb-onglet-num svg { width: 17px; height: 17px; }
+.cb-onglet.est-fait .cb-onglet-num { border-color: var(--moutarde); background: var(--moutarde); }
+.cb-onglet.est-encours .cb-onglet-num { border-color: var(--vert); background: var(--vert); color: var(--creme); }
+.cb-onglet-nom { font-weight: 500; font-size: 15px; color: var(--vert); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cb-onglet .cb-progres { margin: 0; height: 6px; }
+.cb-onglet-compte { font-size: 13px; font-variant-numeric: tabular-nums; }
+
+.cb-panneau { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 32px; align-items: start; padding: 26px 28px; border: 1px solid var(--trait); border-radius: 14px; background: var(--blanc); box-shadow: 0 12px 0 -6px #e9e5dc; }
+.cb-panneau[hidden] { display: none; }
+.cb-panneau-texte { display: grid; gap: 12px; align-content: start; }
+.cb-panneau-texte > p { margin: 0; }
+.cb-panneau-nom { margin: 0; font-family: var(--serif); font-style: italic; font-weight: 400; font-size: 34px; line-height: 1.1; color: var(--vert); text-wrap: balance; }
+.cb-repars { padding: 14px 16px; border-radius: 10px; background: var(--sable); font-size: 15px; }
+.cb-repars b { display: block; margin-bottom: 2px; font-family: var(--main); font-weight: 600; font-size: 22px; line-height: 1.1; color: var(--vert); }
+.cb-cours-desc { font-size: 15px; max-width: 70ch; }
+.cb-progres-lecon { height: 5px; max-width: 220px; margin-top: 6px; background: var(--blanc); }
+.cb-atoi { margin-top: 4px; font-size: 14px; color: var(--texte); }
+.cb-atoi b { font-weight: 500; color: var(--vert); }
+.cb-cours-lecons { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
 .cb-cours-lecons .cb-plan-item a, .cb-cours-verrou { grid-template-columns: 32px minmax(0, 1fr) auto; align-items: center; }
 .cb-cours-verrou { display: grid; gap: 12px; padding: 10px; color: var(--texte); }
 .cb-cours-action { font-size: 14px; color: var(--vert); text-decoration: underline; text-decoration-color: var(--moutarde); text-decoration-thickness: 2px; text-underline-offset: 3px; white-space: nowrap; }
@@ -354,10 +384,19 @@ body { margin: 0; -webkit-font-smoothing: antialiased; }
   .cb-feuille { padding: 20px 18px; }
   .cb-suite { grid-template-columns: 1fr; }
   .cb-suite-apres { text-align: left; }
-  .cb-formation-tete { grid-template-columns: 1fr; gap: 24px; }
-  .cb-cours-tete { grid-template-columns: 40px minmax(0, 1fr); padding: 18px; }
-  .cb-cours-compte { grid-column: 2; }
-  .cb-cours-lecons { padding: 8px; }
+  .cb-prog-tete, .cb-prog-tete-vente { grid-template-columns: minmax(0, 1fr); padding: 20px 18px; }
+  .cb-anneau { display: none; }
+  .cb-prog-bouton { width: 100%; max-width: none; }
+  .cb-onglets { grid-template-columns: repeat(auto-fit, minmax(48px, 1fr)); gap: 6px; }
+  .cb-onglet { justify-items: center; padding: 10px 6px; }
+  .cb-onglet[aria-selected="true"] { padding: 9.5px 5.5px; }
+  .cb-onglet-nom { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .cb-onglet-compte { display: none; }
+  .cb-onglet .cb-progres { width: 100%; }
+  .cb-panneau { grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 20px 12px; }
+  .cb-panneau-texte { padding: 0 6px; }
+  .cb-cours-lecons .cb-plan-item a { grid-template-columns: 32px minmax(0, 1fr); }
+  .cb-cours-lecons .cb-cours-action { display: none; }
   .cb-classe { grid-template-columns: 1fr; padding: 22px; gap: 20px; }
   .cb-classe-action, .cb-classe-action .cb-bouton { width: 100%; }
   .cb-reglement { padding: 18px 18px 18px 40px; }
@@ -367,4 +406,4 @@ body { margin: 0; -webkit-font-smoothing: antialiased; }
   .cb-case-pct { grid-column: 2; font-size: 19px; }
 }
 
-@media (prefers-reduced-motion: reduce) { .ct-bouton, .cb-lecture svg, .cb-chevron { transition: none; } .cb-roue { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .ct-bouton, .cb-lecture svg { transition: none; } .cb-roue { animation: none; } }

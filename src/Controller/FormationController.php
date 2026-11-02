@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controller;
 
+use App\Catalogue\Programme;
 use App\Entity\User;
 use App\Repository\EnrollmentRepository;
 use App\Repository\FormationRepository;
@@ -28,19 +29,10 @@ final class FormationController extends AbstractController
         $user = $this->getUser();
         $enrollment = $enrollments->findOneByUserAndFormation($user, $formation);
 
-        $completedLessonIds = [];
-        if ($enrollment !== null) {
-            foreach ($enrollment->getProgresses() as $p) {
-                if ($p->isCompleted() && $p->getLesson() !== null) {
-                    $completedLessonIds[$p->getLesson()->getId()] = true;
-                }
-            }
-        }
-
         return $this->render('formation/show.html.twig', [
-            'formation'         => $formation,
-            'enrollment'        => $enrollment,
-            'completedLessonIds' => $completedLessonIds,
+            'formation'  => $formation,
+            'enrollment' => $enrollment,
+            'programme'  => Programme::pour($formation, $enrollment),
         ]);
     }
 }

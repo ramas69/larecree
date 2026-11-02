@@ -2,4 +2,6 @@
 
 {% macro duree(secondes) %}{{ secondes // 60 }} min{% if secondes % 60 %} {{ secondes % 60 }} s{% endif %}{% endmacro %}
 
+{% macro heures(secondes) %}{% if secondes >= 3600 %}{{ secondes // 3600 }} h {{ '%02d'|format(secondes % 3600 // 60) }}{% else %}{{ secondes // 60 }} min{% endif %}{% endmacro %}
+
 {% macro prix(formation) %}{{ (formation.priceCents / 100)|number_format(formation.priceCents % 100 ? 2 : 0, ',', ' ') }} €{% endmacro %}

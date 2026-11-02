@@ -99,10 +99,14 @@ final class StudentJourneyTest extends WebTestCase
         $client->request('GET', '/formations/claude-2026');
 
         self::assertResponseIsSuccessful();
-        self::assertSelectorTextContains('.cb-titre', 'Claude');
-        self::assertSelectorExists('.cb-cours');
-        // M01+M02 toutes leçons done (8 leçons) + M03L1 done = 9 done markers
-        self::assertGreaterThanOrEqual(8, $client->getCrawler()->filter('.cb-cours-lecons .cb-plan-item.est-fait')->count());
+        // Rama a fini les étapes 1 et 2 (13 leçons) et la 1re leçon de l'étape 3 ; la 2e est vue à 47 %.
+        self::assertSelectorTextContains('.cb-prog-titre', 'Étape 3 sur 5');
+        self::assertSelectorTextContains('.cb-prog-bouton', 'Reprendre');
+        self::assertSelectorCount(5, '.cb-onglet');
+        self::assertSelectorTextContains('.cb-onglet[aria-selected="true"]', '3');
+        self::assertSelectorCount(4, '.cb-panneau[hidden]');
+        self::assertSelectorCount(14, '.cb-cours-lecons .cb-plan-item.est-fait');
+        self::assertSelectorTextContains('.cb-plan-item.est-ici', '47 % vus');
     }
 
     public function testLessonShowRequiresEnrollment(): void
