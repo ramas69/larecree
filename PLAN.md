@@ -261,27 +261,28 @@ User ──< Enrollment >── Formation ──< Module ──< Lesson ──< 
 
 ---
 
-## Variables CSS marque
+## Variables CSS marque — identité « école » (refonte de novembre 2026)
+
+La seule identité : celle de `assets/styles/cartable.css` et du site (`larecreetech/recree.css`).
+L'ancienne palette rose (Fraunces, Manrope, DM Mono) est abandonnée, ne plus l'appliquer.
+Charte complète (vidéos et couvertures) : `~/Desktop/Perso/videos/formation-claude/frame.md`.
 
 ```css
 :root {
-  --rose: #C8395E;
-  --rose-light: #E8587A;
-  --rose-deep: #A82248;
-  --rose-pale: #F0D6D6;
-  --ink: #14110D;
-  --ink-soft: #4A4540;
-  --cream: #FCFAF5;
-  --cream-warm: #F5EEDB;
-  --tableau: #1F3025;
-  --tableau-light: #2D4438;
-  --line: rgba(20, 17, 13, 0.10);
-  --grid: rgba(20, 17, 13, 0.05);
-  --grid-dark: rgba(252, 250, 245, 0.08);
+  --blanc: #ffffff;
+  --casse: #f7f6f3;     /* papier crème */
+  --creme: #f3f1ea;     /* texte clair sur vert */
+  --vert: #1f3025;      /* couleur principale */
+  --vert-doux: #2e4637;
+  --texte: #3f4a42;
+  --trait: #e3e0d8;
+  --moutarde: #e3ab1f;  /* surligneur et action, jamais en texte */
+  --sauge: #dfe7df;     /* illustrations */
+  --sable: #efe6d3;     /* illustrations, post-it */
 }
 ```
 
-Fontes : **Fraunces** (titres italiques) · **Manrope** (body) · **DM Mono** (eyebrows caps) · **Caveat** (signatures manuscrites).
+Fontes : **Newsreader** italique (titres) · **Lexend** (texte) · **Caveat** (notes à la main).
 
 ---
 
