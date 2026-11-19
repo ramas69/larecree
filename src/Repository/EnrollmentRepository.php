@@ -46,6 +46,24 @@ final class EnrollmentRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    /**
+     * L'inscription qui ouvre la formation à cette personne. Un·e admin n'a pas à acheter pour voir les leçons comme un·e élève :
+     * à sa première visite, on lui ouvre une inscription « admin » (comptée ni dans les ventes ni dans les VIP).
+     */
+    public function findOrOpenForAdmin(User $user, Formation $formation): ?Enrollment
+    {
+        $enrollment = $this->findOneByUserAndFormation($user, $formation);
+        if ($enrollment !== null || !$user->isAdmin()) {
+            return $enrollment;
+        }
+
+        $enrollment = (new Enrollment())->setUser($user)->setFormation($formation)->setSource(EnrollmentSource::Admin);
+        $this->getEntityManager()->persist($enrollment);
+        $this->getEntityManager()->flush();
+
+        return $enrollment;
+    }
+
     public function countBySource(EnrollmentSource $source): int
     {
         return (int) $this->createQueryBuilder('e')

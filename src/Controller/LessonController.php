@@ -221,7 +221,7 @@ final class LessonController extends AbstractController
 
         /** @var User $user */
         $user = $this->getUser();
-        $enrollment = $enrollments->findOneByUserAndFormation($user, $formation);
+        $enrollment = $enrollments->findOrOpenForAdmin($user, $formation);
         if ($enrollment === null) {
             throw new AccessDeniedHttpException('Tu dois être inscrit·e à la formation pour accéder à cette leçon.');
         }

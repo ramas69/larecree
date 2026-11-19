@@ -133,6 +133,31 @@ final class StudentJourneyTest extends WebTestCase
         self::assertStringNotContainsString('vimeo.com', (string) $client->getResponse()->getContent());
     }
 
+    public function testAdminSeesEveryLessonWithoutBuyingButStudentsStillNeedToEnroll(): void
+    {
+        $client = $this->bootWithFixtures();
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $admin = $em->getRepository(User::class)->findOneBy(['email' => 'admin@larecreetech.com']);
+        $client->loginUser($admin);
+
+        // L'admin n'a rien acheté : la leçon s'ouvre quand même, deux fois, avec une seule inscription « admin »
+        $client->request('GET', '/formations/claude-2026/etape-1-cowork/m1-l1');
+        self::assertResponseIsSuccessful();
+        $client->request('GET', '/formations/claude-2026/etape-1-cowork/m1-l2');
+        self::assertResponseIsSuccessful();
+        $enrollments = $em->getRepository(Enrollment::class)->findBy(['user' => $admin]);
+        self::assertCount(1, $enrollments);
+        self::assertSame(\App\Entity\EnrollmentSource::Admin, $enrollments[0]->getSource());
+
+        // Un·e élève sans inscription reste bloqué·e
+        $eleve = (new User())->setEmail('sans-inscription@example.com')->setFirstName('Sam')->setLastName('Test')->setRoles(['ROLE_STUDENT'])->setPassword('x');
+        $em->persist($eleve);
+        $em->flush();
+        $client->loginUser($eleve);
+        $client->request('GET', '/formations/claude-2026/etape-1-cowork/m1-l1');
+        self::assertResponseStatusCodeSame(403);
+    }
+
     public function testLessonCoverShowsBeforeTheVideoAndAsItsPoster(): void
     {
         $client = $this->bootWithFixtures();

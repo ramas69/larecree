@@ -27,7 +27,7 @@ final class FormationController extends AbstractController
 
         /** @var User $user */
         $user = $this->getUser();
-        $enrollment = $enrollments->findOneByUserAndFormation($user, $formation);
+        $enrollment = $enrollments->findOrOpenForAdmin($user, $formation);
 
         return $this->render('formation/show.html.twig', [
             'formation'  => $formation,
