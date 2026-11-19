@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use App\Controller\Admin\FormationCrudController;
 use App\Controller\Admin\LessonCrudController;
 use App\Controller\Admin\ModuleCrudController;
 use App\DataFixtures\AppFixtures;
@@ -109,6 +110,28 @@ final class AdminAccessTest extends WebTestCase
             self::assertResponseHeaderSame('Content-Type', 'video/mp4');
         } finally {
             @unlink($filePath);
+        }
+    }
+
+    public function testDetailPagesShowTheRecord(): void
+    {
+        $client = $this->bootWithFixtures();
+        $container = static::getContainer();
+        $em = $container->get(EntityManagerInterface::class);
+        $client->loginUser($em->getRepository(User::class)->findOneBy(['email' => 'admin@larecreetech.com']));
+        $urlGen = $container->get(AdminUrlGenerator::class);
+
+        // La fiche d'un module, d'une leçon, d'une formation affiche ses informations (pas seulement les titres de blocs)
+        foreach ([
+            [ModuleCrudController::class, $em->getRepository(Module::class)->findOneBy([])],
+            [LessonCrudController::class, $em->getRepository(\App\Entity\Lesson::class)->findOneBy([])],
+            [FormationCrudController::class, $em->getRepository(\App\Entity\Formation::class)->findOneBy([])],
+        ] as [$crud, $entity]) {
+            self::assertNotNull($entity);
+            $client->request('GET', $urlGen->setController($crud)->setAction(Action::DETAIL)->setEntityId($entity->getId())->generateUrl());
+            self::assertResponseIsSuccessful();
+            self::assertSelectorTextContains('body', $entity->getTitle());
+            self::assertSelectorTextContains('body', $entity->getSlug());
         }
     }
 

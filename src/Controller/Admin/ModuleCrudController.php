@@ -44,21 +44,22 @@ final class ModuleCrudController extends AbstractCrudController
         // Formulaire : 2 colonnes
         yield FormField::addColumn(8);
         yield FormField::addFieldset('Informations')->setIcon('fa fa-circle-info');
-        yield AssociationField::new('formation')->onlyOnForms()
+        yield AssociationField::new('formation')->hideOnIndex()
             ->setHelp('À quelle formation appartient ce module.');
-        yield TextField::new('title', 'Titre')->onlyOnForms();
-        yield SlugField::new('slug')->setTargetFieldName('title')->onlyOnForms()
+        yield TextField::new('title', 'Titre')->hideOnIndex();
+        yield SlugField::new('slug')->setTargetFieldName('title')->hideOnIndex()
             ->setHelp('Généré depuis le titre. Sert d\'URL.');
 
         yield FormField::addFieldset('Contenu')->setIcon('fa fa-align-left');
         yield TextareaField::new('description')
+            ->renderAsHtml()
             ->setFormTypeOption('attr', ['class' => 'ckeditor'])
             ->setHelp('Présentation du module + le livrable promis à la fin.')
-            ->onlyOnForms();
+            ->hideOnIndex();
 
         yield FormField::addColumn(4);
         yield FormField::addFieldset('Réglages')->setIcon('fa fa-sliders');
-        yield IntegerField::new('displayOrder', 'Ordre d\'affichage')->onlyOnForms()
+        yield IntegerField::new('displayOrder', 'Ordre d\'affichage')->hideOnIndex()
             ->setHelp('1 = premier module de la formation.');
         yield ImageField::new('coverImage', 'Image d\'ouverture')
             ->setUploadDir('public/uploads/modules')
@@ -66,6 +67,6 @@ final class ModuleCrudController extends AbstractCrudController
             ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
             ->setHelp('Visuel 16:9. Vide = couverture par défaut.')
             ->setRequired(false)
-            ->onlyOnForms();
+            ->hideOnIndex();
     }
 }

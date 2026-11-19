@@ -64,14 +64,15 @@ final class LessonCrudController extends AbstractCrudController
         // Formulaire : 2 colonnes
         yield FormField::addColumn(8);
         yield FormField::addFieldset('Leçon')->setIcon('fa fa-play-circle');
-        yield AssociationField::new('module')->onlyOnForms();
-        yield TextField::new('title', 'Titre')->onlyOnForms();
-        yield SlugField::new('slug')->setTargetFieldName('title')->onlyOnForms()
+        yield AssociationField::new('module')->hideOnIndex();
+        yield TextField::new('title', 'Titre')->hideOnIndex();
+        yield SlugField::new('slug')->setTargetFieldName('title')->hideOnIndex()
             ->setHelp('Généré depuis le titre. Sert d\'URL.');
         yield TextareaField::new('description')
+            ->renderAsHtml()
             ->setFormTypeOption('attr', ['class' => 'ckeditor'])
             ->setHelp('Éditeur riche : titres, couleurs, alignement, images, listes. Termine par l\'exercice « À toi de jouer ».')
-            ->onlyOnForms();
+            ->hideOnIndex();
 
         yield FormField::addColumn(4);
         yield FormField::addFieldset('Vidéo')->setIcon('fa fa-film')
@@ -88,7 +89,7 @@ final class LessonCrudController extends AbstractCrudController
         yield TextField::new('videoFilename', 'Fichier vidéo (déposé par FTP)')
             ->setRequired(false)
             ->setHelp('Nom du fichier dans private/videos/ (ex : m01-l01.mp4). Rempli automatiquement après un upload. Vide ce champ pour retirer la vidéo.')
-            ->onlyOnForms();
+            ->hideOnIndex();
         if ($pageName === Crud::PAGE_EDIT) {
             yield Field::new('videoRemove', '🗑 Retirer la vidéo actuelle')
                 ->setFormType(CheckboxType::class)
@@ -99,8 +100,8 @@ final class LessonCrudController extends AbstractCrudController
         yield FormField::addFieldset('Réglages')->setIcon('fa fa-sliders');
         yield IntegerField::new('durationMinutes', 'Durée (minutes)')
             ->setHelp('En minutes (ex : 9). Rempli automatiquement après un upload.')
-            ->onlyOnForms();
-        yield IntegerField::new('displayOrder', 'Ordre d\'affichage')->onlyOnForms()
+            ->hideOnIndex();
+        yield IntegerField::new('displayOrder', 'Ordre d\'affichage')->hideOnIndex()
             ->setHelp('1 = première leçon du module.');
 
         yield FormField::addColumn(12);
@@ -113,7 +114,7 @@ final class LessonCrudController extends AbstractCrudController
             ->allowAdd()
             ->allowDelete()
             ->renderExpanded()
-            ->onlyOnForms();
+            ->hideOnIndex();
     }
 
     public function createNewFormBuilder(EntityDto $entityDto, KeyValueStore $formOptions, AdminContext $context): FormBuilderInterface
