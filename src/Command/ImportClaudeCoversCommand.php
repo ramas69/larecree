@@ -13,9 +13,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+/**
+ * Les couvertures des étapes et des leçons de la formation Claude (identité « école », novembre 2026).
+ * Les sources sont versionnées dans public/images/etapes/<slug du module>.jpg et public/images/lecons/<slug de la leçon>.jpg,
+ * faites depuis le modèle ~/Desktop/Perso/videos/formation-claude/couvertures/.
+ * Les anciennes images d'ouverture des modules (charte rose) ne sont plus importées.
+ */
 #[AsCommand(
     name: 'app:import-claude-covers',
-    description: 'Copie les visuels d\'ouverture des modules Claude (public/images/modules) vers public/uploads/modules et renseigne Module.coverImage.',
+    description: 'Copie les couvertures des étapes (public/images/etapes) et des leçons (public/images/lecons) de la formation Claude vers public/uploads et renseigne Module.coverImage et Lesson.coverImage.',
 )]
 final class ImportClaudeCoversCommand extends Command
 {
@@ -33,39 +39,52 @@ final class ImportClaudeCoversCommand extends Command
 
         $formation = $this->formations->findBySlug(ClaudeProgram::FORMATION_SLUG);
         if ($formation === null) {
-            $io->error('Formation claude-2026 introuvable.');
-            return Command::FAILURE;
-        }
-
-        $srcDir  = $this->projectDir.'/public/images/modules';
-        $destDir = $this->projectDir.'/public/uploads/modules';
-        if (!is_dir($destDir) && !mkdir($destDir, 0775, true) && !is_dir($destDir)) {
-            $io->error('Impossible de créer '.$destDir);
+            $io->error('Formation '.ClaudeProgram::FORMATION_SLUG.' introuvable.');
             return Command::FAILURE;
         }
 
         $done = 0;
         foreach ($formation->getModules() as $module) {
-            $n = $module->getDisplayOrder();
-            $src = sprintf('%s/module-%02d-ouverture.png', $srcDir, $n);
-            if (!is_file($src)) {
-                $io->warning(sprintf('M%02d : source absente (%s) — skip.', $n, $src));
-                continue;
+            // l'étape : public/images/etapes/<slug du module>.jpg → public/uploads/modules/
+            $filename = $this->copier('etapes/'.$module->getSlug().'.jpg', 'modules', $formation->getSlug().'-'.$module->getSlug().'.jpg', $io);
+            if ($filename !== null) {
+                $module->setCoverImage($filename);
+                $done++;
             }
-            $filename = $module->getSlug().'.png';
-            $dest = $destDir.'/'.$filename;
-            if (!copy($src, $dest)) {
-                $io->warning(sprintf('M%02d : copie échouée — skip.', $n));
-                continue;
+            // ses leçons : public/images/lecons/<slug de la leçon>.jpg → public/uploads/lessons/
+            foreach ($module->getLessons() as $lesson) {
+                $filename = $this->copier('lecons/'.$lesson->getSlug().'.jpg', 'lessons', $formation->getSlug().'-'.$lesson->getSlug().'.jpg', $io);
+                if ($filename !== null) {
+                    $lesson->setCoverImage($filename);
+                    $done++;
+                }
             }
-            $module->setCoverImage($filename);
-            $io->writeln(sprintf('  M%02d %s → /uploads/modules/%s', $n, $module->getTitle(), $filename));
-            $done++;
         }
 
         $this->em->flush();
-        $io->success($done.' couvertures importées.');
+        $io->success($done.' couverture(s) importée(s).');
 
         return Command::SUCCESS;
+    }
+
+    /** Copie public/images/<source> vers public/uploads/<dossier>/<nom> ; null si pas de source (rien à faire) ou si la copie échoue. */
+    private function copier(string $source, string $dossier, string $nom, SymfonyStyle $io): ?string
+    {
+        $src = $this->projectDir.'/public/images/'.$source;
+        if (!is_file($src)) {
+            return null;
+        }
+        $destDir = $this->projectDir.'/public/uploads/'.$dossier;
+        if (!is_dir($destDir) && !mkdir($destDir, 0775, true) && !is_dir($destDir)) {
+            $io->warning('Impossible de créer '.$destDir);
+            return null;
+        }
+        if (!copy($src, $destDir.'/'.$nom)) {
+            $io->warning($source.' : copie échouée, sautée.');
+            return null;
+        }
+        $io->writeln('  '.$source.' → /uploads/'.$dossier.'/'.$nom);
+
+        return $nom;
     }
 }

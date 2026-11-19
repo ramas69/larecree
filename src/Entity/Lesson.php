@@ -34,6 +34,10 @@ class Lesson
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $videoFilename = null;
 
+    /** Couverture 16:9 dans public/uploads/lessons/ : l'aperçu de la vidéo, ou l'image de la leçon tant que la vidéo n'est pas là. */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $coverImage = null;
+
     #[ORM\Column(type: 'text', nullable: true)]
     private ?string $description = null;
 
@@ -115,6 +119,17 @@ class Lesson
     public function setVideoFilename(?string $videoFilename): static
     {
         $this->videoFilename = $videoFilename;
+        return $this;
+    }
+
+    public function getCoverImage(): ?string
+    {
+        return $this->coverImage;
+    }
+
+    public function setCoverImage(?string $coverImage): static
+    {
+        $this->coverImage = $coverImage;
         return $this;
     }
 

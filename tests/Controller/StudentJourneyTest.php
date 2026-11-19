@@ -133,6 +133,31 @@ final class StudentJourneyTest extends WebTestCase
         self::assertStringNotContainsString('vimeo.com', (string) $client->getResponse()->getContent());
     }
 
+    public function testLessonCoverShowsBeforeTheVideoAndAsItsPoster(): void
+    {
+        $client = $this->bootWithFixtures();
+        $this->loginAsRama($client);
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $lesson = $em->getRepository(Lesson::class)->findOneBy(['slug' => 'm3-l2']);
+        self::assertNotNull($lesson);
+
+        // Pas encore de vidéo : la couverture s'affiche, avec « la vidéo arrive bientôt »
+        $lesson->setCoverImage('claude-2026-m3-l2.jpg');
+        $em->flush();
+        $client->request('GET', '/formations/claude-2026/etape-3-connecteurs/m3-l2');
+        self::assertResponseIsSuccessful();
+        self::assertSelectorExists('img.cb-couverture[src$="/uploads/lessons/claude-2026-m3-l2.jpg"]');
+        self::assertSelectorTextContains('.cb-bientot', 'la vidéo arrive bientôt');
+        self::assertSelectorNotExists('.cb-sans-video');
+
+        // Avec la vidéo : la couverture devient l'aperçu du lecteur
+        $lesson->setVideoFilename('m3-l2.mp4');
+        $em->flush();
+        $client->request('GET', '/formations/claude-2026/etape-3-connecteurs/m3-l2');
+        self::assertSelectorExists('video[poster$="/uploads/lessons/claude-2026-m3-l2.jpg"]');
+        self::assertSelectorNotExists('.cb-bientot');
+    }
+
     public function testLessonVideoReturns404WhenNoSelfHostedFile(): void
     {
         $client = $this->bootWithFixtures();

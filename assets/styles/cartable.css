@@ -185,6 +185,10 @@ body { margin: 0; -webkit-font-smoothing: antialiased; }
 .cb-roue { width: 34px; height: 34px; border-radius: 50%; border: 3px solid rgba(243, 241, 234, .25); border-top-color: var(--moutarde); animation: cb-tourne 1s linear infinite; }
 @keyframes cb-tourne { to { transform: rotate(360deg); } }
 .cb-sans-video { position: absolute; inset: 0; display: grid; place-items: center; margin: 0; font-family: var(--main); font-weight: 600; font-size: 30px; color: var(--creme); }
+/* la couverture de la leçon : aperçu de la vidéo, ou image tant que la vidéo n'est pas là (avec un post-it « bientôt ») */
+.cb-couverture { width: 100%; height: 100%; display: block; object-fit: cover; border-radius: 8px; }
+.cb-video .cb-couverture { position: absolute; inset: 0; border-radius: 0; }
+.cb-bientot { position: absolute; right: 18px; top: 16px; margin: 0; padding: 6px 16px; border-radius: 4px; background: var(--sable); color: var(--vert); font-family: var(--main); font-weight: 600; font-size: 22px; transform: rotate(-2deg); box-shadow: 0 10px 0 -5px rgba(31, 48, 37, .08); }
 
 .cb-etat { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
 .cb-etat-texte { margin: 0; display: flex; align-items: center; gap: 10px; font-size: 15px; }

@@ -31,10 +31,12 @@
         {% set url = path('app_lesson_show', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) %}
         <section class="cb-reprendre" aria-labelledby="titre-reprendre">
             <div class="cb-video">
+                {% set couverture = lesson.coverImage ? asset('uploads/lessons/' ~ lesson.coverImage) : null %}
                 {% if lesson.hasSelfHostedVideo %}
-                    <video preload="metadata" controls playsinline
+                    <video preload="metadata" controls playsinline{% if couverture %} poster="{{ couverture }}"{% endif %}
                            src="{{ path('app_lesson_video', { slug: formation.slug, moduleSlug: module.slug, lessonSlug: lesson.slug }) }}#t=0.1"></video>
                 {% else %}
+                    {% if couverture %}<img class="cb-couverture" src="{{ couverture }}" alt="">{% endif %}
                     <a href="{{ url }}" class="cb-lecture" aria-label="Ouvrir la leçon">
                         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></svg>
                     </a>

@@ -16,6 +16,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\SlugField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
@@ -97,6 +98,15 @@ final class LessonCrudController extends AbstractCrudController
                 ->setHelp('Coche pour supprimer la vidéo locale (le fichier est effacé). Pour remplacer : upload simplement une nouvelle vidéo.')
                 ->onlyOnForms();
         }
+        yield FormField::addFieldset('Couverture')->setIcon('fa fa-image');
+        yield ImageField::new('coverImage', 'Couverture')
+            ->setUploadDir('public/uploads/lessons')
+            ->setBasePath('/uploads/lessons')
+            ->setUploadedFileNamePattern('[slug]-[timestamp].[extension]')
+            ->setHelp('Image 16:9 (1920×1080). Aperçu de la vidéo, et image de la leçon tant que la vidéo n\'est pas là.')
+            ->setRequired(false)
+            ->hideOnIndex();
+
         yield FormField::addFieldset('Réglages')->setIcon('fa fa-sliders');
         yield IntegerField::new('durationMinutes', 'Durée (minutes)')
             ->setHelp('En minutes (ex : 9). Rempli automatiquement après un upload.')
